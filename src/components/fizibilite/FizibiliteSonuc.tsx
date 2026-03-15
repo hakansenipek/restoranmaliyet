@@ -6,29 +6,12 @@ interface Props {
   gelir?: GelirGirdisi;
 }
 
-function pct(v: number, digits = 1) {
-  return '%' + (v * 100).toFixed(digits);
+function para(v: number) {
+  return Math.round(v).toLocaleString('tr-TR') + ' ₺';
 }
 
-function OranSatir({
-  label,
-  deger,
-  renk,
-  kalın = false,
-}: {
-  label: string;
-  deger: string;
-  renk?: string;
-  kalın?: boolean;
-}) {
-  return (
-    <div className={`flex items-center justify-between gap-2 ${kalın ? 'border-t border-gray-200 pt-2 mt-1' : ''}`}>
-      <span className={`text-sm ${kalın ? 'font-bold text-gray-800' : 'text-gray-600'}`}>{label}</span>
-      <span className={`font-mono text-sm ${kalın ? 'font-bold text-base' : 'font-semibold'} ${renk ?? 'text-gray-800'}`}>
-        {deger}
-      </span>
-    </div>
-  );
+function pct(v: number, digits = 1) {
+  return '%' + (v * 100).toFixed(digits);
 }
 
 function Kart({
@@ -46,6 +29,53 @@ function Kart({
         <h3 className="text-sm font-semibold text-white tracking-wide">{baslik}</h3>
       </div>
       <div className="p-4 flex flex-col gap-2">{children}</div>
+    </div>
+  );
+}
+
+function GelirSatir({
+  label,
+  tutar,
+  tutarRenk,
+  kalın = false,
+}: {
+  label: string;
+  tutar: number;
+  tutarRenk?: string;
+  kalın?: boolean;
+}) {
+  return (
+    <div className={`flex items-center justify-between gap-2 ${kalın ? 'border-t border-gray-200 pt-2 mt-1' : ''}`}>
+      <span className={`text-sm ${kalın ? 'font-bold text-gray-800' : 'text-gray-600'}`}>{label}</span>
+      <span className={`font-mono text-sm font-semibold ${tutarRenk ?? 'text-gray-800'}`}>
+        {para(tutar)}
+      </span>
+    </div>
+  );
+}
+
+function GiderSatir({
+  label,
+  tutar,
+  oran,
+  tutarRenk,
+  kalın = false,
+}: {
+  label: string;
+  tutar: number;
+  oran: number;
+  tutarRenk?: string;
+  kalın?: boolean;
+}) {
+  return (
+    <div className={`flex items-center gap-2 ${kalın ? 'border-t border-gray-200 pt-2 mt-1' : ''}`}>
+      <span className={`flex-1 text-sm ${kalın ? 'font-bold text-gray-800' : 'text-gray-600'}`}>{label}</span>
+      <span className={`font-mono text-sm font-semibold ${tutarRenk ?? 'text-gray-800'}`}>
+        {para(tutar)}
+      </span>
+      <span className={`w-12 text-right text-xs font-mono ${tutarRenk ?? 'text-gray-400'}`}>
+        {pct(oran)}
+      </span>
     </div>
   );
 }
@@ -81,8 +111,9 @@ export default function FizibiliteSonuc({ sonuc, gelir }: Props) {
   }
 
   const {
-    odemeKomisyonGideri,
     tahminiAylikBrutCiro,
+    odemeKomisyonGideri,
+    netCiro,
     toplamPersonelMaliyet,
     personelCiroOrani,
     toplamSMMGider,
@@ -95,12 +126,11 @@ export default function FizibiliteSonuc({ sonuc, gelir }: Props) {
     uyarilar,
   } = sonuc;
 
-  const komisyonOrani = tahminiAylikBrutCiro > 0 ? odemeKomisyonGideri / tahminiAylikBrutCiro : 0;
   const genelGiderOrani = tahminiAylikBrutCiro > 0 ? toplamGenelGider / tahminiAylikBrutCiro : 0;
   const toplamGiderOrani = tahminiAylikBrutCiro > 0 ? toplamAylikGider / tahminiAylikBrutCiro : 0;
+  const komisyonOrani = tahminiAylikBrutCiro > 0 ? odemeKomisyonGideri / tahminiAylikBrutCiro : 0;
   const karPositif = faaliyetKari >= 0;
 
-  // Gelir özeti için
   const aktifOgunSayisi = gelir
     ? [gelir.sabah, gelir.ogle, gelir.aksam].filter(o => o.aktif).length
     : null;
@@ -116,45 +146,62 @@ export default function FizibiliteSonuc({ sonuc, gelir }: Props) {
 
         {/* Gelir Projeksiyonu */}
         <Kart baslik="Gelir Projeksiyonu" headerClass="bg-[#7B3F8E]">
-          <OranSatir
-            label="Ödeme Komisyon Oranı"
-            deger={pct(komisyonOrani)}
-            renk={oranRengi(komisyonOrani, 0.05, 0.10)}
+          <GelirSatir label="Tahmini Brüt Ciro" tutar={tahminiAylikBrutCiro} />
+          <GelirSatir
+            label="Ödeme Komisyon Gideri"
+            tutar={odemeKomisyonGideri}
+            tutarRenk="text-red-600"
+          />
+          <GelirSatir
+            label="Net Ciro"
+            tutar={netCiro}
+            tutarRenk="text-[#7B3F8E] font-bold"
+            kalın
           />
           {aktifOgunSayisi !== null && (
-            <OranSatir
-              label="Aktif Öğün Sayısı"
-              deger={`${aktifOgunSayisi} öğün`}
-            />
+            <div className="flex items-center justify-between gap-2 border-t border-gray-100 pt-2 mt-1">
+              <span className="text-xs text-gray-400">Aktif öğün</span>
+              <span className="text-xs font-mono text-gray-500">{aktifOgunSayisi} öğün</span>
+            </div>
           )}
           {gunlukMusteriTahmini !== null && (
-            <OranSatir
-              label="Tahmini Günlük Müşteri"
-              deger={`${gunlukMusteriTahmini} kişi`}
-            />
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-gray-400">Tahmini günlük müşteri</span>
+              <span className="text-xs font-mono text-gray-500">{gunlukMusteriTahmini} kişi</span>
+            </div>
           )}
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-gray-400">Ödeme komisyon oranı</span>
+            <span className={`text-xs font-mono font-semibold ${oranRengi(komisyonOrani, 0.05, 0.10)}`}>
+              {pct(komisyonOrani)}
+            </span>
+          </div>
         </Kart>
 
-        {/* Gider Dağılımı */}
-        <Kart baslik="Gider Oranları (Ciro %)" headerClass="bg-[#7B3F8E]">
-          <OranSatir
-            label="Personel Gider Oranı"
-            deger={pct(personelCiroOrani)}
-            renk={oranRengi(personelCiroOrani, 0.25, 0.30)}
+        {/* Aylık Gider Dağılımı */}
+        <Kart baslik="Aylık Gider Dağılımı" headerClass="bg-[#7B3F8E]">
+          <GiderSatir
+            label="Personel Gideri"
+            tutar={toplamPersonelMaliyet}
+            oran={personelCiroOrani}
+            tutarRenk={oranRengi(personelCiroOrani, 0.25, 0.30)}
           />
-          <OranSatir
-            label="SMM Oranı"
-            deger={pct(smmOrani)}
-            renk={oranRengi(smmOrani, 0.32, 0.38)}
+          <GiderSatir
+            label="SMM Gideri"
+            tutar={toplamSMMGider}
+            oran={smmOrani}
+            tutarRenk={oranRengi(smmOrani, 0.32, 0.38)}
           />
-          <OranSatir
-            label="Genel Gider Oranı"
-            deger={pct(genelGiderOrani)}
+          <GiderSatir
+            label="Genel Giderler"
+            tutar={toplamGenelGider}
+            oran={genelGiderOrani}
           />
-          <OranSatir
-            label="Toplam Gider Oranı"
-            deger={pct(toplamGiderOrani)}
-            renk={oranRengi(toplamGiderOrani, 0.80, 1.00)}
+          <GiderSatir
+            label="Toplam Gider"
+            tutar={toplamAylikGider}
+            oran={toplamGiderOrani}
+            tutarRenk={oranRengi(toplamGiderOrani, 0.80, 1.00)}
             kalın
           />
         </Kart>
@@ -164,15 +211,21 @@ export default function FizibiliteSonuc({ sonuc, gelir }: Props) {
           baslik="Kârlılık"
           headerClass={karPositif ? 'bg-green-700' : 'bg-red-600'}
         >
-          <div className="flex flex-col items-center py-3 gap-1">
+          <div className="flex flex-col items-center py-2 gap-1">
             <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-              Net Kâr Marjı
+              Aylık Faaliyet Kârı
             </span>
-            <span className={`text-4xl font-bold font-mono ${karPositif ? 'text-green-600' : 'text-red-600'}`}>
-              {karPositif ? '' : '−'}{pct(Math.abs(netKarMarji))}
+            <span className={`text-2xl font-bold font-mono ${karPositif ? 'text-green-600' : 'text-red-600'}`}>
+              {karPositif ? '' : '−'}{para(Math.abs(faaliyetKari))}
             </span>
             <span className={`text-xs font-medium ${karPositif ? 'text-green-600' : 'text-red-500'}`}>
               {karPositif ? 'Kâr' : 'Zarar'}
+            </span>
+          </div>
+          <div className="border-t border-gray-100 pt-2 flex items-center justify-between">
+            <span className="text-sm text-gray-600">Net Kâr Marjı</span>
+            <span className={`font-mono text-sm font-bold ${karPositif ? 'text-green-600' : 'text-red-600'}`}>
+              {karPositif ? '' : '−'}{pct(Math.abs(netKarMarji))}
             </span>
           </div>
         </Kart>
