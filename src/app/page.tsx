@@ -24,7 +24,7 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.origin + '/auth/callback' },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
     setYukleniyor(false);
     setDurum(error ? 'hata' : 'gonderildi');
