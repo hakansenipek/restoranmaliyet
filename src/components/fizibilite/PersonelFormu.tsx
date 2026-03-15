@@ -18,7 +18,7 @@ const POZISYONLAR: Record<GrupKey, string[]> = {
     'Muhasebeci',
     'Mali Müşavir',
     'Pazarlama Uzmanı',
-    'İnsan Kaynakları',
+    'Satın Alma',
   ],
   mutfak: [
     'Aşçıbaşı (Head Chef)',
