@@ -106,6 +106,7 @@ export default function FizibiliteFormu() {
           {aktifSekme === 'gelir' && (
             <GelirFormu
               girdi={girdi.gelir}
+              mekan={girdi.mekan}
               onChange={gelir => guncelle({ ...girdi, gelir })}
             />
           )}

@@ -1,19 +1,20 @@
 'use client';
-import type { GelirGirdisi, OgunProjeksiyon } from '@/types/fizibilite';
+import type { GelirGirdisi, OgunProjeksiyon, MekanGirdisi } from '@/types/fizibilite';
 
 interface Props {
   girdi: GelirGirdisi;
+  mekan: MekanGirdisi;
   onChange: (g: GelirGirdisi) => void;
 }
 
 const GUNLER = [
-  { key: 'pazartesi', label: 'Pzt' },
-  { key: 'sali', label: 'Sal' },
-  { key: 'carsamba', label: 'Çar' },
-  { key: 'persembe', label: 'Per' },
-  { key: 'cuma', label: 'Cum' },
-  { key: 'cumartesi', label: 'Cmt' },
-  { key: 'pazar', label: 'Paz' },
+  { key: 'pazartesi', label: 'Pazartesi' },
+  { key: 'sali', label: 'Salı' },
+  { key: 'carsamba', label: 'Çarşamba' },
+  { key: 'persembe', label: 'Perşembe' },
+  { key: 'cuma', label: 'Cuma' },
+  { key: 'cumartesi', label: 'Cumartesi' },
+  { key: 'pazar', label: 'Pazar' },
 ] as const;
 
 type GunKey = keyof GelirGirdisi['dolulukCarpanlari'];
@@ -72,7 +73,7 @@ function OgunKarti({
   );
 }
 
-export default function GelirFormu({ girdi, onChange }: Props) {
+export default function GelirFormu({ girdi, mekan, onChange }: Props) {
   const { odemeTipleri: op } = girdi;
   const toplamPay = op.nakitPay + op.krediKartiPay + op.yemekKartiPay + op.onlinePlatformPay;
   const payUyari = Math.abs(toplamPay - 1) > 0.001;
@@ -89,6 +90,21 @@ export default function GelirFormu({ girdi, onChange }: Props) {
     onChange({ ...girdi, dolulukCarpanlari: { ...girdi.dolulukCarpanlari, [gun]: pct / 100 } });
   }
 
+  // Tahmini ciro projeksiyonu hesapla
+  const ogeler = [girdi.sabah, girdi.ogle, girdi.aksam];
+  const toplamBazCiro = ogeler.reduce(
+    (t, o) => t + (o.aktif ? o.kisiBasiHarcama * o.gunlukKisiSayisi : 0),
+    0
+  );
+
+  const gunlukCirolar = GUNLER.map(({ key }) => {
+    const acik = mekan.calismaGunleri[key];
+    const ciro = acik ? toplamBazCiro * girdi.dolulukCarpanlari[key] : 0;
+    return { key, ciro, acik };
+  });
+  const haftalikCiro = gunlukCirolar.reduce((t, g) => t + g.ciro, 0);
+  const aylikCiro = haftalikCiro * 4.33;
+
   return (
     <div className="flex flex-col gap-6">
       {/* Öğün kartları */}
@@ -98,6 +114,76 @@ export default function GelirFormu({ girdi, onChange }: Props) {
           <OgunKarti baslik="☀️ Sabah" renk="bg-amber-500" ogun={girdi.sabah} onChange={o => setOgun('sabah', o)} />
           <OgunKarti baslik="🌤 Öğle" renk="bg-[#7B3F8E]" ogun={girdi.ogle} onChange={o => setOgun('ogle', o)} />
           <OgunKarti baslik="🌙 Akşam" renk="bg-[#5A2D6E]" ogun={girdi.aksam} onChange={o => setOgun('aksam', o)} />
+        </div>
+      </div>
+
+      {/* Tahmini Ciro Projeksiyonu tablosu */}
+      <div>
+        <h3 className="text-sm font-semibold text-[#5A2D6E] mb-3">Tahmini Ciro Projeksiyonu</h3>
+        <div className="rounded-xl border border-gray-200 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#5A2D6E] text-white">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">Gün</th>
+                <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide">Doluluk</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Günlük Ciro</th>
+              </tr>
+            </thead>
+            <tbody>
+              {gunlukCirolar.map(({ key, ciro, acik }, i) => {
+                const dolulukPct = Math.round(girdi.dolulukCarpanlari[key as GunKey] * 100);
+                const gunLabel = GUNLER[i].label;
+                return (
+                  <tr
+                    key={key}
+                    className={`border-t border-gray-100 ${
+                      !acik ? 'opacity-40' : i % 2 === 0 ? 'bg-white' : 'bg-[#EFE6F4]/30'
+                    }`}
+                  >
+                    <td className="px-4 py-2">
+                      <span className={`text-sm font-medium ${!acik ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                        {gunLabel}
+                      </span>
+                      {!acik && (
+                        <span className="ml-2 text-[10px] text-gray-400 font-normal">Kapalı</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center justify-center">
+                        <div className="relative w-20">
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            disabled={!acik}
+                            value={dolulukPct}
+                            onChange={e => setDoluluk(key as GunKey, parseInt(e.target.value) || 0)}
+                            className="w-full rounded border border-gray-200 px-2 py-1 pr-6 text-right text-xs font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+                          />
+                          <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">%</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 text-right font-mono font-semibold text-[#5A2D6E]">
+                      {acik ? para(ciro) : '—'}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-[#7B3F8E]/30 bg-[#EFE6F4]/60">
+                <td className="px-4 py-2.5 text-xs font-bold text-[#5A2D6E] uppercase">Haftalık</td>
+                <td />
+                <td className="px-4 py-2.5 text-right font-mono font-bold text-[#5A2D6E]">{para(haftalikCiro)}</td>
+              </tr>
+              <tr className="border-t border-[#7B3F8E]/20 bg-[#5A2D6E]">
+                <td className="px-4 py-2.5 text-xs font-bold text-white uppercase">Aylık (× 4.33)</td>
+                <td />
+                <td className="px-4 py-2.5 text-right font-mono font-bold text-white">{para(aylikCiro)}</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
 
@@ -131,33 +217,6 @@ export default function GelirFormu({ girdi, onChange }: Props) {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Doluluk çarpanları */}
-      <div>
-        <h3 className="text-sm font-semibold text-[#5A2D6E] mb-3">Günlük Doluluk Oranları</h3>
-        <div className="flex flex-col gap-2">
-          {GUNLER.map(({ key, label }) => {
-            const pct = Math.round(girdi.dolulukCarpanlari[key] * 100);
-            return (
-              <div key={key} className="flex items-center gap-3">
-                <span className="w-8 text-xs font-semibold text-gray-500">{label}</span>
-                <input
-                  type="range" min={0} max={100} step={5} value={pct}
-                  onChange={e => setDoluluk(key, parseInt(e.target.value))}
-                  className="flex-1 h-2 accent-[#7B3F8E] cursor-pointer"
-                />
-                <div className="relative w-16">
-                  <input type="number" min={0} max={100} value={pct}
-                    onChange={e => setDoluluk(key, parseInt(e.target.value) || 0)}
-                    className="w-full rounded border border-gray-200 px-2 py-1 pr-5 text-right text-xs font-mono focus:border-[#7B3F8E] focus:outline-none"
-                  />
-                  <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">%</span>
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
     </div>

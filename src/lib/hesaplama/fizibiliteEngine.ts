@@ -122,7 +122,8 @@ export const FIZIBILITE_VARSAYILAN: FizibiliteGirdisi = {
 
   genelGider: {
     netKira: 0,
-    kiraStopajOrani: 0.20,
+    kiraVergiTipi: 'stopaj',
+    kiraVergiOrani: 0.20,
     elektrik: 0,
     su: 0,
     dogalgazLpg: 0,
@@ -161,44 +162,52 @@ export function capexHesapla(
 
 // ─── GELİR HESAPLAMA ─────────────────────────────────────────────────────────
 
+const GUNLER = [
+  'pazartesi',
+  'sali',
+  'carsamba',
+  'persembe',
+  'cuma',
+  'cumartesi',
+  'pazar',
+] as const;
+
+type GunKey = (typeof GUNLER)[number];
+
 export function gelirHesapla(
   gelir: GelirGirdisi,
   mekan: MekanGirdisi
-): { brutCiro: number; komisyonGider: number; netCiro: number } {
-  const gunler = [
-    'pazartesi',
-    'sali',
-    'carsamba',
-    'persembe',
-    'cuma',
-    'cumartesi',
-    'pazar',
-  ] as const;
-
+): {
+  brutCiro: number;
+  komisyonGider: number;
+  netCiro: number;
+  gunlukDetay: Record<GunKey, number>;
+  haftalikCiro: number;
+} {
   const ogeler = [gelir.sabah, gelir.ogle, gelir.aksam] as const;
 
-  // Haftada kaç gün çalışıyor
-  const calismaGunSayisi = gunler.filter((g) => mekan.calismaGunleri[g]).length;
+  // Her aktif öğün için baz günlük ciro (doluluksuz)
+  const ogunBazCirolar = ogeler.map((o) =>
+    o.aktif ? o.kisiBasiHarcama * o.gunlukKisiSayisi : 0
+  );
+  const toplamBazCiro = ogunBazCirolar.reduce((t, v) => t + v, 0);
 
-  // Ayda ortalama çalışma günü (4.333 hafta)
-  const aylikCalismaSayi = (calismaGunSayisi / 7) * (365 / 12);
+  // Her gün için ciro
+  const gunlukDetay = {} as Record<GunKey, number>;
+  let haftalikCiro = 0;
 
-  // Günlük ağırlıklı ortalama doluluk çarpanı (sadece çalışılan günler)
-  const calisilanGunler = gunler.filter((g) => mekan.calismaGunleri[g]);
-  const ortalamaDoluluk =
-    calisilanGunler.length > 0
-      ? calisilanGunler.reduce((t, g) => t + gelir.dolulukCarpanlari[g], 0) /
-        calisilanGunler.length
-      : 0;
-
-  // Günlük brüt ciro
-  let gunlukCiro = 0;
-  for (const ogun of ogeler) {
-    if (!ogun.aktif) continue;
-    gunlukCiro += ogun.kisiBasiHarcama * ogun.gunlukKisiSayisi * ortalamaDoluluk;
+  for (const gun of GUNLER) {
+    if (!mekan.calismaGunleri[gun]) {
+      gunlukDetay[gun] = 0;
+    } else {
+      const doluluk = gelir.dolulukCarpanlari[gun];
+      const gunCiro = toplamBazCiro * doluluk;
+      gunlukDetay[gun] = gunCiro;
+      haftalikCiro += gunCiro;
+    }
   }
 
-  const brutCiro = gunlukCiro * aylikCalismaSayi;
+  const brutCiro = haftalikCiro * 4.33;
 
   const { krediKartiPay, yemekKartiPay, onlinePlatformPay } = gelir.odemeTipleri;
   const komisyonGider =
@@ -207,7 +216,7 @@ export function gelirHesapla(
 
   const netCiro = brutCiro - komisyonGider;
 
-  return { brutCiro, komisyonGider, netCiro };
+  return { brutCiro, komisyonGider, netCiro, gunlukDetay, haftalikCiro };
 }
 
 // ─── PERSONEL HESAPLAMA ──────────────────────────────────────────────────────
@@ -263,7 +272,9 @@ export function genelGiderHesapla(gider: GenelGiderGirdisi): {
   bakim: number;
   toplam: number;
 } {
-  const kiraBrut = gider.netKira * (1 + gider.kiraStopajOrani);
+  const kiraBrut = gider.kiraVergiTipi === 'yok'
+    ? gider.netKira
+    : gider.netKira * (1 + gider.kiraVergiOrani);
   const enerjiler = gider.elektrik + gider.su + gider.dogalgazLpg;
   const iletisim = gider.internet + gider.telefon + gider.posMalzeme;
   const bakim = gider.bakimOnarim + gider.klimaBakim + gider.hasereIlaclama + gider.aidat;
@@ -287,7 +298,7 @@ export function fizibiliteHesapla(girdi: FizibiliteGirdisi): FizibiliteSonucu {
   };
 
   // Gelir
-  const { brutCiro, komisyonGider, netCiro } = gelirHesapla(
+  const { brutCiro, komisyonGider, netCiro, gunlukDetay, haftalikCiro } = gelirHesapla(
     girdi.gelir,
     girdi.mekan
   );
@@ -397,5 +408,7 @@ export function fizibiliteHesapla(girdi: FizibiliteGirdisi): FizibiliteSonucu {
     basaBasGunlukCiro,
     roiAy,
     uyarilar,
+    gunlukCiroDetay: gunlukDetay as Record<string, number>,
+    haftalikCiro,
   };
 }

@@ -33,23 +33,6 @@ function NumInput({ label, value, onChange, hint, readonly = false }: {
   );
 }
 
-function PctInput({ label, value, onChange }: {
-  label: string; value: number; onChange: (v: number) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">{label}</label>
-      <div className="relative">
-        <input type="number" min={0} max={100} step={1} value={+(value * 100).toFixed(1)}
-          onChange={e => onChange((parseFloat(e.target.value) || 0) / 100)}
-          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 pr-7 text-right text-sm font-mono shadow-sm focus:border-[#7B3F8E] focus:outline-none focus:ring-2 focus:ring-[#7B3F8E]/20"
-        />
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">%</span>
-      </div>
-    </div>
-  );
-}
-
 function Grup({ baslik, children }: { baslik: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-gray-200 overflow-hidden">
@@ -66,7 +49,9 @@ export default function GenelGiderFormu({ girdi, onChange }: Props) {
     onChange({ ...girdi, [key]: val });
   }
 
-  const kiraBrut = girdi.netKira * (1 + girdi.kiraStopajOrani);
+  const kiraBrut = girdi.kiraVergiTipi === 'yok'
+    ? girdi.netKira
+    : girdi.netKira * (1 + girdi.kiraVergiOrani);
   const enerjiler = girdi.elektrik + girdi.su + girdi.dogalgazLpg;
   const iletisim = girdi.internet + girdi.telefon + girdi.posMalzeme;
   const bakim = girdi.bakimOnarim + girdi.klimaBakim + girdi.hasereIlaclama + girdi.aidat;
@@ -78,13 +63,41 @@ export default function GenelGiderFormu({ girdi, onChange }: Props) {
         {/* Kira */}
         <Grup baslik="Kira">
           <NumInput label="Net Kira" value={girdi.netKira} onChange={v => set('netKira', v)} />
-          <PctInput label="Stopaj Oranı" value={girdi.kiraStopajOrani} onChange={v => set('kiraStopajOrani', v)} />
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Vergi Tipi</label>
+            <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-medium">
+              {([
+                { val: 'kdv', label: 'KDV %20' },
+                { val: 'stopaj', label: 'Stopaj %20' },
+                { val: 'yok', label: 'Vergi Yok' },
+              ] as const).map(({ val, label }) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => set('kiraVergiTipi', val)}
+                  className={`flex-1 py-2 px-1 text-center transition-colors ${
+                    girdi.kiraVergiTipi === val
+                      ? 'bg-[#7B3F8E] text-white'
+                      : 'bg-white text-gray-600 hover:bg-[#EFE6F4]'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="col-span-2">
             <NumInput
               label="Brüt Kira (Otomatik)"
               value={kiraBrut}
               readonly
-              hint="Net Kira × (1 + Stopaj Oranı)"
+              hint={
+                girdi.kiraVergiTipi === 'kdv'
+                  ? "KDV'li kiralarda %20 KDV eklenir."
+                  : girdi.kiraVergiTipi === 'stopaj'
+                  ? 'Stopajlı kiralarda %20 stopaj eklenir.'
+                  : 'Vergi eklenmez.'
+              }
             />
           </div>
         </Grup>

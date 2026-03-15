@@ -152,7 +152,8 @@ export interface GelirGirdisi {
 
 export interface GenelGiderGirdisi {
   netKira: number;
-  kiraStopajOrani: number; // Varsayılan: 0.20
+  kiraVergiTipi: 'kdv' | 'stopaj' | 'yok';
+  kiraVergiOrani: number; // sabit 0.20
   elektrik: number;
   su: number;
   dogalgazLpg: number;
@@ -214,6 +215,10 @@ export interface FizibiliteSonucu {
   basaBasAylikCiro: number;
   basaBasGunlukCiro: number;
   roiAy: number; // Capex / Aylık net kâr
+
+  // Günlük ciro detayı
+  gunlukCiroDetay: Record<string, number>;
+  haftalikCiro: number;
 
   // Uyarılar
   uyarilar: FizibiliteUyari[];
