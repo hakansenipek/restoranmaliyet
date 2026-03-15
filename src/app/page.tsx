@@ -15,14 +15,24 @@ const FizibiliteFormu = dynamic(
 
 const LS_KEY = 'rm_gecici_girdi';
 
+const LS_TTL = 30 * 24 * 60 * 60 * 1000; // 30 gün (ms)
+
 function lsKaydet(girdi: FizibiliteGirdisi) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(girdi)); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ girdi, kaydedilmeZamani: Date.now() }));
+  } catch { /* ignore */ }
 }
 
 function lsYukle(): FizibiliteGirdisi | null {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    return raw ? (JSON.parse(raw) as FizibiliteGirdisi) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { girdi: FizibiliteGirdisi; kaydedilmeZamani: number };
+    if (Date.now() - parsed.kaydedilmeZamani > LS_TTL) {
+      localStorage.removeItem(LS_KEY);
+      return null;
+    }
+    return parsed.girdi;
   } catch { return null; }
 }
 
