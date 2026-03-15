@@ -4,32 +4,19 @@ export interface CapexMimari {
   konseptTasarim: number;
   belediyeRuhsatProjesi: number;
   dogalgazElektrikProjesi: number;
+  itfaiyeProjesi: number;
   diger: number;
 }
 
 export interface CapexMutfak {
-  // Paslanmaz grup
-  tezgahEvyeRaf: number;
-  davlumbaz: number;
-  // Ana ekipmanlar
-  firin: number;
-  ocaklar: number;
-  fritoz: number;
-  bulasikmakine: number;
-  buzMakine: number;
-  // Soğutma
-  dikBuzdolabi: number;
-  tezgahAltiDolap: number;
-  derinDondurucular: number;
-  sogukHavaDeposu: number;
-  // Hazırlık ve küçük cihazlar
-  mikserBlender: number;
-  teraziVakum: number;
-  dilimlemeMakine: number;
-  // Servis takımları
-  porselen: number;
-  camEsyasi: number;
-  catalkasik: number;
+  paslanmazMalzeme: number;     // Paslanmaz malzeme grubu
+  pisiriciGrup: number;         // Pişirici grubu
+  buzdolabiVeBuzMakine: number; // Buzdolapları ve buz makinesi
+  kahveMakinesi: number;        // Kahve makinesi
+  ufakAletler: number;          // Ufak mutfak aletleri
+  catalkasikBicak: number;      // Çatal, bıçak, kaşık
+  bardak: number;               // Bardak
+  tabaklar: number;             // Tabaklar
   diger: number;
 }
 
