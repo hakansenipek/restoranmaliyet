@@ -25,16 +25,24 @@ function hesaplaGirdi(girdi: FizibiliteGirdisi): FizibiliteSonucu {
   return fizibiliteHesapla(girdi);
 }
 
-export default function FizibiliteFormu() {
-  const [girdi, setGirdi] = useState<FizibiliteGirdisi>(FIZIBILITE_VARSAYILAN);
-  const [sonuc, setSonuc] = useState<FizibiliteSonucu>(() => hesaplaGirdi(FIZIBILITE_VARSAYILAN));
+interface Props {
+  initialGirdi?: FizibiliteGirdisi;
+  onChange?: (girdi: FizibiliteGirdisi, sonuc: FizibiliteSonucu) => void;
+}
+
+export default function FizibiliteFormu({ initialGirdi, onChange }: Props) {
+  const baslangic = initialGirdi ?? FIZIBILITE_VARSAYILAN;
+  const [girdi, setGirdi] = useState<FizibiliteGirdisi>(baslangic);
+  const [sonuc, setSonuc] = useState<FizibiliteSonucu>(() => hesaplaGirdi(baslangic));
   const [aktifSekme, setAktifSekme] = useState<SekmeKey>('mekan');
   const [indiriliyor, setIndiriliyor] = useState<'excel' | 'pdf' | null>(null);
 
   const guncelle = useCallback((yeniGirdi: FizibiliteGirdisi) => {
     setGirdi(yeniGirdi);
-    setSonuc(hesaplaGirdi(yeniGirdi));
-  }, []);
+    const yeniSonuc = hesaplaGirdi(yeniGirdi);
+    setSonuc(yeniSonuc);
+    onChange?.(yeniGirdi, yeniSonuc);
+  }, [onChange]);
 
   async function excelIndir() {
     setIndiriliyor('excel');
