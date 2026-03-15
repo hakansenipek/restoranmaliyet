@@ -48,7 +48,7 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
           <div>
             <h2 className="text-white text-base font-semibold">Hesaplamalarını Kaydet</h2>
             <p className="text-purple-200 text-xs mt-1">
-              E-posta adresinize bir magic link göndereceğiz.
+              E-posta adresinize tek kullanımlık giriş linki göndereceğiz.
             </p>
           </div>
           <button
@@ -68,12 +68,12 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
               <span className="text-4xl">📬</span>
               <p className="text-sm font-semibold text-gray-700">E-postanı kontrol et!</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                <strong>{email}</strong> adresine magic link gönderdik.
+                <strong>{email}</strong> adresine giriş linkinizi gönderdik.
                 Linke tıklayarak giriş yapabilirsin.
               </p>
               <div className="mt-1 w-full rounded-lg bg-green-50 border border-green-200 px-3 py-2">
                 <p className="text-xs text-green-700 font-medium text-center">
-                  Magic link gönderildi.
+                  Giriş linkiniz gönderildi.
                 </p>
               </div>
               <button
@@ -113,12 +113,9 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
                 className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#7B3F8E' }}
               >
-                {yukleniyor ? 'Gönderiliyor…' : 'Magic Link Gönder'}
+                {yukleniyor ? 'Gönderiliyor…' : 'Giriş Linki Gönder'}
               </button>
 
-              <p className="text-center text-[11px] text-gray-400">
-                Şifre gerekmez — tek kullanımlık giriş bağlantısı gönderilir.
-              </p>
             </form>
           )}
         </div>
