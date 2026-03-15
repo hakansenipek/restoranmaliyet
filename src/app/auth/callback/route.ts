@@ -29,7 +29,9 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}/`);
+      const saved = searchParams.get('saved');
+      const dest = saved === 'true' ? `${origin}/?saved=true` : `${origin}/`;
+      return NextResponse.redirect(dest);
     }
   }
 

@@ -3,13 +3,32 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import { hesaplamayiKaydet, hesaplamayiYukle } from '@/lib/supabase/kaydet';
-import { FIZIBILITE_VARSAYILAN } from '@/lib/hesaplama/fizibiliteEngine';
+import { FIZIBILITE_VARSAYILAN, fizibiliteHesapla } from '@/lib/hesaplama/fizibiliteEngine';
 import type { FizibiliteGirdisi, FizibiliteSonucu } from '@/types/fizibilite';
 
 const FizibiliteFormu = dynamic(
   () => import('@/components/fizibilite/FizibiliteFormu'),
   { ssr: false, loading: () => <div className="py-24 text-center text-sm text-gray-400">Yükleniyor…</div> }
 );
+
+// ─── localStorage yardımcıları ────────────────────────────────────────────────
+
+const LS_KEY = 'rm_gecici_girdi';
+
+function lsKaydet(girdi: FizibiliteGirdisi) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(girdi)); } catch { /* ignore */ }
+}
+
+function lsYukle(): FizibiliteGirdisi | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? (JSON.parse(raw) as FizibiliteGirdisi) : null;
+  } catch { return null; }
+}
+
+function lsSil() {
+  try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+}
 
 // ─── Magic Link Modal ────────────────────────────────────────────────────────
 
@@ -25,7 +44,7 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?saved=true` },
     });
     setYukleniyor(false);
     if (error) {
@@ -48,7 +67,7 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
           <div>
             <h2 className="text-white text-base font-semibold">Hesaplamalarını Kaydet</h2>
             <p className="text-purple-200 text-xs mt-1">
-              E-posta adresinize tek kullanımlık giriş linki göndereceğiz.
+              Verileriniz korunacak. E-posta adresinize giriş linki göndereceğiz.
             </p>
           </div>
           <button
@@ -113,7 +132,7 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
                 className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#7B3F8E' }}
               >
-                {yukleniyor ? 'Gönderiliyor…' : 'Giriş Linki Gönder'}
+                {yukleniyor ? 'Gönderiliyor…' : 'Kaydet ve Giriş Yap'}
               </button>
 
             </form>
@@ -136,24 +155,59 @@ export default function Page() {
   const guncelGirdiRef = useRef<FizibiliteGirdisi>(FIZIBILITE_VARSAYILAN);
   const guncelSonucRef = useRef<FizibiliteSonucu | null>(null);
   const basariliTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const yuklendiRef = useRef(false);
 
   // Auth state listener + ilk yükleme
   useEffect(() => {
     const supabase = createClient();
+    const savedParam = new URLSearchParams(window.location.search).get('saved') === 'true';
 
     async function yukleKayit(userId: string, email: string) {
+      // Çift çalışmayı önle
+      if (yuklendiRef.current) return;
+      yuklendiRef.current = true;
+
       setKullaniciEmail(email);
-      const girdi = await hesaplamayiYukle();
-      if (girdi) {
-        setInitialGirdi(girdi);
+
+      const geciciGirdi = lsYukle();
+
+      if (savedParam && geciciGirdi) {
+        // Magic link dönüşü: localStorage verisini DB'ye kaydet
+        const sonuc = fizibiliteHesapla(geciciGirdi);
+        await hesaplamayiKaydet(geciciGirdi, sonuc);
+        lsSil();
+        // URL'den ?saved=true parametresini temizle
+        window.history.replaceState({}, '', '/');
+        setInitialGirdi(geciciGirdi);
         setFormuKey('kayitli-' + userId);
+      } else {
+        // Normal giriş: DB'yi kontrol et, yoksa localStorage kullan
+        const dbGirdi = await hesaplamayiYukle();
+        if (dbGirdi) {
+          setInitialGirdi(dbGirdi);
+          setFormuKey('kayitli-' + userId);
+        } else if (geciciGirdi) {
+          setInitialGirdi(geciciGirdi);
+          setFormuKey('gecici-' + userId);
+        }
       }
+
       setModalAcik(false);
     }
 
     // İlk kontrol
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) yukleKayit(user.id, user.email!);
+      if (user) {
+        yukleKayit(user.id, user.email!);
+      } else {
+        // Giriş yapılmamış: localStorage'dan yükle
+        const geciciGirdi = lsYukle();
+        if (geciciGirdi) {
+          setInitialGirdi(geciciGirdi);
+          setFormuKey('gecici');
+        }
+      }
     });
 
     // Auth değişikliklerini dinle (giriş linki dönüşü)
@@ -161,6 +215,7 @@ export default function Page() {
       if (event === 'SIGNED_IN' && session?.user) {
         yukleKayit(session.user.id, session.user.email!);
       } else if (event === 'SIGNED_OUT') {
+        yuklendiRef.current = false;
         setKullaniciEmail(null);
         setInitialGirdi(FIZIBILITE_VARSAYILAN);
         setFormuKey('cikis');
@@ -168,12 +223,16 @@ export default function Page() {
     });
 
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = useCallback(
     (girdi: FizibiliteGirdisi, sonuc: FizibiliteSonucu) => {
       guncelGirdiRef.current = girdi;
       guncelSonucRef.current = sonuc;
+      // localStorage'a debounced kaydet (giriş yapılmamış kullanıcılar için de)
+      clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => lsKaydet(girdi), 500);
     },
     []
   );
@@ -192,6 +251,7 @@ export default function Page() {
 
   async function handleCikis() {
     clearTimeout(basariliTimerRef.current);
+    yuklendiRef.current = false;
     const supabase = createClient();
     await supabase.auth.signOut();
     // onAuthStateChange SIGNED_OUT event state'i güncelleyecek
