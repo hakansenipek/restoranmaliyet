@@ -16,62 +16,68 @@ export const FIZIBILITE_VARSAYILAN: FizibiliteGirdisi = {
 
   capex: {
     mimari: {
-      konseptTasarim: 50_000,
-      belediyeRuhsatProjesi: 30_000,
-      dogalgazElektrikProjesi: 20_000,
+      konseptTasarim: 0,
+      belediyeRuhsatProjesi: 0,
+      dogalgazElektrikProjesi: 0,
+      diger: 0,
     },
     mutfak: {
-      tezgahEvyeRaf: 80_000,
-      davlumbaz: 40_000,
-      firin: 60_000,
-      ocaklar: 50_000,
-      fritoz: 20_000,
-      bulasikmakine: 70_000,
-      buzMakine: 25_000,
-      dikBuzdolabi: 35_000,
-      tezgahAltiDolap: 30_000,
-      derinDondurucular: 25_000,
-      sogukHavaDeposu: 80_000,
-      mikserBlender: 15_000,
-      teraziVakum: 10_000,
-      dilimlemeMakine: 12_000,
-      porselen: 20_000,
-      camEsyasi: 10_000,
-      catalkasik: 8_000,
+      tezgahEvyeRaf: 0,
+      davlumbaz: 0,
+      firin: 0,
+      ocaklar: 0,
+      fritoz: 0,
+      bulasikmakine: 0,
+      buzMakine: 0,
+      dikBuzdolabi: 0,
+      tezgahAltiDolap: 0,
+      derinDondurucular: 0,
+      sogukHavaDeposu: 0,
+      mikserBlender: 0,
+      teraziVakum: 0,
+      dilimlemeMakine: 0,
+      porselen: 0,
+      camEsyasi: 0,
+      catalkasik: 0,
+      diger: 0,
     },
     dekorasyon: {
-      zeminDuvar: 200_000,
-      mobilya: 150_000,
-      aydinlatma: 50_000,
-      disAlan: 40_000,
-      wcHijyen: 30_000,
+      masaSandalye: 0,
+      elektrikAydinlatma: 0,
+      boyaIsleri: 0,
+      wc: 0,
+      isiticilar: 0,
+      pergoleSemsiye: 0,
+      acilisTemizligi: 0,
+      diger: 0,
     },
     teknoloji: {
-      posYazilim: 15_000,
-      posTerminal: 20_000,
-      adisyonYazici: 8_000,
-      kameraDvr: 25_000,
-      alarmYangın: 20_000,
-      muzikSistemi: 15_000,
+      posYazilim: 0,
+      posTerminal: 0,
+      adisyonYazici: 0,
+      kameraDvr: 0,
+      alarmYangın: 0,
+      muzikSistemi: 0,
+      diger: 0,
     },
     resmi: {
-      belediyeRuhsatHarci: 20_000,
+      belediyeRuhsatHarci: 0,
       tapdkAlkolBedeli: 0,
-      emlakcıKomisyonu: 30_000,
-      kiraDepozitosu: 60_000,
-      ilkStokMaliyeti: 50_000,
-      gorulenGiderler: 0, // Otomatik hesaplanır
+      emlakcıKomisyonu: 0,
+      kiraDepozitosu: 0,
+      ilkStokMaliyeti: 0,
+      diger: 0,
     },
   },
 
   mekan: {
-    toplamMetrekare: 150,
-    mutfakMetrekare: 40,
-    depoMetrekare: 15,
-    kapaliMasa: 15,
-    kapaliSandalye: 60,
-    acikMasa: 5,
-    acikSandalye: 20,
+    toplamMetrekare: 0,
+    mutfakMetrekare: 0,
+    depoMetrekare: 0,
+    kapaliMasa: 0,
+    kapaliSandalye: 0,
+    acikMasa: 0,
+    acikSandalye: 0,
     calismaGunleri: {
       pazartesi: true,
       sali: true,
@@ -79,28 +85,18 @@ export const FIZIBILITE_VARSAYILAN: FizibiliteGirdisi = {
       persembe: true,
       cuma: true,
       cumartesi: true,
-      pazar: false,
+      pazar: true,
     },
   },
 
   personel: {
     gruplar: {
-      yonetim: [
-        { pozisyon: 'İşletme Müdürü', adet: 1, netMaas: 25_000, isverenMaliyet: 39_375, yolYemek: 2_000, prim: 2_000 },
-      ],
-      mutfak: [
-        { pozisyon: 'Aşçıbaşı', adet: 1, netMaas: 20_000, isverenMaliyet: 31_500, yolYemek: 1_500, prim: 1_000 },
-        { pozisyon: 'Yardımcı Aşçı', adet: 2, netMaas: 14_000, isverenMaliyet: 22_050, yolYemek: 1_500, prim: 0 },
-      ],
-      salon: [
-        { pozisyon: 'Garson', adet: 3, netMaas: 12_000, isverenMaliyet: 18_900, yolYemek: 1_500, prim: 500 },
-        { pozisyon: 'Barista', adet: 1, netMaas: 14_000, isverenMaliyet: 22_050, yolYemek: 1_500, prim: 500 },
-      ],
-      destek: [
-        { pozisyon: 'Temizlik Görevlisi', adet: 1, netMaas: 11_000, isverenMaliyet: 17_325, yolYemek: 1_500, prim: 0 },
-      ],
+      yonetim: [],
+      mutfak: [],
+      salon: [],
+      destek: [],
     },
-    personelKiyafetMaliyeti: 5_000,
+    personelKiyafetMaliyeti: 0,
   },
 
   gelir: {
@@ -125,17 +121,17 @@ export const FIZIBILITE_VARSAYILAN: FizibiliteGirdisi = {
   },
 
   genelGider: {
-    netKira: 60_000,
+    netKira: 0,
     kiraStopajOrani: 0.20,
-    elektrik: 25_000,
-    su: 5_000,
-    dogalgazLpg: 15_000,
-    internet: 1_500,
-    telefon: 1_000,
-    posMalzeme: 500,
-    bakimOnarim: 5_000,
-    klimaBakim: 2_000,
-    hasereIlaclama: 1_500,
+    elektrik: 0,
+    su: 0,
+    dogalgazLpg: 0,
+    internet: 0,
+    telefon: 0,
+    posMalzeme: 0,
+    bakimOnarim: 0,
+    klimaBakim: 0,
+    hasereIlaclama: 0,
     aidat: 0,
   },
 
@@ -157,20 +153,10 @@ export function capexHesapla(
   const dekorasyon = Object.values(capex.dekorasyon).reduce((t, v) => t + v, 0);
   const teknoloji = Object.values(capex.teknoloji).reduce((t, v) => t + v, 0);
 
-  // Görülmeyen giderler: diğer 4 kategori toplamının %10'u
-  const araToplam = mimari + mutfak + dekorasyon + teknoloji;
-  const resmiBase =
-    capex.resmi.belediyeRuhsatHarci +
-    capex.resmi.tapdkAlkolBedeli +
-    capex.resmi.emlakcıKomisyonu +
-    capex.resmi.kiraDepozitosu +
-    capex.resmi.ilkStokMaliyeti;
-  const gorulenGiderler = araToplam * 0.10;
-  const resmi = resmiBase + gorulenGiderler;
+  const resmi = Object.values(capex.resmi).reduce((t, v) => t + v, 0);
+  const toplam = mimari + mutfak + dekorasyon + teknoloji + resmi;
 
-  const toplam = araToplam + resmi;
-
-  return { mimari, mutfak, dekorasyon, teknoloji, resmi, gorulenGiderler, toplam };
+  return { mimari, mutfak, dekorasyon, teknoloji, resmi, toplam };
 }
 
 // ─── GELİR HESAPLAMA ─────────────────────────────────────────────────────────

@@ -4,6 +4,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Restoran Maliyet Hesaplama',
   description: 'Restoran ve kafeterya açılış öngörü hesaplama aracı',
+  icons: { icon: '/favicon.svg' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

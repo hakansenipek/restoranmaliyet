@@ -40,6 +40,7 @@ const MIMARI_LABELS: Record<keyof CapexMimari, string> = {
   konseptTasarim: 'Konsept Tasarım',
   belediyeRuhsatProjesi: 'Belediye Ruhsat Projesi',
   dogalgazElektrikProjesi: 'Doğalgaz / Elektrik Projesi',
+  diger: 'Diğer',
 };
 
 const MUTFAK_LABELS: Record<keyof CapexMutfak, string> = {
@@ -60,14 +61,18 @@ const MUTFAK_LABELS: Record<keyof CapexMutfak, string> = {
   porselen: 'Porselen',
   camEsyasi: 'Cam Eşyası',
   catalkasik: 'Çatal / Kaşık / Bıçak',
+  diger: 'Diğer',
 };
 
 const DEKORASYON_LABELS: Record<keyof CapexDekorasyon, string> = {
-  zeminDuvar: 'Zemin / Duvar',
-  mobilya: 'Mobilya',
-  aydinlatma: 'Aydınlatma',
-  disAlan: 'Dış Alan',
-  wcHijyen: 'WC / Hijyen',
+  masaSandalye: 'Masa & Sandalye',
+  elektrikAydinlatma: 'Elektrik & Aydınlatma',
+  boyaIsleri: 'Boya İşleri',
+  wc: 'WC',
+  isiticilar: 'Isıtıcılar',
+  pergoleSemsiye: 'Pergole & Şemsiye',
+  acilisTemizligi: 'Açılış Temizliği',
+  diger: 'Diğer',
 };
 
 const TEKNOLOJI_LABELS: Record<keyof CapexTeknoloji, string> = {
@@ -77,6 +82,7 @@ const TEKNOLOJI_LABELS: Record<keyof CapexTeknoloji, string> = {
   kameraDvr: 'Kamera / DVR',
   alarmYangın: 'Alarm / Yangın',
   muzikSistemi: 'Müzik Sistemi',
+  diger: 'Diğer',
 };
 
 const RESMI_LABELS: Partial<Record<keyof CapexResmi, string>> = {
@@ -85,6 +91,7 @@ const RESMI_LABELS: Partial<Record<keyof CapexResmi, string>> = {
   emlakcıKomisyonu: 'Emlakçı Komisyonu',
   kiraDepozitosu: 'Kira Depozitosu',
   ilkStokMaliyeti: 'İlk Stok Maliyeti',
+  diger: 'Diğer',
 };
 
 function AccordionSection({
@@ -132,45 +139,51 @@ export default function CapexFormu({ girdi, onChange }: Props) {
         {/* Mimari */}
         <AccordionSection title="Mimari & Proje" toplamLabel={para(det.mimari)} ara={det.mimari} open={open.mimari} onToggle={() => toggle('mimari')}>
           {(Object.keys(MIMARI_LABELS) as (keyof CapexMimari)[]).map(k => (
-            <NumInput key={k} label={MIMARI_LABELS[k]} value={girdi.mimari[k]}
-              onChange={v => setNested('mimari', k, v)} />
+            <div key={k} className={k === 'diger' ? 'col-span-2' : ''}>
+              <NumInput label={MIMARI_LABELS[k]} value={girdi.mimari[k]}
+                onChange={v => setNested('mimari', k, v)} />
+            </div>
           ))}
         </AccordionSection>
 
         {/* Mutfak */}
         <AccordionSection title="Mutfak Ekipmanları" toplamLabel={para(det.mutfak)} ara={det.mutfak} open={open.mutfak} onToggle={() => toggle('mutfak')}>
           {(Object.keys(MUTFAK_LABELS) as (keyof CapexMutfak)[]).map(k => (
-            <NumInput key={k} label={MUTFAK_LABELS[k]} value={girdi.mutfak[k]}
-              onChange={v => setNested('mutfak', k, v)} />
+            <div key={k} className={k === 'diger' ? 'col-span-2' : ''}>
+              <NumInput label={MUTFAK_LABELS[k]} value={girdi.mutfak[k]}
+                onChange={v => setNested('mutfak', k, v)} />
+            </div>
           ))}
         </AccordionSection>
 
         {/* Dekorasyon */}
         <AccordionSection title="Dekorasyon & Mobilya" toplamLabel={para(det.dekorasyon)} ara={det.dekorasyon} open={open.dekorasyon} onToggle={() => toggle('dekorasyon')}>
-          {(Object.keys(DEKORASYON_LABELS) as (keyof CapexDekorasyon)[]).map(k => (
-            <NumInput key={k} label={DEKORASYON_LABELS[k]} value={girdi.dekorasyon[k]}
-              onChange={v => setNested('dekorasyon', k, v)} />
+          {(Object.keys(DEKORASYON_LABELS) as (keyof CapexDekorasyon)[]).map((k, i, arr) => (
+            <div key={k} className={i === arr.length - 1 && arr.length % 2 !== 0 ? 'col-span-2' : ''}>
+              <NumInput label={DEKORASYON_LABELS[k]} value={girdi.dekorasyon[k]}
+                onChange={v => setNested('dekorasyon', k, v)} />
+            </div>
           ))}
         </AccordionSection>
 
         {/* Teknoloji */}
         <AccordionSection title="Teknoloji & Güvenlik" toplamLabel={para(det.teknoloji)} ara={det.teknoloji} open={open.teknoloji} onToggle={() => toggle('teknoloji')}>
           {(Object.keys(TEKNOLOJI_LABELS) as (keyof CapexTeknoloji)[]).map(k => (
-            <NumInput key={k} label={TEKNOLOJI_LABELS[k]} value={girdi.teknoloji[k]}
-              onChange={v => setNested('teknoloji', k, v)} />
+            <div key={k} className={k === 'diger' ? 'col-span-2' : ''}>
+              <NumInput label={TEKNOLOJI_LABELS[k]} value={girdi.teknoloji[k]}
+                onChange={v => setNested('teknoloji', k, v)} />
+            </div>
           ))}
         </AccordionSection>
 
         {/* Resmi */}
         <AccordionSection title="Resmi & Diğer Giderler" toplamLabel={para(det.resmi)} ara={det.resmi} open={open.resmi} onToggle={() => toggle('resmi')}>
           {(Object.keys(RESMI_LABELS) as (keyof typeof RESMI_LABELS)[]).map(k => (
-            <NumInput key={k} label={RESMI_LABELS[k]!} value={girdi.resmi[k]}
-              onChange={v => setNested('resmi', k, v)} />
+            <div key={k} className={k === 'diger' ? 'col-span-2' : ''}>
+              <NumInput label={RESMI_LABELS[k]!} value={girdi.resmi[k]}
+                onChange={v => setNested('resmi', k, v)} />
+            </div>
           ))}
-          <div className="col-span-2">
-            <NumInput label={`Görülmeyen Giderler (Otomatik — Ara Toplam × %10)`}
-              value={det.gorulenGiderler} readonly />
-          </div>
         </AccordionSection>
       </div>
 

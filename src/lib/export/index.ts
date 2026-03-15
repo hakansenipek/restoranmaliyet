@@ -216,6 +216,7 @@ const CAPEX_ETIKETLER: Record<string, Record<string, string>> = {
     konseptTasarim: 'Konsept Tasarım',
     belediyeRuhsatProjesi: 'Belediye Ruhsat Projesi',
     dogalgazElektrikProjesi: 'Doğalgaz / Elektrik Projesi',
+    diger: 'Diğer',
   },
   mutfak: {
     tezgahEvyeRaf: 'Tezgah / Evye / Raf',
@@ -235,13 +236,17 @@ const CAPEX_ETIKETLER: Record<string, Record<string, string>> = {
     porselen: 'Porselen',
     camEsyasi: 'Cam Eşyası',
     catalkasik: 'Çatal / Kaşık / Bıçak',
+    diger: 'Diğer',
   },
   dekorasyon: {
-    zeminDuvar: 'Zemin / Duvar',
-    mobilya: 'Mobilya',
-    aydinlatma: 'Aydınlatma',
-    disAlan: 'Dış Alan',
-    wcHijyen: 'WC / Hijyen',
+    masaSandalye: 'Masa & Sandalye',
+    elektrikAydinlatma: 'Elektrik & Aydınlatma',
+    boyaIsleri: 'Boya İşleri',
+    wc: 'WC',
+    isiticilar: 'Isıtıcılar',
+    pergoleSemsiye: 'Pergole & Şemsiye',
+    acilisTemizligi: 'Açılış Temizliği',
+    diger: 'Diğer',
   },
   teknoloji: {
     posYazilim: 'POS Yazılımı',
@@ -250,6 +255,7 @@ const CAPEX_ETIKETLER: Record<string, Record<string, string>> = {
     kameraDvr: 'Kamera / DVR',
     alarmYangın: 'Alarm / Yangın',
     muzikSistemi: 'Müzik Sistemi',
+    diger: 'Diğer',
   },
   resmi: {
     belediyeRuhsatHarci: 'Belediye Ruhsat Harcı',
@@ -257,6 +263,7 @@ const CAPEX_ETIKETLER: Record<string, Record<string, string>> = {
     emlakcıKomisyonu: 'Emlakçı Komisyonu',
     kiraDepozitosu: 'Kira Depozitosu',
     ilkStokMaliyeti: 'İlk Stok Maliyeti',
+    diger: 'Diğer',
   },
 };
 

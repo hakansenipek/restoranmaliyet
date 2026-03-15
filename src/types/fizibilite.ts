@@ -4,6 +4,7 @@ export interface CapexMimari {
   konseptTasarim: number;
   belediyeRuhsatProjesi: number;
   dogalgazElektrikProjesi: number;
+  diger: number;
 }
 
 export interface CapexMutfak {
@@ -29,14 +30,18 @@ export interface CapexMutfak {
   porselen: number;
   camEsyasi: number;
   catalkasik: number;
+  diger: number;
 }
 
 export interface CapexDekorasyon {
-  zeminDuvar: number;
-  mobilya: number;
-  aydinlatma: number;
-  disAlan: number;
-  wcHijyen: number;
+  masaSandalye: number;
+  elektrikAydinlatma: number;
+  boyaIsleri: number;
+  wc: number;
+  isiticilar: number;
+  pergoleSemsiye: number;
+  acilisTemizligi: number;
+  diger: number;
 }
 
 export interface CapexTeknoloji {
@@ -46,6 +51,7 @@ export interface CapexTeknoloji {
   kameraDvr: number;
   alarmYangın: number;
   muzikSistemi: number;
+  diger: number;
 }
 
 export interface CapexResmi {
@@ -54,7 +60,7 @@ export interface CapexResmi {
   emlakcıKomisyonu: number;
   kiraDepozitosu: number;
   ilkStokMaliyeti: number;
-  gorulenGiderler: number; // Otomatik: toplam * 0.10
+  diger: number;
 }
 
 export interface CapexGirdisi {
