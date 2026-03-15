@@ -16,6 +16,7 @@ const FizibiliteFormu = dynamic(
 function GirisModal({ onKapat }: { onKapat: () => void }) {
   const [email, setEmail] = useState('');
   const [durum, setDurum] = useState<'bekliyor' | 'gonderildi' | 'hata'>('bekliyor');
+  const [hata, setHata] = useState('');
   const [yukleniyor, setYukleniyor] = useState(false);
 
   async function handleGonder(e: React.FormEvent) {
@@ -27,7 +28,12 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
     setYukleniyor(false);
-    setDurum(error ? 'hata' : 'gonderildi');
+    if (error) {
+      setHata(error.message);
+      setDurum('hata');
+    } else {
+      setDurum('gonderildi');
+    }
   }
 
   return (
@@ -97,7 +103,7 @@ function GirisModal({ onKapat }: { onKapat: () => void }) {
 
               {durum === 'hata' && (
                 <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                  Bir hata oluştu. Tekrar deneyin.
+                  {hata || 'Bir hata oluştu. Tekrar deneyin.'}
                 </p>
               )}
 
