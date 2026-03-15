@@ -131,7 +131,11 @@ export default function Page() {
   const [modalAcik, setModalAcik] = useState(false);
   const [formuKey, setFormuKey] = useState('varsayilan');
   const [initialGirdi, setInitialGirdi] = useState<FizibiliteGirdisi>(FIZIBILITE_VARSAYILAN);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const [kaydetDurum, setKaydetDurum] = useState<'bekliyor' | 'yukleniyor' | 'basarili' | 'hata'>('bekliyor');
+
+  const guncelGirdiRef = useRef<FizibiliteGirdisi>(FIZIBILITE_VARSAYILAN);
+  const guncelSonucRef = useRef<FizibiliteSonucu | null>(null);
+  const basariliTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Auth state listener + ilk yükleme
   useEffect(() => {
@@ -152,7 +156,7 @@ export default function Page() {
       if (user) yukleKayit(user.id, user.email!);
     });
 
-    // Auth değişikliklerini dinle (magic link dönüşü)
+    // Auth değişikliklerini dinle (giriş linki dönüşü)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         yukleKayit(session.user.id, session.user.email!);
@@ -168,20 +172,41 @@ export default function Page() {
 
   const handleChange = useCallback(
     (girdi: FizibiliteGirdisi, sonuc: FizibiliteSonucu) => {
-      if (!kullaniciEmail) return;
-      clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
-        hesaplamayiKaydet(girdi, sonuc);
-      }, 1500);
+      guncelGirdiRef.current = girdi;
+      guncelSonucRef.current = sonuc;
     },
-    [kullaniciEmail]
+    []
   );
 
+  async function handleKaydet() {
+    if (!guncelSonucRef.current) return;
+    setKaydetDurum('yukleniyor');
+    try {
+      await hesaplamayiKaydet(guncelGirdiRef.current, guncelSonucRef.current);
+      setKaydetDurum('basarili');
+      basariliTimerRef.current = setTimeout(() => setKaydetDurum('bekliyor'), 2000);
+    } catch {
+      setKaydetDurum('hata');
+    }
+  }
+
   async function handleCikis() {
+    clearTimeout(basariliTimerRef.current);
     const supabase = createClient();
     await supabase.auth.signOut();
     // onAuthStateChange SIGNED_OUT event state'i güncelleyecek
   }
+
+  const kaydetLabel =
+    kaydetDurum === 'yukleniyor' ? 'Kaydediliyor...' :
+    kaydetDurum === 'basarili'  ? 'Kaydedildi ✓' :
+    kaydetDurum === 'hata'      ? 'Hata!' :
+    'Kaydet';
+
+  const kaydetRenk =
+    kaydetDurum === 'basarili' ? '#16a34a' :
+    kaydetDurum === 'hata'     ? '#dc2626' :
+    '#16a34a';
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -201,6 +226,15 @@ export default function Page() {
           {kullaniciEmail ? (
             <>
               <span className="text-xs text-purple-200 hidden sm:block">{kullaniciEmail}</span>
+              <button
+                type="button"
+                onClick={handleKaydet}
+                disabled={kaydetDurum === 'yukleniyor'}
+                className="text-xs font-semibold text-white rounded px-2.5 py-1 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: kaydetRenk }}
+              >
+                {kaydetLabel}
+              </button>
               <button
                 type="button"
                 onClick={handleCikis}
