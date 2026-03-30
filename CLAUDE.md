@@ -1,3 +1,4 @@
+
 # CLAUDE.md — Restoran Maliyet Hesaplama Aracı
 
 Bu dosya Claude Code session'larında projenin tam bağlamını sağlar.
@@ -8,10 +9,11 @@ Bu dosya Claude Code session'larında projenin tam bağlamını sağlar.
 ## 1. Proje Özeti
 
 - **Repo:** `hakansenipek/restoranmaliyet`
-- **Deploy:** Vercel
-- **Amaç:** Restoran/kafeterya açmayı planlayan kullanıcıların ciro, KDV, gider, başa baş noktası ve faaliyet kârı öngörülerini anlık hesaplamasını sağlayan tek sayfalık web uygulaması. Ek olarak: yatırım fizibilitesi, personel maliyeti ve gelir projeksiyonu modülleri.
-- **Auth:** YOK — herkese açık
-- **Veritabanı:** YOK — Supabase kaldırıldı
+- **Deploy:** Vercel → `https://restoranmaliyet.vercel.app`
+- **Amaç:** Restoran/kafeterya açmayı planlayan kullanıcıların yatırım maliyeti, ciro projeksiyonu, operasyonel giderler, vergi/net kâr ve ROI hesaplarını adım adım ve anlık (real-time) yapabildiği web uygulaması.
+- **Auth:** Supabase Magic Link (e-posta bağlantısı, şifresiz)
+- **Veritabanı:** Supabase (hesaplamalar tablosu)
+- **SMTP:** Resend (`smtp.resend.com`)
 
 ---
 
@@ -22,12 +24,26 @@ Bu dosya Claude Code session'larında projenin tam bağlamını sağlar.
 | Framework | Next.js 14 (App Router) |
 | Dil | TypeScript (strict) |
 | Stil | Tailwind CSS |
+| Auth | Supabase Auth + Magic Link |
+| DB | Supabase (PostgreSQL) |
+| SMTP | Resend (onboarding@resend.dev) |
 | Export | `xlsx` + `jspdf` + `jspdf-autotable` |
 | Paket Yöneticisi | npm |
 
 ---
 
-## 3. Klasör Yapısı
+## 3. Environment Variables
+
+```
+NEXT_PUBLIC_SUPABASE_URL=<proje-url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+```
+
+Vercel Dashboard → Project → Settings → Environment Variables içinde tanımlı olmalı.
+
+---
+
+## 4. Klasör Yapısı
 
 ```
 restoranmaliyet/
@@ -36,392 +52,351 @@ restoranmaliyet/
 ├── tailwind.config.ts
 ├── tsconfig.json
 ├── package.json
+├── middleware.ts                         ← Supabase session middleware
 │
 └── src/
     ├── app/
     │   ├── layout.tsx
-    │   ├── page.tsx              ← Ana sayfa (tek sayfa, 'use client')
-    │   └── globals.css
+    │   ├── page.tsx                      ← Ana sayfa (5 modül + sonuç)
+    │   ├── globals.css
+    │   ├── giris/
+    │   │   └── page.tsx                  ← Magic Link giriş sayfası
+    │   └── auth/
+    │       └── callback/
+    │           └── route.ts              ← Supabase code exchange
     │
     ├── components/
-    │   ├── GirdiFormu.tsx        ← 3 bölümlü input formu (aylık operasyon)
-    │   ├── SonucPaneli.tsx       ← Canlı hesaplama sonuçları
-    │   ├── SenaryoTablosu.tsx    ← Düşük / Baz / Yüksek karşılaştırma
-    │   ├── IndirButonlari.tsx    ← Excel + PDF indirme butonları
     │   │
-    │   ├── fizibilite/           ← YENİ MODÜL
-    │   │   ├── FizibiliteFormu.tsx       ← Tüm sekmeleri barındıran ana form
-    │   │   ├── CapexFormu.tsx            ← Yatırım maliyeti girişleri
-    │   │   ├── MekanFormu.tsx            ← Alan, kapasite, operasyon günleri
-    │   │   ├── PersonelFormu.tsx         ← Kadro yapısı ve maliyet hesabı
-    │   │   ├── GelirFormu.tsx            ← Öğün bazlı gelir projeksiyonu
-    │   │   ├── GenelGiderFormu.tsx       ← Aylık sabit giderler
-    │   │   ├── DegiskenGiderFormu.tsx    ← SMM oranları ve sarf malzeme
-    │   │   └── FizibiliteSonuc.tsx       ← Başabaş, ROI, kâr marjı, uyarılar
+    │   ├── layout/
+    │   │   ├── Header.tsx                ← Koyu mor header + kullanıcı durumu
+    │   │   └── Footer.tsx                ← Uyarı notları
     │   │
-    │   └── ui/
-    │       ├── Card.tsx
-    │       ├── InputField.tsx
-    │       └── SonucSatiri.tsx
+    │   ├── moduls/
+    │   │   ├── Modul1Capex.tsx           ← Yatırım Maliyeti (CAPEX)
+    │   │   ├── Modul2Ciro.tsx            ← Ciro Projeksiyonu (Revenue)
+    │   │   ├── Modul3Opex.tsx            ← Operasyonel Giderler (OPEX)
+    │   │   ├── Modul4PL.tsx              ← Vergilendirme ve Net Kâr (P&L)
+    │   │   └── Modul5Roi.tsx             ← ROI & Başabaş Noktası
+    │   │
+    │   ├── sonuc/
+    │   │   ├── SonucPaneli.tsx           ← Canlı özet (sağ/alt panel)
+    │   │   ├── SenaryoTablosu.tsx        ← Düşük/Baz/Yüksek karşılaştırma
+    │   │   └── RoiGrafik.tsx             ← "X ayda amorti eder" grafiği
+    │   │
+    │   ├── ui/
+    │   │   ├── Card.tsx
+    │   │   ├── InputField.tsx
+    │   │   ├── SliderInput.tsx           ← Kaydırmalı input (doluluk oranları)
+    │   │   ├── SonucSatiri.tsx
+    │   │   └── UyariKutusu.tsx
+    │   │
+    │   └── IndirButonlari.tsx            ← Excel + PDF export butonları
     │
     ├── lib/
+    │   ├── supabase/
+    │   │   ├── client.ts                 ← createBrowserClient
+    │   │   └── server.ts                 ← createServerClient (route handler)
+    │   │
     │   ├── hesaplama/
-    │   │   ├── engine.ts             ← Aylık operasyon hesaplama motoru
-    │   │   └── fizibiliteEngine.ts   ← YENİ: Fizibilite hesaplama motoru
+    │   │   ├── capexEngine.ts            ← Modül 1 hesapları
+    │   │   ├── ciroEngine.ts             ← Modül 2 hesapları
+    │   │   ├── opexEngine.ts             ← Modül 3 hesapları
+    │   │   ├── plEngine.ts               ← Modül 4 hesapları (KDV, stopaj, vergiler)
+    │   │   └── roiEngine.ts              ← Modül 5 hesapları (ROI, başabaş)
+    │   │
     │   └── export/
-    │       └── index.ts              ← excelIndir() + pdfIndir() + fizibiliteExport()
+    │       └── index.ts                  ← excelIndir() + pdfIndir()
     │
     └── types/
-        ├── index.ts                  ← Mevcut tipler
-        └── fizibilite.ts             ← YENİ: Fizibilite tipleri
+        ├── index.ts                      ← Tüm tip tanımları
+        └── supabase.ts                   ← DB tipleri
 ```
 
 ---
 
-## 4. TypeScript Tipleri
+## 5. Auth Akışı
 
-### Mevcut (`src/types/index.ts`)
+### Giriş Sayfası (`/giris`)
 
-```typescript
-export interface HesaplamaGirdisi {
-  isletmeAdi?: string;
-  aylikCiro: number;
-  kdvOranDusuk: number;        // 0.10
-  kdvOranYuksek: number;       // 0.20
-  kdvDusukPay: number;         // 0.50
-  hammaddeOrani: number;       // 0.35 — net satış üzeri
-  hammaddeKdvOrani: number;    // 0.01
-  kkKomisyonOrani: number;     // 0.02 — brüt ciro üzeri
-  digerDegiskenOrani: number;  // 0.015 — brüt ciro üzeri
-  personelGider: number;
-  elektrikGider: number;
-  kiraGider: number;
-  notlar?: string;
-}
-
-export interface HesaplamaSonucu {
-  kdvDusukBrut: number;   kdvDusukNet: number;
-  kdvYuksekBrut: number;  kdvYuksekNet: number;
-  netSatis: number;       satisKdv: number;
-  hammadde: number;       hammaddeKdv: number;
-  kkKomisyon: number;     digerDegisken: number;
-  toplamDegisken: number;
-  personelGider: number;  elektrikGider: number;
-  kiraGider: number;      toplamSabit: number;
-  odenmesiGerekenKdv: number;
-  faaliyetKari: number;   karMarji: number;
-  degiskenOran: number;   netSatisCiroOrani: number;
-  basaBasCiro: number;    basaBasGunluk: number;
-}
-
-export interface Senaryo {
-  etiket: 'Düşük' | 'Baz' | 'Yüksek';
-  carpan: number;
-  ciro: number;
-  sonuc: HesaplamaSonucu;
-}
+```
+Kullanıcı → E-posta girer → "Magic Link Gönder" butonuna basar
+  → supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/auth/callback' } })
+  → "E-postanı kontrol et" mesajı gösterilir
+  → Kullanıcı linke tıklar → /auth/callback → / sayfasına yönlendirilir
 ```
 
-### Yeni Fizibilite Tipleri (`src/types/fizibilite.ts`)
+### Middleware (`middleware.ts`)
 
 ```typescript
-// ─── 1. YATIRIM MALİYETİ (CAPEX) ───────────────────────────────────────────
+// Korunan rotalar: "/"
+// Auth yoksa → "/giris"e yönlendir
+// Auth varsa /giris'e gelirse → "/"e yönlendir
+```
 
-export interface CapexMimari {
-  konseptTasarim: number;
-  belediyeRuhsatProjesi: number;
-  dogalgazElektrikProjesi: number;
-}
+### Callback Route (`/auth/callback/route.ts`)
 
-export interface CapexMutfak {
-  // Paslanmaz grup
-  tezgahEvyeRaf: number;
-  davlumbaz: number;
-  // Ana ekipmanlar
-  firin: number;
-  ocaklar: number;
-  fritoz: number;
-  bulasikmakine: number;
-  buzMakine: number;
-  // Soğutma
-  dikBuzdolabi: number;
-  tezgahAltiDolap: number;
-  derinDondurucular: number;
-  sogukHavaDeposu: number;
-  // Hazırlık ve küçük cihazlar
-  mikserBlender: number;
-  teraziVakum: number;
-  dilimlemeMakine: number;
-  // Servis takımları
-  porselen: number;
-  camEsyasi: number;
-  catalkasik: number;
-}
+```typescript
+// Supabase code exchange yapılır
+// Başarılıysa "/" a, hata varsa "/giris?error=..." e yönlendirilir
+```
 
-export interface CapexDekorasyon {
-  zeminDuvar: number;
-  mobilya: number;
-  aydinlatma: number;
-  disAlan: number;
-  wcHijyen: number;
-}
+### Supabase Dashboard Ayarları
 
-export interface CapexTeknoloji {
-  posYazilim: number;
-  posTerminal: number;
-  adisyonYazici: number;
-  kameraDvr: number;
-  alarmYangın: number;
-  muzikSistemi: number;
-}
+- **Site URL:** `https://restoranmaliyet.vercel.app`
+- **Redirect URLs:** `https://restoranmaliyet.vercel.app/auth/callback`
+- **SMTP:** Resend — host: `smtp.resend.com`, port: `465`, user: `resend`, pass: Resend API key
 
-export interface CapexResmi {
-  belediyeRuhsatHarci: number;
-  tapdkAlkolBedeli: number;
-  emlakcıKomisyonu: number;
-  kiraDepozitosu: number;
-  ilkStokMaliyeti: number;
-  gorulenGiderler: number;  // Otomatik: toplam * 0.10
-}
+---
 
-export interface CapexGirdisi {
-  mimari: CapexMimari;
-  mutfak: CapexMutfak;
-  dekorasyon: CapexDekorasyon;
-  teknoloji: CapexTeknoloji;
-  resmi: CapexResmi;
-}
+## 6. Supabase Veritabanı
 
-// ─── 2. MEKAN VE OPERASYONEL DETAYLAR ──────────────────────────────────────
+### `hesaplamalar` Tablosu
 
-export interface MekanGirdisi {
-  toplamMetrekare: number;
-  mutfakMetrekare: number;
-  depoMetrekare: number;
-  kapaliMasa: number;
-  kapaliSandalye: number;
-  acikMasa: number;
-  acikSandalye: number;
-  // Haftalık çalışma günleri (true = açık)
-  calismaGunleri: {
-    pazartesi: boolean;
-    sali: boolean;
-    carsamba: boolean;
-    persembe: boolean;
-    cuma: boolean;
-    cumartesi: boolean;
-    pazar: boolean;
-  };
-}
+```sql
+create table hesaplamalar (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  isletme_adi text,
+  notlar text,
+  girdi jsonb not null,      -- Tüm form girdileri (5 modül)
+  sonuc jsonb not null,      -- Hesaplama sonuçları
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
-// ─── 3. PERSONEL VE İK ──────────────────────────────────────────────────────
+alter table hesaplamalar enable row level security;
 
-export interface PersonelKalem {
-  pozisyon: string;
-  adet: number;
-  netMaas: number;
-  isverenMaliyet: number;  // Otomatik: netMaas * 1.575 (ortalama)
-  yolYemek: number;
-  prim: number;
-}
-
-export interface PersonelGruplar {
-  yonetim: PersonelKalem[];    // Müdür, Muhasebe, Pazarlama
-  mutfak: PersonelKalem[];     // Şef, Yardımcı, Kısım, Hazırlık, Bulaşıkçı
-  salon: PersonelKalem[];      // Salon Şef, Garson, Komi, Hostes, Barista, Barmen
-  destek: PersonelKalem[];     // Temizlik, Güvenlik, Vale, Kurye
-}
-
-export interface PersonelGirdisi {
-  gruplar: PersonelGruplar;
-  personelKiyafetMaliyeti: number;
-}
-
-// ─── 4. GELİR PROJEKSİYONU ──────────────────────────────────────────────────
-
-export interface OgunProjeksiyon {
-  aktif: boolean;
-  kisiBasiHarcama: number;   // Check average (₺)
-  gunlukKisiSayisi: number;
-}
-
-export interface OdemeTipi {
-  nakitPay: number;           // 0-1 arası (örn. 0.20)
-  krediKartiPay: number;      // Komisyon: %2
-  yemekKartiPay: number;      // Komisyon: %10
-  onlinePlatformPay: number;  // Komisyon: %20
-}
-
-export interface GelirGirdisi {
-  sabah: OgunProjeksiyon;
-  ogle: OgunProjeksiyon;
-  aksam: OgunProjeksiyon;
-  odemeTipleri: OdemeTipi;
-  // Haftalık doluluk çarpanı (gün bazında, 0-1 arası)
-  dolulukCarpanlari: {
-    pazartesi: number;
-    sali: number;
-    carsamba: number;
-    persembe: number;
-    cuma: number;
-    cumartesi: number;
-    pazar: number;
-  };
-}
-
-// ─── 5. GENEL GİDERLER (AYLIK SABİT) ────────────────────────────────────────
-
-export interface GenelGiderGirdisi {
-  netKira: number;
-  kiraStopajOrani: number;   // Varsayılan: 0.20
-  elektrik: number;
-  su: number;
-  dogalgazLpg: number;
-  internet: number;
-  telefon: number;
-  posMalzeme: number;        // Rulo vb.
-  bakimOnarim: number;
-  klimaBakim: number;
-  hasereIlaclama: number;
-  aidat: number;             // AVM/site aidatı
-}
-
-// ─── 6. DEĞİŞKEN GİDERLER (SMM) ─────────────────────────────────────────────
-
-export interface DegiskenGiderGirdisi {
-  yiyecekMaliyetOrani: number;    // Hedef: 0.28-0.35
-  icecekMaliyetOrani: number;     // Hedef: 0.20-0.30
-  fireZayiatOrani: number;        // Hedef: 0.03-0.05
-  sarfMalzemeOrani: number;       // Ambalaj, peçete vb. — ciro %'si
-}
-
-// ─── ANA FİZİBİLİTE GİRDİSİ ─────────────────────────────────────────────────
-
-export interface FizibiliteGirdisi {
-  isletmeAdi: string;
-  capex: CapexGirdisi;
-  mekan: MekanGirdisi;
-  personel: PersonelGirdisi;
-  gelir: GelirGirdisi;
-  genelGider: GenelGiderGirdisi;
-  degiskenGider: DegiskenGiderGirdisi;
-}
-
-// ─── FİZİBİLİTE SONUCU ──────────────────────────────────────────────────────
-
-export interface FizibiliteSonucu {
-  // Yatırım
-  toplamCapex: number;
-  capexKategoriDetay: Record<string, number>;
-
-  // Gelir
-  tahminiAylikBrutCiro: number;
-  odemeKomisyonGideri: number;
-  netCiro: number;
-
-  // Giderler
-  toplamPersonelMaliyet: number;
-  personelCiroOrani: number;       // Uyarı: > 0.30
-  toplamSMMGider: number;
-  smmOrani: number;
-  toplamGenelGider: number;
-  toplamAylikGider: number;
-
-  // Kârlılık
-  faaliyetKari: number;
-  netKarMarji: number;
-
-  // Başabaş & ROI
-  basaBasAylikCiro: number;
-  basaBasGunlukCiro: number;
-  roiAy: number;                   // Capex / Aylık net kâr
-
-  // Uyarılar
-  uyarilar: FizibiliteUyari[];
-}
-
-export interface FizibiliteUyari {
-  seviye: 'bilgi' | 'uyari' | 'kritik';
-  mesaj: string;
-}
+create policy "Kendi hesaplamalarını gör"
+  on hesaplamalar for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
 ```
 
 ---
 
-## 5. Hesaplama Motorları
+## 7. Modül Mimarisi ve Hesaplama Kuralları
 
-### Mevcut (`src/lib/hesaplama/engine.ts`)
+### Modül 1 — Yatırım Maliyeti / CAPEX (`capexEngine.ts`)
 
-Tüm aylık operasyon finansal mantığı bu dosyada — değişmedi.
+**Girdiler:**
 
-#### Varsayılan Değerler
+| Kategori | Alt Kalemler |
+|----------|-------------|
+| İnşaat & Dekorasyon | m² × m² birim maliyet (slider: 2.000–15.000 ₺/m²) |
+| Mutfak Ekipmanları | Liste usulü: Paslanmaz grup, Pişirici grup, Soğutma, Kahve makinesi, Ufak aletler, Çatal/bıçak/kaşık, Bardak, Tabaklar, Diğer |
+| Mimari & Proje | Konsept tasarım, Belediye ruhsat projesi, Doğalgaz/elektrik projesi, İtfaiye projesi, Diğer |
+| Lisans & Ruhsat | Belediye ruhsat harcı, TAPDK/alkol belgesi, Diğer |
+| Açılış Pazarlaması | İlk reklam bütçesi |
+| Kira & Depozito | Kira depozitosu (genelde 3 ay), Emlakçı komisyonu |
+| İlk Stok | Açılış için ilk hammadde alımı |
+| Görülmeyen Giderler | **Otomatik:** (alt toplam) × 0.10 |
 
-```typescript
-export const VARSAYILAN: HesaplamaGirdisi = {
-  aylikCiro: 9_620_000,
-  kdvOranDusuk: 0.10,   kdvOranYuksek: 0.20,  kdvDusukPay: 0.50,
-  hammaddeOrani: 0.35,  hammaddeKdvOrani: 0.01,
-  kkKomisyonOrani: 0.02, digerDegiskenOrani: 0.015,
-  personelGider: 1_500_000, elektrikGider: 135_000, kiraGider: 600_000,
-};
+**Çıktı:**
+```
+toplamCapex = Σ tüm kalemler + görülmeyen giderler
 ```
 
-#### Senaryo Çarpanları
+---
+
+### Modül 2 — Ciro Projeksiyonu / Revenue (`ciroEngine.ts`)
+
+**Girdiler:**
+
+| Alan | Açıklama |
+|------|----------|
+| Toplam Sandalye | Kapalı + Açık alan toplamı |
+| Kahvaltı Servisi | Aktif mi? Doluluk % (slider 0–100), Kişi başı ortalama ₺ |
+| Öğle Servisi | Aktif mi? Doluluk % (slider), Kişi başı ortalama ₺ |
+| Akşam Servisi | Aktif mi? Doluluk % (slider), Kişi başı ortalama ₺ |
+| Paket Servis | Günlük sipariş adedi, Ortalama sipariş tutarı ₺ |
+| Aylık Çalışma Günü | Slider: 20–31 gün |
+
+**Hesaplama:**
+```
+gunlukKapasiteCiro = Σ öğünler:
+  ogunGelir = sandalye × (dolulukOrani/100) × kisiBasiHarcama
+
+gunlukPaketCiro = siparisSayisi × siparisOrtalaması
+gunlukBrutCiro = gunlukKapasiteCiro + gunlukPaketCiro
+
+aylikBrutCiro = gunlukBrutCiro × aylıkCalismaGunu
+yillikBrutCiro = aylikBrutCiro × 12
+```
+
+**Senaryo Çarpanları:**
 
 | Senaryo | Çarpan |
 |---------|--------|
-| Düşük   | 0.727  |
-| Baz     | 1.000  |
-| Yüksek  | 1.248  |
+| Düşük (kötümser) | 0.70 |
+| Baz (gerçekçi) | 1.00 |
+| Yüksek (iyimser) | 1.30 |
 
-### Yeni Fizibilite Motoru (`src/lib/hesaplama/fizibiliteEngine.ts`)
+---
 
-Tüm fizibilite hesapları bu dosyada — UI'a gömülmez.
+### Modül 3 — Operasyonel Giderler / OPEX (`opexEngine.ts`)
 
-#### Temel Hesaplama Kuralları
+**Girdiler:**
 
+| Kategori | Alan |
+|----------|------|
+| Gıda Maliyeti | Ciro yüzdesi slider: %20–%45 (uyarı eşiği: >%35) |
+| Personel | Kişi sayısı + toplam net maaş → işveren maliyeti otomatik (×1.575) + yol/yemek |
+| Kira | Net kira ₺ |
+| Elektrik | ₺/ay |
+| Su | ₺/ay |
+| Doğalgaz/LPG | ₺/ay |
+| Muhasebe | ₺/ay |
+| Yazılım & POS | ₺/ay |
+| Diğer Sabit | ₺/ay |
+| Sarf Malzeme | Ciro % si (ambalaj, peçete vb.) |
+| Ödeme Komisyonu | Nakit %, Kredi Kartı % (kom: %2), Yemek Kartı % (kom: %10), Online % (kom: %20) |
+
+**Hesaplama:**
 ```
-// İşveren maliyeti
-isverenMaliyet = netMaas * 1.575
-
-// Kira brüt
-kirayaBrut = netKira * (1 + kiraStopajOrani)
-
-// Görülmeyen gider (otomatik)
-gorulenGiderler = (toplamCapex - gorulenGiderler) * 0.10
-
-// Aylık brüt ciro (öğün bazlı)
-gunlukCiro = Σ (ogun.kisiBasiHarcama * ogun.gunlukKisiSayisi * dolulukCarpani)
-aylikCiro = gunlukCiro * aylikCalismaSayi
-
-// Ödeme komisyonu
-komisyonGider = ciro * (nakitPay*0 + kkPay*0.02 + yemekKartiPay*0.10 + onlinePay*0.20)
-
-// Personel uyarı eşiği
-if (personelCiroOrani > 0.30) → 'kritik' uyarı
-
-// SMM uyarısı
-if (smmOrani > 0.38) → 'uyari'
-
-// ROI
-roiAy = toplamCapex / faaliyetKari
+gidaMaliyeti = netCiro × gidaMaliyetOrani
+personelToplamMaliyet = Σ (netMaas × 1.575 + yolYemek)
+odemeKomisyonu = brutCiro × (kkPay×0.02 + yemekKartiPay×0.10 + onlinePay×0.20)
+toplamOpex = gidaMaliyeti + personelToplamMaliyet + toplamSabit + sarfMalzeme + odemeKomisyonu
 ```
 
 ---
 
-## 6. UI Kuralları
+### Modül 4 — Vergilendirme ve Net Kâr / P&L (`plEngine.ts`)
+
+**Girdiler:**
+
+| Alan | Açıklama |
+|------|----------|
+| KDV Oranı Dağılımı | Düşük KDV (%10) payı slider, Yüksek KDV (%20) payı otomatik |
+| Hammadde KDV'si | Alış KDV oranı (%1 veya %10) |
+| Kira Stopaj Oranı | Varsayılan %20 |
+| Vergi Türü | Gelir Vergisi (şahıs) veya Kurumlar Vergisi (%25) seçimi |
+
+**Hesaplama:**
+```
+// KDV
+kdvDusukBrut = brutCiro × kdvDusukPay
+kdvYuksekBrut = brutCiro × (1 - kdvDusukPay)
+netSatis = (kdvDusukBrut/1.10) + (kdvYuksekBrut/1.20)
+tahsilEdilen KDV = brutCiro - netSatis
+odenenKDV = gidaMaliyeti × hammaddeKdvOrani
+odenmesiGerekenKDV = tahsilEdilenKDV - odenenKDV
+
+// Stopaj
+kiraStopaj = netKira × stopajOrani   (beyan edilir, gider olarak düşülür)
+
+// Brüt kâr
+brutKar = netSatis - toplamOpex - kiraStopaj
+
+// Vergi (yıllık gelir vergisi dilimlerine göre aylık tahmini)
+// Kurumlar vergisi: brutKar × 0.25
+// Gelir vergisi: 2024 dilimlerine göre kademeli hesap
+
+netAylikKar = brutKar - tahminiVergi
+netKarMarji = netAylikKar / netSatis
+```
+
+---
+
+### Modül 5 — ROI & Başabaş Noktası (`roiEngine.ts`)
+
+**Hesaplama:**
+```
+// Başabaş
+degiskenGiderOrani = (gidaMaliyeti + sarfMalzeme + odemeKomisyonu) / netSatis
+katkilaMarji = 1 - degiskenGiderOrani
+basaBasAylikCiro = toplamSabitGider / katkilaMarji
+basaBasGunlukCiro = basaBasAylikCiro / aylıkCalismaGunu
+
+// ROI (amortisman)
+roiAy = toplamCapex / netAylikKar   // Pozitif kâr varsa
+
+// Grafik verisi (12 ay kümülatif)
+aylikKumulatifKar[n] = netAylikKar × n
+amortiAyi = roiAy (grafik üzerinde kesişim noktası)
+```
+
+**Çıktı (RoiGrafik.tsx):**
+- Bar/line chart: X ekseni = Ay (1–36), Y ekseni = Kümülatif kâr
+- Capex çizgisi (yatay kırmızı) ile kesişim → "Bu yatırım kendini X ayda amorti eder"
+
+---
+
+## 8. UI Kuralları
 
 ### Renk Paleti
 
 | Renk | Hex | Kullanım |
 |------|-----|---------|
-| Mor | `#7B3F8E` | Card header, vurgu |
+| Mor | `#7B3F8E` | Card header, vurgu, aktif sekme |
 | Koyu Mor | `#5A2D6E` | Ana header, footer arka planı |
-| Magenta | `#C4215A` | PDF butonu, başa baş kutusu |
+| Magenta | `#C4215A` | PDF butonu, başabaş kutusu, CTA |
 | Açık Mor | `#EFE6F4` | Section arka planı |
 | Yeşil | `#16a34a` | Kâr, pozitif değer, Excel butonu |
-| Kırmızı | `#dc2626` | Zarar, negatif değer |
-| Amber | `#f59e0b` | Uyarı kutusu |
+| Kırmızı | `#dc2626` | Zarar, negatif değer, uyarı |
+| Amber | `#f59e0b` | Dikkat kutusu |
+| Gri | `#f8fafc` | Sayfa arka planı |
+
+### Sayfa Yapısı (`page.tsx`)
+
+```
+Header (koyu mor) — kullanıcı adı + çıkış butonu (giriş yapıldıysa)
+  ↓
+5 Modül — Adım adım, accordion veya sekme yapısında
+  Modül 1: Yatırım Maliyeti (CAPEX)
+  Modül 2: Ciro Projeksiyonu
+  Modül 3: Operasyonel Giderler
+  Modül 4: Vergilendirme & Net Kâr
+  Modül 5: ROI & Başabaş
+  ↓
+Canlı Sonuç Paneli (sticky sağ panel — desktop, alt panel — mobil)
+  ├── Toplam Yatırım
+  ├── Tahmini Aylık Ciro
+  ├── Net Aylık Kâr (yeşil/kırmızı)
+  ├── Kâr Marjı
+  ├── Başabaş Noktası (magenta)
+  └── ROI Süresi
+  ↓
+Senaryo Tablosu (Düşük / Baz / Yüksek)
+  ↓
+ROI Grafiği (amortisman çizgisi)
+  ↓
+İndir Butonları (Excel + PDF)
+  ↓
+[Giriş yapıldıysa] Kaydet Butonu → Supabase hesaplamalar tablosuna
+  ↓
+Footer (koyu mor — yasal uyarı notu)
+```
+
+### Giriş Sayfası (`/giris`)
+
+```
+Header (koyu mor)
+  ↓
+Merkezi kart:
+  - Logo/başlık: "Restoran Maliyet & Açılış Öngörü"
+  - Alt başlık: "Hesaplamalarınızı kaydetmek için giriş yapın"
+  - E-posta input
+  - "Magic Link Gönder" butonu (mor #7B3F8E)
+  - Gönderim sonrası: amber uyarı kutusu "E-postanı kontrol et"
+  - "Hesap oluşturmana gerek yok — sadece e-posta yeterli"
+  ↓
+Footer
+```
+
+### SliderInput Bileşeni
+
+```tsx
+// Kaydırma sırasında sonuç paneli anlık güncellenir
+<SliderInput
+  label="Doluluk Oranı"
+  min={0} max={100} step={5}
+  value={doluluk}
+  onChange={(val) => setDoluluk(val)}
+  suffix="%"
+  uyariEsigi={80}        // >80 → amber uyarı
+/>
+```
 
 ### Format Kuralları
 
@@ -431,128 +406,87 @@ Math.round(val).toLocaleString('tr-TR') + ' ₺'
 
 // Yüzde
 (val * 100).toFixed(1) + '%'
+
+// Ay
+Math.ceil(val) + ' ay'
 ```
 
-- Negatif değer → kırmızı metin
-- Pozitif değer → yeşil metin
-
-### Mevcut Sayfa Yapısı (`page.tsx`)
-
-```
-Header (koyu mor)
-  ↓
-Grid: GirdiFormu (sol) | SonucPaneli (sağ)   ← mobilde alt alta
-  ↓
-SenaryoTablosu (tam genişlik)
-  ↓
-IndirButonlari kartı (Excel + PDF yan yana)
-  ↓
-Uyarı notu (amber)
-  ↓
-[YENİ] Fizibilite Modülü Bölümü (ayraç ile)
-  ↓
-Footer (koyu mor)
-```
-
-### Fizibilite Modülü Yapısı
-
-```
-<FizibiliteFormu> — Tab/Sekme navigasyonu
-  ├── Sekme 1: İşletme Adı + Mekan Bilgileri    (MekanFormu)
-  ├── Sekme 2: Yatırım Maliyeti (Capex)          (CapexFormu) — accordion gruplar
-  ├── Sekme 3: Personel ve İK                    (PersonelFormu) — dinamik satır ekle/sil
-  ├── Sekme 4: Gelir Projeksiyonu                (GelirFormu)
-  ├── Sekme 5: Genel Giderler                    (GenelGiderFormu)
-  └── Sekme 6: Değişken Giderler (SMM)           (DegiskenGiderFormu)
-
-<FizibiliteSonuc> — Fizibilite formu doldukça canlı güncellenir
-  ├── Kart: Toplam Yatırım (Capex breakdown)
-  ├── Kart: Tahmini Aylık Ciro ve Net Ciro
-  ├── Kart: Gider Dağılımı (pasta/bar gösterimi)
-  ├── Kart: Faaliyet Kârı ve Net Kâr Marjı      ← yeşil/kırmızı
-  ├── Kart: Başabaş Noktası (aylık + günlük)     ← magenta
-  ├── Kart: Yatırım Geri Dönüş Süresi (ROI)
-  └── Uyarı Paneli (bilgi/uyarı/kritik renk kodlu)
-```
+- Negatif değer → `text-red-600`
+- Pozitif değer → `text-green-600`
+- Uyarı eşiği aşıldı → amber kutu
 
 ---
 
-## 7. Export Fonksiyonları (`src/lib/export/index.ts`)
+## 9. Export Fonksiyonları (`src/lib/export/index.ts`)
 
-### Mevcut
-- `excelIndir(girdi, sonuc, senaryolar)` → 2 sayfalı `.xlsx`
-- `pdfIndir(girdi, sonuc, senaryolar)` → A4 `.pdf`
+### Excel (`excelIndir`)
+- Sayfa 1: CAPEX detay tablosu
+- Sayfa 2: Ciro projeksiyonu (öğün bazlı)
+- Sayfa 3: OPEX + P&L özeti
+- Sayfa 4: ROI ve başabaş tablosu
+- Sayfa 5: Senaryo karşılaştırması
 
-### Yeni (Fizibilite)
-- `fizibiliteExcelIndir(girdi, sonuc)` → `.xlsx`
-  - Sayfa 1: Capex detay tablosu
-  - Sayfa 2: Personel maliyet tablosu
-  - Sayfa 3: Gelir projeksiyonu
-  - Sayfa 4: Gider özeti ve kârlılık
-- `fizibilitePdfIndir(girdi, sonuc)` → A4 `.pdf`
-  - Header: koyu mor, işletme adı, tarih, "Fizibilite Raporu"
-  - Capex özeti → Personel özeti → Gelir tablosu → Gider tablosu → Başabaş & ROI → Uyarılar
+### PDF (`pdfIndir`)
+- Header: koyu mor, işletme adı, tarih, "Fizibilite Raporu"
+- CAPEX özeti → Ciro projeksiyonu → OPEX → P&L → ROI & Başabaş → Senaryo tablosu → Uyarılar
+- Footer: yasal uyarı notu
 
 Her fonksiyon `await import(...)` ile dinamik yüklenir — SSR sorunu olmaz.
 
 ---
 
-## 8. Kurulum (Codespaces)
+## 10. Kurulum (Codespaces)
 
 ```bash
 # 1. Next.js kur
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --no-turbopack --yes
 
 # 2. Paketleri ekle
-npm install xlsx jspdf jspdf-autotable
+npm install xlsx jspdf jspdf-autotable @supabase/supabase-js @supabase/ssr
 
-# 3. Klasör yapısını oluştur
-mkdir -p src/lib/hesaplama src/lib/export src/types src/components/ui src/components/fizibilite
+# 3. .env.local oluştur
+echo "NEXT_PUBLIC_SUPABASE_URL=<url>" >> .env.local
+echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=<key>" >> .env.local
 
-# 4. Dosyaları yaz (Claude Code halleder)
+# 4. Klasör yapısını oluştur
+mkdir -p src/lib/hesaplama src/lib/export src/lib/supabase src/types
+mkdir -p src/components/layout src/components/moduls src/components/sonuc src/components/ui
+mkdir -p src/app/giris src/app/auth/callback
+
 # 5. Çalıştır
 npm run dev
 ```
 
-### Vercel Deploy
-
-1. Vercel → New Project → GitHub `restoranmaliyet`
-2. Environment variable **YOK**
-3. Deploy → bitti ✅
-
-> ⚠️ Vercel'de **tek proje** oluştur. GitHub'ı yanlışlıkla ikinci projeye bağlarsan:
-> Vercel Dashboard → Project → Settings → Git → Disconnect
-
 ---
 
-## 9. Geliştirme Kuralları
+## 11. Geliştirme Kuralları
 
-- Hesaplama mantığı **yalnızca** ilgili `engine.ts` dosyasında
+- Her modülün hesaplama mantığı **yalnızca** kendi `Engine.ts` dosyasında
 - Export mantığı **yalnızca** `lib/export/index.ts` içinde
 - `any` kullanma — her zaman tip tanımlarını kullan
 - `jsPDF.lastAutoTable.finalY` için `(doc as any)` kabul edilebilir
 - Yeni alan ekleme sırası: `types/` → `engine.ts` → form → UI → export
-- Migration / DB işlemi yok
+- Slider değişikliği → `useCallback` ile optimize et (불필요한 re-render önle)
+- Tüm hesaplamalar `useMemo` ile sarmalansın
 
 ---
 
-## 10. Bilinen Kısıtlar
+## 12. Bilinen Kısıtlar
 
-- Amortisman, kurumlar/gelir vergisi, stopajlar, bankacılık giderleri, lisans/ruhsat ve sigorta **dahil değil** — footer'da belirtilmeli
-- KDV indiriminde yalnızca hammadde giriş KDV'si dikkate alınır
-- Kaydetme özelliği yok (Supabase kaldırıldı)
+- Amortisman muhasebesi (vergisel), bankacılık giderleri, sigorta ve tam vergi dilimi hesabı tahminidir — footer'da belirtilmeli
+- Kaydetme özelliği yalnızca giriş yapan kullanıcılara açık
 - Fizibilite hesaplamaları tahmini/öngörü niteliğindedir — yasal bağlayıcılığı yoktur
 
 ---
 
-## 11. Backlog
+## 13. Backlog
 
-- [ ] Geçmiş hesaplamalar (localStorage)
-- [ ] Haftalık / günlük kârlılık planı (öğle-akşam servis ayrımı)
-- [ ] Supabase Auth + hesaplama kaydetme
+- [ ] Geçmiş hesaplamalar listesi (kullanıcı dashboard'u)
+- [ ] 3 yıllık projeksiyon (yıllık büyüme oranı ile)
+- [ ] Monte Carlo simülasyonu (olasılıksal senaryo)
 - [ ] Çoklu işletme karşılaştırma
-- [ ] Fizibilite: 3 yıllık projeksiyon (yıllık büyüme oranı ile)
-- [ ] Fizibilite: Monte Carlo simülasyonu (olasılıksal senaryo)
+- [ ] Haftalık doluluk çarpanı (gün bazında farklılaştırma)
+- [ ] Mobil uygulama (React Native)
 
 ---
 
