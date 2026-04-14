@@ -18,7 +18,7 @@ export function capexHesapla(g: CapexGirdisi): CapexSonucu {
     g.devirUcreti + g.mimariHizmetBedeli + g.belediyeRuhsatBedeli +
     g.turizmBelgesiBedeli + g.dogalgazProjeBedeli + g.mimariDiger;
 
-  const lisansRuhsat = g.belediyeRuhsatHarci + g.tapdk + g.lisansDiger;
+  const lisansRuhsat = g.yazarKasaPos + g.tapdk + g.lisansDiger;
 
   const acilisPazarlama = g.ilkReklamButcesi;
 

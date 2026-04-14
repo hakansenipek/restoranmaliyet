@@ -39,7 +39,7 @@ export interface CapexGirdisi {
   dogalgazProjeBedeli: number;
   mimariDiger: number;
   // Lisans & Ruhsat
-  belediyeRuhsatHarci: number;
+  yazarKasaPos: number;            // Yazar kasa / POS programı
   tapdk: number;                   // TAPDK / alkol belgesi
   lisansDiger: number;
   // Açılış Pazarlaması
@@ -217,7 +217,7 @@ export const FORM_VARSAYILAN: FormDurumu = {
     turizmBelgesiBedeli: 0,
     dogalgazProjeBedeli: 15000,
     mimariDiger: 0,
-    belediyeRuhsatHarci: 15000,
+    yazarKasaPos: 15000,
     tapdk: 10000,
     lisansDiger: 0,
     ilkReklamButcesi: 30000,

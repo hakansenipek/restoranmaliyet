@@ -138,7 +138,7 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
           {/* Lisans & Ruhsat */}
           <Card title="Lisans & Ruhsat">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Belediye Ruhsat Harcı" value={girdi.belediyeRuhsatHarci} onChange={v => set('belediyeRuhsatHarci', v)} />
+              <InputField label="Yazar Kasa / POS Programı" value={girdi.yazarKasaPos} onChange={v => set('yazarKasaPos', v)} />
               <InputField label="TAPDK / Alkol Belgesi" value={girdi.tapdk} onChange={v => set('tapdk', v)} />
               <InputField label="Diğer" value={girdi.lisansDiger} onChange={v => set('lisansDiger', v)} />
             </div>

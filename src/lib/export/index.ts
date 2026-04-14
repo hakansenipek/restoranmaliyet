@@ -58,7 +58,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     ['  Doğalgaz Proje Bedeli', form.capex.dogalgazProjeBedeli],
     ['  Diğer', form.capex.mimariDiger],
     ['Lisans & Ruhsat', capex.lisansRuhsat],
-    ['  Belediye Ruhsat Harcı', form.capex.belediyeRuhsatHarci],
+    ['  Yazar Kasa / POS Programı', form.capex.yazarKasaPos],
     ['  TAPDK / Alkol Belgesi', form.capex.tapdk],
     ['  Diğer', form.capex.lisansDiger],
     ['Açılış Pazarlaması', capex.acilisPazarlama],
