@@ -121,7 +121,7 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Mutfak Ekipmanları</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <InputField label="Paslanmaz Grubu" value={girdi.paslanmazGrup} onChange={v => set('paslanmazGrup', v)} hint="Tezgahlar, davlumbaz vb." />
-              <InputField label="Pişirici Grubu" value={girdi.pisiriciGrup} onChange={v => set('pisiriciGrup', v)} hint="Fırın, ocak, fritöz vb." />
+              <InputField label="Pişirici Grubu" value={girdi.pisiriciGrup} onChange={v => set('pisiriciGrup', v)} hint="Fırın, Ocak, Plate, Fritöz vb." />
               <InputField label="Soğutma Grubu" value={girdi.sogutma} onChange={v => set('sogutma', v)} hint="Buzdolabı, soğuk hava odası vb." />
               <InputField label="Endüstriyel Makineler" value={girdi.endustriyelMakineler} onChange={v => set('endustriyelMakineler', v)} hint="Bulaşık, buz, kahve makinesi vb." />
             </div>

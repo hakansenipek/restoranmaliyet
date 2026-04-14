@@ -43,7 +43,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     ['  Açık Alan Sandalye', form.capex.acikSandalyeAdet + ' ad × ' + form.capex.acikSandalyeBirimFiyat.toLocaleString('tr-TR') + ' ₺'],
     ['Mutfak ve Servis Ekipmanları', capex.mutfakEkipmanlari],
     ['  Paslanmaz Grubu (tezgahlar, davlumbaz)', form.capex.paslanmazGrup],
-    ['  Pişirici Grubu (fırın, ocak, fritöz)', form.capex.pisiriciGrup],
+    ['  Pişirici Grubu (fırın, ocak, plate, fritöz)', form.capex.pisiriciGrup],
     ['  Soğutma Grubu (buzdolabı, soğuk hava)', form.capex.sogutma],
     ['  Endüstriyel Makineler (bulaşık, buz, kahve)', form.capex.endustriyelMakineler],
     ['  Çatal/Bıçak/Kaşık', form.capex.catalKasik],
