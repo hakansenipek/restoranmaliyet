@@ -202,15 +202,12 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
 
           {/* Gıda Maliyeti */}
           <Card title="Gıda Maliyeti">
-            <SliderInput
+            <InputField
               label="Gıda Maliyet Oranı (Net Ciro %'si)"
-              min={20}
-              max={45}
-              step={1}
               value={Math.round(girdi.gidaMaliyetOrani * 100)}
               onChange={v => set('gidaMaliyetOrani', v / 100)}
               suffix="%"
-              uyariEsigi={35}
+              step={1}
             />
             {gidaOranYuksek && (
               <UyariKutusu
