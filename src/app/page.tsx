@@ -54,6 +54,12 @@ function lsYukle(): FormDurumu | null {
     if (f.opex && typeof f.opex.yemekBedeli !== 'number') {
       f.opex = { ...f.opex, yemekBedeli: 0 };
     }
+    // muhasebe → maliMusavir migrasyonu
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const opexAny = f.opex as any;
+    if (f.opex && typeof opexAny.maliMusavir !== 'number') {
+      f.opex = { ...f.opex, maliMusavir: opexAny.muhasebe ?? 3000 };
+    }
     return f;
   } catch { return null; }
 }
@@ -67,8 +73,8 @@ function hesapla(form: FormDurumu): HesaplamaSonucu {
     ciro.aylikBrutCiro,
     form.pl.kdvDusukPay,
   );
-  const opex = opexHesapla(form.opex, ciro, netSatis);
-  const pl = plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv, form.opex.kira, form.capex.kiraSozlesmeTipi);
+  const opex = opexHesapla(form.opex, ciro, netSatis, form.capex.aylikKira);
+  const pl = plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv, form.capex.aylikKira, form.capex.kiraSozlesmeTipi);
   const roi = roiHesapla(capex, opex, pl, form.ciro);
   return { capex, ciro, opex, pl, roi };
 }
@@ -236,13 +242,14 @@ export default function Page() {
             <Modul3Opex
               girdi={form.opex}
               ciro={sonuc.ciro}
+              aylikKira={form.capex.aylikKira}
               onChange={opex => handleChange({ opex })}
             />
             <Modul4PL
               girdi={form.pl}
               ciro={sonuc.ciro}
               opex={sonuc.opex}
-              netKira={form.opex.kira}
+              netKira={form.capex.aylikKira}
               kiraSozlesmeTipi={form.capex.kiraSozlesmeTipi}
               onChange={pl => handleChange({ pl })}
             />

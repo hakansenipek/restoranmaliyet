@@ -5,6 +5,7 @@ export function opexHesapla(
   g: OpexGirdisi,
   ciro: CiroSonucu,
   netSatis: number,
+  aylikKira: number,
 ): OpexSonucu {
   const gidaMaliyeti = netSatis * g.gidaMaliyetOrani;
 
@@ -23,8 +24,8 @@ export function opexHesapla(
   const personelToplamMaliyet = Math.round(toplamIsverenMaliyet) + yemekBedeliToplam;
 
   const toplamSabitGider =
-    g.kira + g.elektrik + g.su + g.dogalgaz +
-    g.muhasebe + g.yazilimPos + g.digerSabit;
+    aylikKira + g.elektrik + g.su + g.dogalgaz +
+    g.maliMusavir + g.yazilimPos + g.digerSabit;
 
   const sarfMalzeme = ciro.aylikBrutCiro * g.sarfMalzemeOrani;
 

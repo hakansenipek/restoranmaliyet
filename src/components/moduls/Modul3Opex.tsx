@@ -11,10 +11,11 @@ import type { CiroSonucu, OpexGirdisi, Personel } from '@/types';
 interface Props {
   girdi: OpexGirdisi;
   ciro: CiroSonucu;
+  aylikKira: number;
   onChange: (v: OpexGirdisi) => void;
 }
 
-export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
+export default function Modul3Opex({ girdi, ciro, aylikKira, onChange }: Props) {
   const [acik, setAcik] = useState(true);
 
   const set = useCallback(
@@ -219,18 +220,25 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
 
           {/* Sabit Giderler */}
           <Card title="Sabit Giderler">
+            {/* Kira: Modül 1'den otomatik */}
+            <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Kira (Net)</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-sm text-gray-800">{aylikKira.toLocaleString('tr-TR')} ₺</span>
+                <span className="text-[11px] text-gray-400">(Modül 1'den)</span>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Kira (Net)" value={girdi.kira} onChange={v => set('kira', v)} />
               <InputField label="Elektrik" value={girdi.elektrik} onChange={v => set('elektrik', v)} />
               <InputField label="Su" value={girdi.su} onChange={v => set('su', v)} />
               <InputField label="Doğalgaz / LPG" value={girdi.dogalgaz} onChange={v => set('dogalgaz', v)} />
-              <InputField label="Muhasebe" value={girdi.muhasebe} onChange={v => set('muhasebe', v)} />
+              <InputField label="Mali Müşavir" value={girdi.maliMusavir} onChange={v => set('maliMusavir', v)} />
               <InputField label="Yazılım & POS" value={girdi.yazilimPos} onChange={v => set('yazilimPos', v)} />
               <InputField label="Diğer Sabit" value={girdi.digerSabit} onChange={v => set('digerSabit', v)} />
             </div>
             <SonucSatiri
               label="Toplam Sabit Gider"
-              value={girdi.kira + girdi.elektrik + girdi.su + girdi.dogalgaz + girdi.muhasebe + girdi.yazilimPos + girdi.digerSabit}
+              value={aylikKira + girdi.elektrik + girdi.su + girdi.dogalgaz + girdi.maliMusavir + girdi.yazilimPos + girdi.digerSabit}
               bold
             />
           </Card>

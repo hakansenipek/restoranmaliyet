@@ -118,11 +118,10 @@ export interface OpexGirdisi {
   gidaMaliyetOrani: number;        // 0.20–0.45 (ciro yüzdesi, kesirli)
   personeller: Personel[];
   yemekBedeli: number;             // Kişi başı aylık yemek bedeli (₺)
-  kira: number;                    // Net kira ₺/ay
   elektrik: number;
   su: number;
   dogalgaz: number;
-  muhasebe: number;
+  maliMusavir: number;
   yazilimPos: number;
   digerSabit: number;
   sarfMalzemeOrani: number;        // Ciro %'si (kesirli, örn 0.03)
@@ -330,11 +329,10 @@ export const FORM_VARSAYILAN: FormDurumu = {
       { unvan: 'Temizlik / Güvenlik',          adet: 0, netMaas: 13000 },
     ],
     yemekBedeli: 0,
-    kira: 50000,
     elektrik: 8000,
     su: 2000,
     dogalgaz: 5000,
-    muhasebe: 3000,
+    maliMusavir: 3000,
     yazilimPos: 1500,
     digerSabit: 2000,
     sarfMalzemeOrani: 0.03,
