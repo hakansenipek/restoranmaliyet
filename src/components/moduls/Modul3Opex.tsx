@@ -44,9 +44,13 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
 
   const toplamPersonelSayisi = girdi.personeller.reduce((acc, p) => acc + p.adet, 0);
   const toplamNetMaas = girdi.personeller.reduce((acc, p) => acc + p.netMaas * p.adet, 0);
-  const sgkIsverenToplam = Math.round(toplamNetMaas * 0.575);
+  const toplamIsverenMaliyet = girdi.personeller.reduce(
+    (acc, p) => acc + (p.netMaas / 0.85) * 1.225 * p.adet,
+    0,
+  );
+  const sgkIsverenToplam = Math.round(toplamIsverenMaliyet - toplamNetMaas);
   const toplamYemekBedeli = (girdi.yemekBedeli || 0) * toplamPersonelSayisi;
-  const personelMaliyeti = toplamNetMaas + sgkIsverenToplam + toplamYemekBedeli;
+  const personelMaliyeti = Math.round(toplamIsverenMaliyet) + toplamYemekBedeli;
 
   const toplamOdemePayi =
     girdi.nakitPay + girdi.kkPay + girdi.yemekKartiPay + girdi.onlinePay;
@@ -129,10 +133,10 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
                       <p className="text-[11px] text-gray-400">
                         İşveren maliyeti:{' '}
                         <span className="font-mono text-gray-600">
-                          {Math.round(p.netMaas * 1.575 * p.adet).toLocaleString('tr-TR')} ₺
+                          {Math.round((p.netMaas / 0.85) * 1.225 * p.adet).toLocaleString('tr-TR')} ₺
                         </span>
                         <span className="ml-1 text-gray-300">
-                          ({p.adet} × {p.netMaas.toLocaleString('tr-TR')} ₺ × 1.575)
+                          ({p.adet} × net ÷ 0.85 = brüt, brüt × 1.225 işveren yükü)
                         </span>
                       </p>
                     )}
@@ -185,7 +189,7 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
 
               {/* SGK */}
               <div className="flex justify-between items-center text-xs text-gray-500">
-                <span>SGK İşveren Payı (~%57.5)</span>
+                <span>SGK İşveren Payı (brüt × %22.5)</span>
                 <span className="font-mono">{sgkIsverenToplam.toLocaleString('tr-TR')} ₺</span>
               </div>
 

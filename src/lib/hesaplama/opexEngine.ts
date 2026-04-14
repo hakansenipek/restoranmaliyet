@@ -12,11 +12,15 @@ export function opexHesapla(
   const toplamPersonelSayisi = g.personeller.reduce((acc, p) => acc + p.adet, 0);
   const toplamNetMaas = g.personeller.reduce((acc, p) => acc + p.netMaas * p.adet, 0);
 
-  // İşveren toplam maliyeti: net maaş × 1.575 × adet
-  // SGK işveren payı ≈ net maaş × 0.575 (1.575 - 1)
-  const sgkIsverenToplam = Math.round(toplamNetMaas * 0.575);
+  // İşveren toplam maliyeti: brüt = net / 0.85 → işveren = brüt × 1.225
+  const toplamIsverenMaliyet = g.personeller.reduce(
+    (acc, p) => acc + (p.netMaas / 0.85) * 1.225 * p.adet,
+    0,
+  );
+  // SGK işveren payı = brüt × %22.5 (işveren SSK + işsizlik)
+  const sgkIsverenToplam = Math.round(toplamIsverenMaliyet - toplamNetMaas);
   const yemekBedeliToplam = (g.yemekBedeli || 0) * toplamPersonelSayisi;
-  const personelToplamMaliyet = toplamNetMaas + sgkIsverenToplam + yemekBedeliToplam;
+  const personelToplamMaliyet = Math.round(toplamIsverenMaliyet) + yemekBedeliToplam;
 
   const toplamSabitGider =
     g.kira + g.elektrik + g.su + g.dogalgaz +
