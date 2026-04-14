@@ -22,12 +22,11 @@ export interface CapexGirdisi {
   kapaliSandalyeBirimFiyat: number;
   acikSandalyeAdet: number;
   acikSandalyeBirimFiyat: number;
-  // Mutfak Ekipmanları
-  paslanmazGrup: number;
-  pisiriciGrup: number;
-  sogutma: number;
-  kahveMakinesi: number;
-  ufakAletler: number;
+  // Mutfak ve Servis Ekipmanları
+  paslanmazGrup: number;           // Tezgahlar, davlumbaz vb.
+  pisiriciGrup: number;            // Fırın, ocak, fritöz vb.
+  sogutma: number;                 // Buzdolabı, soğuk hava odası vb.
+  endustriyelMakineler: number;    // Bulaşık, buz, kahve makinesi vb.
   catalKasik: number;              // Çatal/bıçak/kaşık
   bardak: number;
   tabaklar: number;
@@ -207,8 +206,7 @@ export const FORM_VARSAYILAN: FormDurumu = {
     paslanmazGrup: 80000,
     pisiriciGrup: 60000,
     sogutma: 40000,
-    kahveMakinesi: 25000,
-    ufakAletler: 15000,
+    endustriyelMakineler: 40000,
     catalKasik: 10000,
     bardak: 8000,
     tabaklar: 12000,

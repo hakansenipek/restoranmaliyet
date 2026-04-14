@@ -11,8 +11,8 @@ export function capexHesapla(g: CapexGirdisi): CapexSonucu {
     g.acikSandalyeAdet * g.acikSandalyeBirimFiyat;
 
   const mutfakEkipmanlari =
-    g.paslanmazGrup + g.pisiriciGrup + g.sogutma + g.kahveMakinesi +
-    g.ufakAletler + g.catalKasik + g.bardak + g.tabaklar + g.mutfakDiger;
+    g.paslanmazGrup + g.pisiriciGrup + g.sogutma + g.endustriyelMakineler +
+    g.catalKasik + g.bardak + g.tabaklar + g.mutfakDiger;
 
   const mimariProje =
     g.devirUcreti + g.mimariHizmetBedeli + g.belediyeRuhsatBedeli +
