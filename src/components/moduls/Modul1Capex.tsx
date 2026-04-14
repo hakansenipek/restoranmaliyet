@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function Modul1Capex({ girdi, onChange }: Props) {
-  const [acik, setAcik] = useState(true);
+  const [acik, setAcik] = useState(false);
   const sonuc = capexHesapla(girdi);
 
   const set = useCallback(

@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default function Modul4PL({ girdi, ciro, opex, netKira, kiraSozlesmeTipi, onChange }: Props) {
-  const [acik, setAcik] = useState(true);
+  const [acik, setAcik] = useState(false);
 
   const { netSatis, tahsilEdilenKdv } = netSatisHesapla(
     ciro.aylikBrutCiro,

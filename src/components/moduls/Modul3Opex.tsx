@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function Modul3Opex({ girdi, ciro, aylikKira, onChange }: Props) {
-  const [acik, setAcik] = useState(true);
+  const [acik, setAcik] = useState(false);
 
   const set = useCallback(
     <K extends keyof OpexGirdisi>(k: K, v: OpexGirdisi[K]) => {

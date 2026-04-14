@@ -266,7 +266,7 @@ interface Props {
 }
 
 export default function Modul2Ciro({ girdi, onChange }: Props) {
-  const [acik, setAcik] = useState(true);
+  const [acik, setAcik] = useState(false);
   const sonuc = ciroHesapla(girdi);
 
   const set = useCallback(

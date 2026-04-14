@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function Modul5Roi({ sonuc }: Props) {
-  const [acik, setAcik] = useState(true);
+  const [acik, setAcik] = useState(false);
   const { roi, capex, pl } = sonuc;
 
   const roiUyari = roi.roiAy !== null && roi.roiAy > 36;
