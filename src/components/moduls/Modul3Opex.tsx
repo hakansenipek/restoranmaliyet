@@ -34,7 +34,7 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
   function personelEkle() {
     set('personeller', [
       ...girdi.personeller,
-      { unvan: 'Yeni Personel', adet: 1, netMaas: 18000, yolYemek: 1500 },
+      { unvan: 'Yeni Personel', adet: 1, netMaas: 18000 },
     ]);
   }
 
@@ -43,7 +43,7 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
   }
 
   const personelMaliyeti = girdi.personeller.reduce(
-    (acc, p) => acc + (p.netMaas * 1.575 + p.yolYemek) * (p.adet || 1),
+    (acc, p) => acc + p.netMaas * 1.575 * (p.adet || 1),
     0,
   );
 
@@ -103,7 +103,7 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
                         ×
                       </button>
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <InputField
                         label="Adet"
                         value={p.adet}
@@ -112,25 +112,19 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
                         step={1}
                       />
                       <InputField
-                        label="Net Maaş (Kişi)"
+                        label="Net Maaş (Kişi Başı)"
                         value={p.netMaas}
                         onChange={v => personelGuncelle(i, 'netMaas', v)}
                         step={1000}
-                      />
-                      <InputField
-                        label="Yol/Yemek (Kişi)"
-                        value={p.yolYemek}
-                        onChange={v => personelGuncelle(i, 'yolYemek', v)}
-                        step={500}
                       />
                     </div>
                     <p className="text-[11px] text-gray-400">
                       İşveren maliyeti:{' '}
                       <span className="font-mono text-gray-600">
-                        {Math.round((p.netMaas * 1.575 + p.yolYemek) * (p.adet || 1)).toLocaleString('tr-TR')} ₺
+                        {Math.round(p.netMaas * 1.575 * (p.adet || 1)).toLocaleString('tr-TR')} ₺
                       </span>
                       <span className="ml-1 text-gray-300">
-                        ({p.adet || 1} × (×1.575 SSK + yol/yemek))
+                        ({p.adet || 1} × net maaş × 1.575 SSK)
                       </span>
                     </p>
                   </div>

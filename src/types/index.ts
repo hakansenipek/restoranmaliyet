@@ -109,10 +109,9 @@ export interface CiroGirdisi {
 
 export interface Personel {
   unvan: string;
-  adet: number;     // Kaç kişi (varsayılan 1)
-  netMaas: number;  // Kişi başı net maaş
-  yolYemek: number; // Kişi başı yol/yemek
-  grup?: string;    // Grup başlığı — sadece UI gösterimi için
+  adet: number;    // Kaç kişi
+  netMaas: number; // Kişi başı net maaş
+  grup?: string;   // Grup başlığı — sadece UI gösterimi için
 }
 
 export interface OpexGirdisi {
@@ -306,25 +305,25 @@ export const FORM_VARSAYILAN: FormDurumu = {
     gidaMaliyetOrani: 0.32,
     personeller: [
       // Mutfak Operasyonu
-      { unvan: 'Mutfak Şefi (Executive Chef)', adet: 1, netMaas: 35000, yolYemek: 1500, grup: 'Mutfak Operasyonu' },
-      { unvan: 'Sous Chef (Şef Yardımcısı)',   adet: 1, netMaas: 25000, yolYemek: 1500 },
-      { unvan: 'Kısım Şefi (Demirbaş Aşçı)',   adet: 1, netMaas: 20000, yolYemek: 1500 },
-      { unvan: 'Aşçı Yardımcısı',              adet: 1, netMaas: 15000, yolYemek: 1500 },
-      { unvan: 'Bulaşıkçı / Steward',          adet: 1, netMaas: 13000, yolYemek: 1500 },
+      { unvan: 'Mutfak Şefi (Executive Chef)', adet: 1, netMaas: 35000, grup: 'Mutfak Operasyonu' },
+      { unvan: 'Sous Chef (Şef Yardımcısı)',   adet: 1, netMaas: 25000 },
+      { unvan: 'Kısım Şefi (Demirbaş Aşçı)',   adet: 2, netMaas: 20000 },
+      { unvan: 'Aşçı Yardımcısı',              adet: 2, netMaas: 15000 },
+      { unvan: 'Bulaşıkçı / Steward',          adet: 1, netMaas: 13000 },
       // Salon ve Servis
-      { unvan: 'İşletme Müdürü / Salon Şefi', adet: 1, netMaas: 30000, yolYemek: 1500, grup: 'Salon ve Servis' },
-      { unvan: 'Garson',                       adet: 1, netMaas: 15000, yolYemek: 1500 },
-      { unvan: 'Komi',                         adet: 1, netMaas: 13000, yolYemek: 1500 },
-      { unvan: 'Hostes / Karşılama',           adet: 1, netMaas: 14000, yolYemek: 1500 },
-      { unvan: 'Barista / Barmen',             adet: 1, netMaas: 16000, yolYemek: 1500 },
+      { unvan: 'İşletme Müdürü / Salon Şefi', adet: 1, netMaas: 30000, grup: 'Salon ve Servis' },
+      { unvan: 'Garson',                       adet: 3, netMaas: 15000 },
+      { unvan: 'Komi',                         adet: 2, netMaas: 13000 },
+      { unvan: 'Hostes / Karşılama',           adet: 1, netMaas: 14000 },
+      { unvan: 'Barista / Barmen',             adet: 1, netMaas: 16000 },
       // Lojistik ve Tedarik
-      { unvan: 'Şoför / Sevkiyat',   adet: 1, netMaas: 14000, yolYemek: 1500, grup: 'Lojistik ve Tedarik' },
-      { unvan: 'Depo Sorumlusu',     adet: 1, netMaas: 15000, yolYemek: 1500 },
-      { unvan: 'Saha Servis Elemanı', adet: 1, netMaas: 13000, yolYemek: 1500 },
+      { unvan: 'Şoför / Sevkiyat',    adet: 1, netMaas: 14000, grup: 'Lojistik ve Tedarik' },
+      { unvan: 'Depo Sorumlusu',      adet: 1, netMaas: 15000 },
+      { unvan: 'Saha Servis Elemanı', adet: 2, netMaas: 13000 },
       // Yönetim ve İdari
-      { unvan: 'Muhasebe / Finans Sorumlusu',    adet: 1, netMaas: 20000, yolYemek: 1500, grup: 'Yönetim ve İdari' },
-      { unvan: 'Satış ve Pazarlama Sorumlusu',   adet: 1, netMaas: 18000, yolYemek: 1500 },
-      { unvan: 'Temizlik / Güvenlik',            adet: 1, netMaas: 13000, yolYemek: 1500 },
+      { unvan: 'Muhasebe / Finans Sorumlusu',  adet: 1, netMaas: 20000, grup: 'Yönetim ve İdari' },
+      { unvan: 'Satış ve Pazarlama Sorumlusu', adet: 1, netMaas: 18000 },
+      { unvan: 'Temizlik / Güvenlik',          adet: 1, netMaas: 13000 },
     ],
     kira: 50000,
     elektrik: 8000,
