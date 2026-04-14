@@ -24,7 +24,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   const capex = sonuc.capex;
   const capexData = [
     ['YATIRIM MALİYETİ (CAPEX)', ''],
-    ['İşletme Adı', form.isletmeAdi || '—'],
+    ['İşletme Adı', 'Fizibilite Raporu'],
     ['Tarih', tarih()],
     ['', ''],
     ['KATEGORİ', 'TUTAR (₺)'],
@@ -212,7 +212,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   const ws5 = XLSX.utils.aoa_to_sheet(senaryoData);
   XLSX.utils.book_append_sheet(wb, ws5, 'Senaryo');
 
-  XLSX.writeFile(wb, `fizibilite_${form.isletmeAdi || 'rapor'}_${tarih().replace(/\./g, '-')}.xlsx`);
+  XLSX.writeFile(wb, `fizibilite-raporu_${tarih().replace(/\./g, '-')}.xlsx`);
 }
 
 // ─── PDF ──────────────────────────────────────────────────────────────────
@@ -236,7 +236,7 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   doc.text('Restoran Fizibilite Raporu', 14, 12);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(form.isletmeAdi || '—', 14, 19);
+  doc.text('Fizibilite Raporu', 14, 19);
   doc.text(`Tarih: ${tarih()}`, pageW - 14, 19, { align: 'right' });
   doc.setTextColor(0, 0, 0);
   y = 34;
@@ -500,5 +500,5 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   }
 
   void renk; // kullanılmayan referans suppress
-  doc.save(`fizibilite_${form.isletmeAdi || 'rapor'}_${tarih().replace(/\./g, '-')}.pdf`);
+  doc.save(`fizibilite-raporu_${tarih().replace(/\./g, '-')}.pdf`);
 }

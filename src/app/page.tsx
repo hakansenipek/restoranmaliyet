@@ -207,15 +207,49 @@ export default function Page() {
       <Header />
 
       <main className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
-        {/* İşletme Adı */}
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="İşletme Adı (isteğe bağlı)"
-            value={form.isletmeAdi}
-            onChange={e => handleChange({ isletmeAdi: e.target.value })}
-            className="w-full max-w-sm rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#7B3F8E]/30 focus:border-[#7B3F8E]"
-          />
+        {/* Hero Section */}
+        <div className="border-b border-purple-200 pb-8 mb-8">
+
+          <div className="inline-flex items-center gap-2 bg-purple-50 text-purple-800 text-xs font-medium px-3 py-1.5 rounded-full mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+            Türkiye 2026 vergi ve asgari ücret verileriyle güncellendi
+          </div>
+
+          <h1 className="text-xl font-medium text-gray-900 leading-snug mb-4 max-w-2xl">
+            Hayalinizdeki restoran projesini somut verilere dayanan bir iş planına dönüştürün
+          </h1>
+
+          <p className="text-sm text-gray-500 leading-relaxed max-w-xl mb-5">
+            Bu platform; Türkiye&apos;deki güncel vergi mevzuatı, yasal asgari ücret verileri ve sektörel
+            standartları temel alarak geliştirilmiş kapsamlı bir finansal analiz aracıdır. Karmaşık
+            Excel tablolarıyla uğraşmak yerine — yatırım maliyetinizi, aylık net kârınızı ve yatırımın
+            geri dönüş süresini (ROI) dakikalar içinde, en güncel parametrelerle hesaplayın.
+          </p>
+
+          <div className="w-8 h-0.5 bg-purple-700 rounded mb-5" />
+
+          <div className="grid grid-cols-3 gap-2.5 mb-5 max-w-xl">
+            {[
+              { label: 'Yatırım analizi', value: 'CAPEX + amortisman' },
+              { label: 'Kârlılık hesabı', value: 'Aylık net kâr & marj' },
+              { label: 'Geri dönüş süresi', value: 'Nakit & muhasebe ROI' },
+            ].map((f) => (
+              <div key={f.label} className="bg-gray-50 rounded-lg px-3 py-3">
+                <p className="text-xs text-gray-400 mb-1">{f.label}</p>
+                <p className="text-xs font-medium text-gray-800">{f.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="border border-gray-200 border-l-[3px] border-l-purple-700 rounded-r-lg px-4 py-3 max-w-xl">
+            <p className="text-xs text-gray-500 leading-relaxed">
+              <span className="font-medium text-gray-800">Verileriniz güvende.</span>{' '}
+              E-posta adresinizle kayıt oluşturarak çalışmanızı istediğiniz zaman, istediğiniz cihazdan
+              kaldığınız yerden devam ettirebilirsiniz. Farklı senaryolar için birden fazla fizibilite
+              dosyası saklayabilirsiniz.
+            </p>
+          </div>
+
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
