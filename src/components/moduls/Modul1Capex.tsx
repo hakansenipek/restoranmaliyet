@@ -145,15 +145,6 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
             <SonucSatiri label="Lisans & Ruhsat Toplamı" value={sonuc.lisansRuhsat} bold />
           </Card>
 
-          {/* Açılış Pazarlaması */}
-          <Card title="Açılış Pazarlaması">
-            <InputField
-              label="İlk Reklam Bütçesi"
-              value={girdi.ilkReklamButcesi}
-              onChange={v => set('ilkReklamButcesi', v)}
-            />
-          </Card>
-
           {/* Kira & Depozito */}
           <Card title="Kira & Depozito">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -210,6 +201,17 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
               />
             </div>
             <SonucSatiri label="Kira & Depozito Toplamı" value={sonuc.kiraDepozito} bold />
+          </Card>
+
+          {/* Açılış Pazarlaması */}
+          <Card title="Açılış Pazarlaması">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Sosyal Medya Reklamları" value={girdi.sosyalMedyaReklam} onChange={v => set('sosyalMedyaReklam', v)} />
+              <InputField label="İnfluencer Bedeli" value={girdi.influencerBedeli} onChange={v => set('influencerBedeli', v)} />
+              <InputField label="Billboard Reklam Bedeli" value={girdi.billboardReklam} onChange={v => set('billboardReklam', v)} />
+              <InputField label="El İlanı Bedeli" value={girdi.elIlaniReklam} onChange={v => set('elIlaniReklam', v)} />
+            </div>
+            <SonucSatiri label="Açılış Pazarlaması Toplamı" value={sonuc.acilisPazarlama} bold />
           </Card>
 
           {/* İlk Stok */}

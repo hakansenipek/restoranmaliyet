@@ -43,7 +43,10 @@ export interface CapexGirdisi {
   tapdk: number;                   // TAPDK / alkol belgesi
   lisansDiger: number;
   // Açılış Pazarlaması
-  ilkReklamButcesi: number;
+  sosyalMedyaReklam: number;
+  influencerBedeli: number;
+  billboardReklam: number;
+  elIlaniReklam: number;
   // Kira & Depozito
   aylikKira: number;               // Aylık net kira
   kiraSozlesmeTipi: 'bireysel' | 'kurumsal';
@@ -221,7 +224,10 @@ export const FORM_VARSAYILAN: FormDurumu = {
     yazarKasaPos: 15000,
     tapdk: 10000,
     lisansDiger: 0,
-    ilkReklamButcesi: 30000,
+    sosyalMedyaReklam: 15000,
+    influencerBedeli: 0,
+    billboardReklam: 0,
+    elIlaniReklam: 0,
     aylikKira: 50000,
     kiraSozlesmeTipi: 'bireysel',
     depozitoBedeli: 150000,
