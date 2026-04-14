@@ -8,9 +8,9 @@ export function opexHesapla(
 ): OpexSonucu {
   const gidaMaliyeti = netSatis * g.gidaMaliyetOrani;
 
-  // İşveren toplam maliyeti: net maaş × 1.575 + yol/yemek
+  // İşveren toplam maliyeti: (net maaş × 1.575 + yol/yemek) × adet
   const personelToplamMaliyet = g.personeller.reduce(
-    (acc, p) => acc + p.netMaas * 1.575 + p.yolYemek,
+    (acc, p) => acc + (p.netMaas * 1.575 + p.yolYemek) * (p.adet || 1),
     0,
   );
 

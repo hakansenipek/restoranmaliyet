@@ -34,7 +34,7 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
   function personelEkle() {
     set('personeller', [
       ...girdi.personeller,
-      { ad: 'Yeni Personel', netMaas: 18000, yolYemek: 1500 },
+      { unvan: 'Yeni Personel', adet: 1, netMaas: 18000, yolYemek: 1500 },
     ]);
   }
 
@@ -43,7 +43,7 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
   }
 
   const personelMaliyeti = girdi.personeller.reduce(
-    (acc, p) => acc + p.netMaas * 1.575 + p.yolYemek,
+    (acc, p) => acc + (p.netMaas * 1.575 + p.yolYemek) * (p.adet || 1),
     0,
   );
 
@@ -73,6 +73,81 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
 
       {acik && (
         <div className="p-5 flex flex-col gap-5">
+
+          {/* Personel Giderleri — Gıda Maliyeti'nin ÜSTÜNDE */}
+          <Card title="Personel Giderleri">
+            <div className="flex flex-col gap-1">
+              {girdi.personeller.map((p, i) => (
+                <div key={i}>
+                  {/* Grup başlığı */}
+                  {p.grup && (
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-3 mb-1 first:mt-0">
+                      {p.grup}
+                    </p>
+                  )}
+                  {/* Personel satırı */}
+                  <div className="rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={p.unvan}
+                        onChange={e => personelGuncelle(i, 'unvan', e.target.value)}
+                        className="flex-1 text-sm border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#7B3F8E] bg-white"
+                        placeholder="Unvan / Görev"
+                      />
+                      <button
+                        onClick={() => personelSil(i)}
+                        className="text-red-400 hover:text-red-600 text-lg leading-none px-1 shrink-0"
+                        title="Personeli sil"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <InputField
+                        label="Adet"
+                        value={p.adet}
+                        onChange={v => personelGuncelle(i, 'adet', v)}
+                        suffix="kişi"
+                        step={1}
+                      />
+                      <InputField
+                        label="Net Maaş (Kişi)"
+                        value={p.netMaas}
+                        onChange={v => personelGuncelle(i, 'netMaas', v)}
+                        step={1000}
+                      />
+                      <InputField
+                        label="Yol/Yemek (Kişi)"
+                        value={p.yolYemek}
+                        onChange={v => personelGuncelle(i, 'yolYemek', v)}
+                        step={500}
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-400">
+                      İşveren maliyeti:{' '}
+                      <span className="font-mono text-gray-600">
+                        {Math.round((p.netMaas * 1.575 + p.yolYemek) * (p.adet || 1)).toLocaleString('tr-TR')} ₺
+                      </span>
+                      <span className="ml-1 text-gray-300">
+                        ({p.adet || 1} × (×1.575 SSK + yol/yemek))
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={personelEkle}
+              className="mt-3 text-sm text-[#7B3F8E] hover:text-[#5A2D6E] font-medium"
+            >
+              + Personel Ekle
+            </button>
+            <div className="mt-2">
+              <SonucSatiri label="Toplam Personel Maliyeti" value={personelMaliyeti} bold />
+            </div>
+          </Card>
+
           {/* Gıda Maliyeti */}
           <Card title="Gıda Maliyeti">
             <SliderInput
@@ -91,57 +166,6 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
                 tip="uyari"
               />
             )}
-          </Card>
-
-          {/* Personel */}
-          <Card title="Personel Giderleri">
-            <div className="flex flex-col gap-3">
-              {girdi.personeller.map((p, i) => (
-                <div key={i} className="rounded-lg border border-gray-100 p-3 flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={p.ad}
-                      onChange={e => personelGuncelle(i, 'ad', e.target.value)}
-                      className="flex-1 text-sm border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#7B3F8E]"
-                      placeholder="Personel adı / görevi"
-                    />
-                    <button
-                      onClick={() => personelSil(i)}
-                      className="text-red-400 hover:text-red-600 text-sm px-2"
-                      title="Personeli sil"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <InputField
-                      label="Net Maaş"
-                      value={p.netMaas}
-                      onChange={v => personelGuncelle(i, 'netMaas', v)}
-                      step={1000}
-                    />
-                    <InputField
-                      label="Yol/Yemek"
-                      value={p.yolYemek}
-                      onChange={v => personelGuncelle(i, 'yolYemek', v)}
-                      step={500}
-                    />
-                  </div>
-                  <p className="text-[11px] text-gray-400">
-                    İşveren maliyeti: {Math.round(p.netMaas * 1.575 + p.yolYemek).toLocaleString('tr-TR')} ₺
-                    <span className="ml-1 text-gray-300">(×1.575 SSK + yol/yemek)</span>
-                  </p>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={personelEkle}
-              className="mt-1 text-sm text-[#7B3F8E] hover:text-[#5A2D6E] font-medium"
-            >
-              + Personel Ekle
-            </button>
-            <SonucSatiri label="Toplam Personel Maliyeti" value={personelMaliyeti} bold />
           </Card>
 
           {/* Sabit Giderler */}

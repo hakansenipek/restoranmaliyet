@@ -131,8 +131,8 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     [`  Oran: %${(form.opex.gidaMaliyetOrani * 100).toFixed(0)} (net ciro)`, ''],
     ['Personel Toplam Maliyeti', opex.personelToplamMaliyet],
     ...form.opex.personeller.map(p => [
-      `  ${p.ad}`,
-      p.netMaas * 1.575 + p.yolYemek,
+      `  ${p.unvan}${(p.adet || 1) > 1 ? ` (${p.adet} kişi)` : ''}`,
+      (p.netMaas * 1.575 + p.yolYemek) * (p.adet || 1),
     ]),
     ['Toplam Sabit Gider', opex.toplamSabitGider],
     ['  Kira (Net)', form.opex.kira],
