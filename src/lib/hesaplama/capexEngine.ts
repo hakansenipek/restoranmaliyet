@@ -1,30 +1,32 @@
 import type { CapexGirdisi, CapexSonucu } from '@/types';
 
+function n(v: number | undefined): number { return v || 0; }
+
 export function capexHesapla(g: CapexGirdisi): CapexSonucu {
   const insaatDekorasyon =
-    g.zeminDuvarInsaat + g.elektrikTesisat + g.suTesisat + g.dogalgazTesisat +
-    g.camBedeli + g.aydinlatma + g.sesSistemi +
-    g.pergoleSemiye + g.acikAlanIsitici + g.klima +
-    g.kapaliMasaAdet * g.kapaliMasaBirimFiyat +
-    g.acikMasaAdet * g.acikMasaBirimFiyat +
-    g.kapaliSandalyeAdet * g.kapaliSandalyeBirimFiyat +
-    g.acikSandalyeAdet * g.acikSandalyeBirimFiyat;
+    n(g.zeminDuvarInsaat) + n(g.elektrikTesisat) + n(g.suTesisat) + n(g.dogalgazTesisat) +
+    n(g.camBedeli) + n(g.aydinlatma) + n(g.sesSistemi) +
+    n(g.pergoleSemiye) + n(g.acikAlanIsitici) + n(g.klima) +
+    n(g.kapaliMasaAdet) * n(g.kapaliMasaBirimFiyat) +
+    n(g.acikMasaAdet) * n(g.acikMasaBirimFiyat) +
+    n(g.kapaliSandalyeAdet) * n(g.kapaliSandalyeBirimFiyat) +
+    n(g.acikSandalyeAdet) * n(g.acikSandalyeBirimFiyat);
 
   const mutfakEkipmanlari =
-    g.paslanmazGrup + g.pisiriciGrup + g.sogutma + g.endustriyelMakineler +
-    g.catalKasik + g.bardak + g.tabaklar + g.mutfakDiger;
+    n(g.paslanmazGrup) + n(g.pisiriciGrup) + n(g.sogutma) + n(g.endustriyelMakineler) +
+    n(g.catalKasik) + n(g.bardak) + n(g.tabaklar) + n(g.mutfakDiger);
 
   const mimariProje =
-    g.devirUcreti + g.mimariHizmetBedeli + g.belediyeRuhsatBedeli +
-    g.turizmBelgesiBedeli + g.dogalgazProjeBedeli + g.mimariDiger;
+    n(g.devirUcreti) + n(g.mimariHizmetBedeli) + n(g.belediyeRuhsatBedeli) +
+    n(g.turizmBelgesiBedeli) + n(g.dogalgazProjeBedeli) + n(g.mimariDiger);
 
-  const lisansRuhsat = g.yazarKasaPos + g.tapdk + g.lisansDiger;
+  const lisansRuhsat = n(g.yazarKasaPos) + n(g.tapdk) + n(g.lisansDiger);
 
-  const acilisPazarlama = g.ilkReklamButcesi;
+  const acilisPazarlama = n(g.ilkReklamButcesi);
 
-  const kiraDepozito = g.depozitoBedeli + g.emlakciKomisyonu;
+  const kiraDepozito = n(g.depozitoBedeli) + n(g.emlakciKomisyonu);
 
-  const ilkStok = g.ilkStok;
+  const ilkStok = n(g.ilkStok);
 
   const araToplamCapex =
     insaatDekorasyon + mutfakEkipmanlari + mimariProje +

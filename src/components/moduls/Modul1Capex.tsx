@@ -187,9 +187,13 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
                   </button>
                 ))}
               </div>
-              {girdi.kiraSozlesmeTipi === 'bireysel' && (
+              {girdi.kiraSozlesmeTipi === 'bireysel' ? (
                 <p className="text-[11px] text-amber-600 mt-1.5">
                   Bireysel sözleşmede aylık %20 stopaj kesip muhtasar beyanname ile yatırmanız gerekir.
+                </p>
+              ) : (
+                <p className="text-[11px] text-amber-600 mt-1.5">
+                  Kurumsal sözleşmede kiraya %20 KDV eklenir. KDV&apos;yi beyan edip indirim konusu yapabilirsiniz.
                 </p>
               )}
             </div>
