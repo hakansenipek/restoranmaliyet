@@ -22,7 +22,7 @@ export function capexHesapla(g: CapexGirdisi): CapexSonucu {
 
   const acilisPazarlama = g.ilkReklamButcesi;
 
-  const kiraDepozito = g.aylikKira * g.kiraDepozitoAy + g.emlakciKomisyonu;
+  const kiraDepozito = g.depozitoBedeli + g.emlakciKomisyonu;
 
   const ilkStok = g.ilkStok;
 

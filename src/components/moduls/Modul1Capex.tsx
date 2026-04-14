@@ -156,21 +156,51 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* Kira & Depozito */}
           <Card title="Kira & Depozito">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <InputField
-                label="Aylık Kira (brüt)"
+                label="Aylık Kira (Net)"
                 value={girdi.aylikKira}
                 onChange={v => set('aylikKira', v)}
               />
+            </div>
+            <div className="mb-4">
+              <label className="text-xs font-medium text-gray-600 uppercase tracking-wide block mb-1.5">
+                Sözleşme Tipi
+              </label>
+              <div className="flex gap-3">
+                {([
+                  { val: 'bireysel', label: 'Bireysel Sözleşme (Stopaj)' },
+                  { val: 'kurumsal', label: 'Kurumsal Sözleşme (KDV)' },
+                ] as const).map(({ val, label }) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => set('kiraSozlesmeTipi', val)}
+                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold border transition-colors ${
+                      girdi.kiraSozlesmeTipi === val
+                        ? 'text-white border-transparent'
+                        : 'bg-white text-gray-600 border-gray-300 hover:border-purple-400'
+                    }`}
+                    style={girdi.kiraSozlesmeTipi === val ? { backgroundColor: '#7B3F8E' } : {}}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {girdi.kiraSozlesmeTipi === 'bireysel' && (
+                <p className="text-[11px] text-amber-600 mt-1.5">
+                  Bireysel sözleşmede aylık %20 stopaj kesip muhtasar beyanname ile yatırmanız gerekir.
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField
-                label="Depozito (kaç ay)"
-                value={girdi.kiraDepozitoAy}
-                onChange={v => set('kiraDepozitoAy', v)}
-                suffix="ay"
-                step={1}
+                label="Depozito Bedeli"
+                value={girdi.depozitoBedeli}
+                onChange={v => set('depozitoBedeli', v)}
               />
               <InputField
-                label="Emlakçı Komisyonu"
+                label="Emlakçı Komisyon Bedeli"
                 value={girdi.emlakciKomisyonu}
                 onChange={v => set('emlakciKomisyonu', v)}
               />

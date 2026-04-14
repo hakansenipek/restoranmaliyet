@@ -45,8 +45,9 @@ export interface CapexGirdisi {
   // Açılış Pazarlaması
   ilkReklamButcesi: number;
   // Kira & Depozito
-  kiraDepozitoAy: number;          // Kaç ay depozito
-  aylikKira: number;               // Aylık kira (depozito hesabı için)
+  aylikKira: number;               // Aylık net kira
+  kiraSozlesmeTipi: 'bireysel' | 'kurumsal';
+  depozitoBedeli: number;
   emlakciKomisyonu: number;
   // İlk Stok
   ilkStok: number;
@@ -221,8 +222,9 @@ export const FORM_VARSAYILAN: FormDurumu = {
     tapdk: 10000,
     lisansDiger: 0,
     ilkReklamButcesi: 30000,
-    kiraDepozitoAy: 3,
     aylikKira: 50000,
+    kiraSozlesmeTipi: 'bireysel',
+    depozitoBedeli: 150000,
     emlakciKomisyonu: 50000,
     ilkStok: 30000,
   },

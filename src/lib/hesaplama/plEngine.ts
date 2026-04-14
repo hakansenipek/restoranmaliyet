@@ -44,13 +44,16 @@ export function plHesapla(
   netSatis: number,
   tahsilEdilenKdv: number,
   netKira: number,     // opexGirdisi.kira — stopaj hesabı için
+  kiraSozlesmeTipi: 'bireysel' | 'kurumsal' = 'bireysel',
 ): PlSonucu {
   void ciro; // ciro değeri ileride kullanılabilir
   const odenenKdv = opex.gidaMaliyeti * g.hammaddeKdvOrani;
   const odenmesiGerekenKdv = tahsilEdilenKdv - odenenKdv;
 
-  // Kira stopajı: netKira × stopajOrani (ek vergi yükümlülüğü)
-  const kiraStopaj = netKira * g.kiraStopajOrani;
+  // Kira stopajı: yalnızca bireysel sözleşmede uygulanır
+  const kiraStopaj = kiraSozlesmeTipi === 'bireysel'
+    ? netKira * g.kiraStopajOrani
+    : 0;
 
   const brutKar = netSatis - opex.toplamOpex - kiraStopaj;
 

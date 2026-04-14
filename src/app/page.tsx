@@ -54,7 +54,7 @@ function hesapla(form: FormDurumu): HesaplamaSonucu {
     form.pl.kdvDusukPay,
   );
   const opex = opexHesapla(form.opex, ciro, netSatis);
-  const pl = plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv, form.opex.kira);
+  const pl = plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv, form.opex.kira, form.capex.kiraSozlesmeTipi);
   const roi = roiHesapla(capex, opex, pl, form.ciro);
   return { capex, ciro, opex, pl, roi };
 }
@@ -229,6 +229,7 @@ export default function Page() {
               ciro={sonuc.ciro}
               opex={sonuc.opex}
               netKira={form.opex.kira}
+              kiraSozlesmeTipi={form.capex.kiraSozlesmeTipi}
               onChange={pl => handleChange({ pl })}
             />
             <Modul5Roi sonuc={sonuc} />

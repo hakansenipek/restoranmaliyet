@@ -12,17 +12,18 @@ interface Props {
   ciro: CiroSonucu;
   opex: OpexSonucu;
   netKira: number;
+  kiraSozlesmeTipi: 'bireysel' | 'kurumsal';
   onChange: (v: PlGirdisi) => void;
 }
 
-export default function Modul4PL({ girdi, ciro, opex, netKira, onChange }: Props) {
+export default function Modul4PL({ girdi, ciro, opex, netKira, kiraSozlesmeTipi, onChange }: Props) {
   const [acik, setAcik] = useState(true);
 
   const { netSatis, tahsilEdilenKdv } = netSatisHesapla(
     ciro.aylikBrutCiro,
     girdi.kdvDusukPay,
   );
-  const pl = plHesapla(girdi, ciro, opex, netSatis, tahsilEdilenKdv, netKira);
+  const pl = plHesapla(girdi, ciro, opex, netSatis, tahsilEdilenKdv, netKira, kiraSozlesmeTipi);
 
   const set = useCallback(
     <K extends keyof PlGirdisi>(k: K, v: PlGirdisi[K]) => {
@@ -89,21 +90,23 @@ export default function Modul4PL({ girdi, ciro, opex, netKira, onChange }: Props
             </div>
           </Card>
 
-          {/* Kira Stopajı */}
-          <Card title="Kira Stopajı">
-            <SliderInput
-              label="Stopaj Oranı"
-              min={0}
-              max={30}
-              step={5}
-              value={Math.round(girdi.kiraStopajOrani * 100)}
-              onChange={v => set('kiraStopajOrani', v / 100)}
-              suffix="%"
-            />
-            <p className="text-xs text-gray-400">
-              Kira stopajı: {Math.round(pl.kiraStopaj).toLocaleString('tr-TR')} ₺ / ay
-            </p>
-          </Card>
+          {/* Kira Stopajı — yalnızca bireysel sözleşmede */}
+          {kiraSozlesmeTipi === 'bireysel' && (
+            <Card title="Kira Stopajı">
+              <SliderInput
+                label="Stopaj Oranı"
+                min={0}
+                max={30}
+                step={5}
+                value={Math.round(girdi.kiraStopajOrani * 100)}
+                onChange={v => set('kiraStopajOrani', v / 100)}
+                suffix="%"
+              />
+              <p className="text-xs text-gray-400">
+                Kira stopajı: {Math.round(pl.kiraStopaj).toLocaleString('tr-TR')} ₺ / ay
+              </p>
+            </Card>
+          )}
 
           {/* Vergi Türü */}
           <Card title="Vergi Türü">
@@ -137,7 +140,9 @@ export default function Modul4PL({ girdi, ciro, opex, netKira, onChange }: Props
           <div className="rounded-xl border border-purple-200 p-4 flex flex-col gap-1" style={{ backgroundColor: '#EFE6F4' }}>
             <SonucSatiri label="Net Satış" value={pl.netSatis} />
             <SonucSatiri label="Toplam OPEX" value={opex.toplamOpex} />
-            <SonucSatiri label="Kira Stopajı" value={pl.kiraStopaj} />
+            {kiraSozlesmeTipi === 'bireysel' && (
+              <SonucSatiri label="Kira Stopajı" value={pl.kiraStopaj} />
+            )}
             <SonucSatiri label="Brüt Kâr" value={pl.brutKar} bold />
             <SonucSatiri label="Tahmini Vergi" value={pl.tahminiVergi} />
             <div className="border-t border-purple-200 mt-1 pt-1">
