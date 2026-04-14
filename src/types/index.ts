@@ -66,6 +66,8 @@ export interface SezonVerisi {
   ogleHarcama: number;
   aksamKisi: number;
   aksamHarcama: number;
+  paketAdet: number;        // Günlük paket servis adedi
+  paketTutar: number;       // Kişi başı ortalama tutar (₺)
 }
 
 export const VARSAYILAN_SEZON: SezonVerisi = {
@@ -76,6 +78,8 @@ export const VARSAYILAN_SEZON: SezonVerisi = {
   ogleHarcama: 0,
   aksamKisi: 0,
   aksamHarcama: 0,
+  paketAdet: 0,
+  paketTutar: 0,
 };
 
 export interface CiroGirdisi {
@@ -84,8 +88,6 @@ export interface CiroGirdisi {
   sezon1: SezonVerisi;
   sezon2: SezonVerisi;
   sezon3: SezonVerisi;
-  paketSiparisSayisi: number;
-  paketSiparisOrtalaması: number;  // ₺
   aylikCalismaGunu: number;        // 20–31
 }
 
@@ -257,21 +259,22 @@ export const FORM_VARSAYILAN: FormDurumu = {
       sabahKisi: 0, sabahHarcama: 0,
       ogleKisi: 40, ogleHarcama: 250,
       aksamKisi: 60, aksamHarcama: 400,
+      paketAdet: 20, paketTutar: 200,
     },
     sezon2: {
       aylar: ['Mart', 'Nisan', 'Mayıs', 'Eylül', 'Ekim'],
       sabahKisi: 0, sabahHarcama: 0,
       ogleKisi: 35, ogleHarcama: 220,
       aksamKisi: 50, aksamHarcama: 350,
+      paketAdet: 15, paketTutar: 180,
     },
     sezon3: {
       aylar: ['Ocak', 'Şubat', 'Kasım', 'Aralık'],
       sabahKisi: 0, sabahHarcama: 0,
       ogleKisi: 25, ogleHarcama: 200,
       aksamKisi: 40, aksamHarcama: 300,
+      paketAdet: 10, paketTutar: 160,
     },
-    paketSiparisSayisi: 20,
-    paketSiparisOrtalaması: 200,
     aylikCalismaGunu: 26,
   },
   opex: {

@@ -144,6 +144,43 @@ function SezonKarti({ baslik, renk, girdi, digerAylar, onChange }: SezonKartiPro
             </tfoot>
           </table>
         </div>
+
+        {/* Paket Servis */}
+        <div className={`rounded-lg border ${renk.border} p-3`}>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Paket Servis</p>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] text-gray-600 shrink-0">Günlük Adet</span>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={girdi.paketAdet || 0}
+                onChange={e => setField('paketAdet', parseFloat(e.target.value) || 0)}
+                className="w-16 text-right text-xs border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-purple-400"
+              />
+              <span className="text-[11px] text-gray-400">adet</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] text-gray-600 shrink-0">Kişi Başı Tutar</span>
+              <input
+                type="number"
+                min={0}
+                step={10}
+                value={girdi.paketTutar || 0}
+                onChange={e => setField('paketTutar', parseFloat(e.target.value) || 0)}
+                className="w-16 text-right text-xs border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-purple-400"
+              />
+              <span className="text-[11px] text-gray-400">₺</span>
+            </div>
+            <div className={`flex items-center justify-between border-t ${renk.border} pt-2 mt-1`}>
+              <span className={`text-[11px] font-semibold ${renk.text}`}>Aylık Toplam</span>
+              <span className={`text-xs font-mono font-bold ${renk.text}`}>
+                {((girdi.paketAdet || 0) * (girdi.paketTutar || 0) * 30).toLocaleString('tr-TR')} ₺
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -244,25 +281,6 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
               />
             </div>
           </div>
-
-          {/* Paket Servis */}
-          <Card title="Paket Servis">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField
-                label="Günlük Sipariş Adedi"
-                value={girdi.paketSiparisSayisi}
-                onChange={v => set('paketSiparisSayisi', v)}
-                suffix="adet"
-                step={1}
-              />
-              <InputField
-                label="Ortalama Sipariş Tutarı"
-                value={girdi.paketSiparisOrtalaması}
-                onChange={v => set('paketSiparisOrtalaması', v)}
-                step={10}
-              />
-            </div>
-          </Card>
 
           {/* Çalışma Takvimi */}
           <Card title="Çalışma Takvimi">

@@ -101,7 +101,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       `${s.aksamKisi}×${s.aksamHarcama}₺`,
       (s.sabahKisi * s.sabahHarcama) + (s.ogleKisi * s.ogleHarcama) + (s.aksamKisi * s.aksamHarcama),
     ]),
-    ['Paket Servis', `${form.ciro.paketSiparisSayisi} sipariş/gün`, '', '', '', ciro.gunlukPaketCiro],
+    ['Paket Servis (Sezonlara Göre)', '', '', '', '', ciro.gunlukPaketCiro],
     ['', '', '', '', ''],
     ['Günlük Kapasite Cirosu', '', '', '', ciro.gunlukKapasiteCiro],
     ['Günlük Brüt Ciro', '', '', '', ciro.gunlukBrutCiro],
