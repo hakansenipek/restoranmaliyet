@@ -58,18 +58,22 @@ export interface CapexGirdisi {
 
 // ─── CİRO ──────────────────────────────────────────────────────────────────
 
-export interface OgunGirdisi {
-  aktif: boolean;
-  dolulukOrani: number;            // 0–100
-  kisiBasiHarcama: number;         // ₺
+export interface SezonVerisi {
+  aylar: string[];          // Seçili ay isimleri
+  sabahKisi: number;
+  sabahHarcama: number;
+  ogleKisi: number;
+  ogleHarcama: number;
+  aksamKisi: number;
+  aksamHarcama: number;
 }
 
 export interface CiroGirdisi {
   kapaliAlanSandalyeSayisi: number;
   acikAlanSandalyeSayisi: number;
-  kahvalti: OgunGirdisi;
-  ogle: OgunGirdisi;
-  aksam: OgunGirdisi;
+  sezon1: SezonVerisi;
+  sezon2: SezonVerisi;
+  sezon3: SezonVerisi;
   paketSiparisSayisi: number;
   paketSiparisOrtalaması: number;  // ₺
   aylikCalismaGunu: number;        // 20–31
@@ -238,9 +242,24 @@ export const FORM_VARSAYILAN: FormDurumu = {
   ciro: {
     kapaliAlanSandalyeSayisi: 40,
     acikAlanSandalyeSayisi: 20,
-    kahvalti: { aktif: false, dolulukOrani: 50, kisiBasiHarcama: 150 },
-    ogle: { aktif: true, dolulukOrani: 70, kisiBasiHarcama: 200 },
-    aksam: { aktif: true, dolulukOrani: 60, kisiBasiHarcama: 350 },
+    sezon1: {
+      aylar: ['Haziran', 'Temmuz', 'Ağustos'],
+      sabahKisi: 0, sabahHarcama: 0,
+      ogleKisi: 40, ogleHarcama: 250,
+      aksamKisi: 60, aksamHarcama: 400,
+    },
+    sezon2: {
+      aylar: ['Mart', 'Nisan', 'Mayıs', 'Eylül', 'Ekim'],
+      sabahKisi: 0, sabahHarcama: 0,
+      ogleKisi: 35, ogleHarcama: 220,
+      aksamKisi: 50, aksamHarcama: 350,
+    },
+    sezon3: {
+      aylar: ['Ocak', 'Şubat', 'Kasım', 'Aralık'],
+      sabahKisi: 0, sabahHarcama: 0,
+      ogleKisi: 25, ogleHarcama: 200,
+      aksamKisi: 40, aksamHarcama: 300,
+    },
     paketSiparisSayisi: 20,
     paketSiparisOrtalaması: 200,
     aylikCalismaGunu: 26,

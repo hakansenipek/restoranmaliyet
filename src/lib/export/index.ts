@@ -88,35 +88,20 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     ['Toplam Sandalye', (form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)],
     ['Aylık Çalışma Günü', form.ciro.aylikCalismaGunu],
     ['', ''],
-    ['ÖĞÜN', 'AKTİF', 'DOLULUK %', 'KİŞİ BAŞI ₺', 'GÜNLÜK GELİR'],
-    [
-      'Kahvaltı',
-      form.ciro.kahvalti.aktif ? 'Evet' : 'Hayır',
-      form.ciro.kahvalti.dolulukOrani,
-      form.ciro.kahvalti.kisiBasiHarcama,
-      form.ciro.kahvalti.aktif
-        ? ((form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)) * (form.ciro.kahvalti.dolulukOrani / 100) * form.ciro.kahvalti.kisiBasiHarcama
-        : 0,
-    ],
-    [
-      'Öğle',
-      form.ciro.ogle.aktif ? 'Evet' : 'Hayır',
-      form.ciro.ogle.dolulukOrani,
-      form.ciro.ogle.kisiBasiHarcama,
-      form.ciro.ogle.aktif
-        ? ((form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)) * (form.ciro.ogle.dolulukOrani / 100) * form.ciro.ogle.kisiBasiHarcama
-        : 0,
-    ],
-    [
-      'Akşam',
-      form.ciro.aksam.aktif ? 'Evet' : 'Hayır',
-      form.ciro.aksam.dolulukOrani,
-      form.ciro.aksam.kisiBasiHarcama,
-      form.ciro.aksam.aktif
-        ? ((form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)) * (form.ciro.aksam.dolulukOrani / 100) * form.ciro.aksam.kisiBasiHarcama
-        : 0,
-    ],
-    ['Paket Servis', 'Evet', `${form.ciro.paketSiparisSayisi} sipariş`, form.ciro.paketSiparisOrtalaması, ciro.gunlukPaketCiro],
+    ['SEZON', 'AYLAR', 'SABAH (Kişi×₺)', 'ÖĞLE (Kişi×₺)', 'AKŞAM (Kişi×₺)', 'GÜNLÜK TOPLAM'],
+    ...([
+      { label: 'Sezon 1', s: form.ciro.sezon1 },
+      { label: 'Sezon 2', s: form.ciro.sezon2 },
+      { label: 'Sezon 3', s: form.ciro.sezon3 },
+    ]).map(({ label, s }) => [
+      label,
+      s.aylar.join(', '),
+      `${s.sabahKisi}×${s.sabahHarcama}₺`,
+      `${s.ogleKisi}×${s.ogleHarcama}₺`,
+      `${s.aksamKisi}×${s.aksamHarcama}₺`,
+      (s.sabahKisi * s.sabahHarcama) + (s.ogleKisi * s.ogleHarcama) + (s.aksamKisi * s.aksamHarcama),
+    ]),
+    ['Paket Servis', `${form.ciro.paketSiparisSayisi} sipariş/gün`, '', '', '', ciro.gunlukPaketCiro],
     ['', '', '', '', ''],
     ['Günlük Kapasite Cirosu', '', '', '', ciro.gunlukKapasiteCiro],
     ['Günlük Brüt Ciro', '', '', '', ciro.gunlukBrutCiro],
