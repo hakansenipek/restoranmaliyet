@@ -91,13 +91,25 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
       {acik && (
         <div className="p-5 flex flex-col gap-5">
           <Card title="Mekan">
-            <InputField
-              label="Toplam Sandalye Sayısı (Kapalı + Açık)"
-              value={girdi.toplamSandalye}
-              onChange={v => set('toplamSandalye', v)}
-              suffix="kişi"
-              step={5}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField
+                label="Kapalı Alan Sandalye Sayısı"
+                value={girdi.kapaliAlanSandalyeSayisi}
+                onChange={v => set('kapaliAlanSandalyeSayisi', v)}
+                suffix="kişi"
+                step={5}
+              />
+              <InputField
+                label="Açık Alan Sandalye Sayısı"
+                value={girdi.acikAlanSandalyeSayisi}
+                onChange={v => set('acikAlanSandalyeSayisi', v)}
+                suffix="kişi"
+                step={5}
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-2">
+              Toplam: {(girdi.kapaliAlanSandalyeSayisi || 0) + (girdi.acikAlanSandalyeSayisi || 0)} kişi
+            </p>
           </Card>
 
           <Card title="Servis Öğünleri">

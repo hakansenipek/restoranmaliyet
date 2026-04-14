@@ -83,7 +83,9 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   const ciro = sonuc.ciro;
   const ciroData = [
     ['CİRO PROJEKSİYONU', ''],
-    ['Toplam Sandalye', form.ciro.toplamSandalye],
+    ['Kapalı Alan Sandalye', form.ciro.kapaliAlanSandalyeSayisi],
+    ['Açık Alan Sandalye', form.ciro.acikAlanSandalyeSayisi],
+    ['Toplam Sandalye', (form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)],
     ['Aylık Çalışma Günü', form.ciro.aylikCalismaGunu],
     ['', ''],
     ['ÖĞÜN', 'AKTİF', 'DOLULUK %', 'KİŞİ BAŞI ₺', 'GÜNLÜK GELİR'],
@@ -93,7 +95,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       form.ciro.kahvalti.dolulukOrani,
       form.ciro.kahvalti.kisiBasiHarcama,
       form.ciro.kahvalti.aktif
-        ? form.ciro.toplamSandalye * (form.ciro.kahvalti.dolulukOrani / 100) * form.ciro.kahvalti.kisiBasiHarcama
+        ? ((form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)) * (form.ciro.kahvalti.dolulukOrani / 100) * form.ciro.kahvalti.kisiBasiHarcama
         : 0,
     ],
     [
@@ -102,7 +104,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       form.ciro.ogle.dolulukOrani,
       form.ciro.ogle.kisiBasiHarcama,
       form.ciro.ogle.aktif
-        ? form.ciro.toplamSandalye * (form.ciro.ogle.dolulukOrani / 100) * form.ciro.ogle.kisiBasiHarcama
+        ? ((form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)) * (form.ciro.ogle.dolulukOrani / 100) * form.ciro.ogle.kisiBasiHarcama
         : 0,
     ],
     [
@@ -111,7 +113,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       form.ciro.aksam.dolulukOrani,
       form.ciro.aksam.kisiBasiHarcama,
       form.ciro.aksam.aktif
-        ? form.ciro.toplamSandalye * (form.ciro.aksam.dolulukOrani / 100) * form.ciro.aksam.kisiBasiHarcama
+        ? ((form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)) * (form.ciro.aksam.dolulukOrani / 100) * form.ciro.aksam.kisiBasiHarcama
         : 0,
     ],
     ['Paket Servis', 'Evet', `${form.ciro.paketSiparisSayisi} sipariş`, form.ciro.paketSiparisOrtalaması, ciro.gunlukPaketCiro],
@@ -299,7 +301,7 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     startY: y,
     head: [['Gösterge', 'Değer']],
     body: [
-      ['Toplam Sandalye', `${form.ciro.toplamSandalye} kişi`],
+      ['Toplam Sandalye', `${(form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)} kişi`],
       ['Aylık Çalışma Günü', `${form.ciro.aylikCalismaGunu} gün`],
       ['Günlük Kapasite Cirosu', para(sonuc.ciro.gunlukKapasiteCiro)],
       ['Günlük Paket Servisi', para(sonuc.ciro.gunlukPaketCiro)],

@@ -65,7 +65,8 @@ export interface OgunGirdisi {
 }
 
 export interface CiroGirdisi {
-  toplamSandalye: number;
+  kapaliAlanSandalyeSayisi: number;
+  acikAlanSandalyeSayisi: number;
   kahvalti: OgunGirdisi;
   ogle: OgunGirdisi;
   aksam: OgunGirdisi;
@@ -235,7 +236,8 @@ export const FORM_VARSAYILAN: FormDurumu = {
     ilkStok: 30000,
   },
   ciro: {
-    toplamSandalye: 60,
+    kapaliAlanSandalyeSayisi: 40,
+    acikAlanSandalyeSayisi: 20,
     kahvalti: { aktif: false, dolulukOrani: 50, kisiBasiHarcama: 150 },
     ogle: { aktif: true, dolulukOrani: 70, kisiBasiHarcama: 200 },
     aksam: { aktif: true, dolulukOrani: 60, kisiBasiHarcama: 350 },
