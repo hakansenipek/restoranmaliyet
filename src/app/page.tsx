@@ -40,7 +40,17 @@ function lsYukle(): FormDurumu | null {
     if (!raw) return null;
     const { form, ts } = JSON.parse(raw);
     if (Date.now() - ts > LS_TTL) { localStorage.removeItem(LS_KEY); return null; }
-    return form as FormDurumu;
+    const f = form as FormDurumu;
+    // Personel migrasyonu: eski `ad` alanı → yeni `unvan`; yolYemek'i düşür
+    // Herhangi bir personelde unvan yoksa (eski format) varsayılan listeyi kullan
+    const personellerGecerli = f.opex?.personeller?.every(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (p: any) => typeof p.unvan === 'string' && p.unvan.length > 0,
+    );
+    if (!personellerGecerli) {
+      f.opex = { ...f.opex, personeller: FORM_VARSAYILAN.opex.personeller };
+    }
+    return f;
   } catch { return null; }
 }
 
