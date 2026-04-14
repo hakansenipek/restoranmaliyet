@@ -8,11 +8,15 @@ export function opexHesapla(
 ): OpexSonucu {
   const gidaMaliyeti = netSatis * g.gidaMaliyetOrani;
 
+  // Toplam personel sayısı ve net maaş toplamı
+  const toplamPersonelSayisi = g.personeller.reduce((acc, p) => acc + p.adet, 0);
+  const toplamNetMaas = g.personeller.reduce((acc, p) => acc + p.netMaas * p.adet, 0);
+
   // İşveren toplam maliyeti: net maaş × 1.575 × adet
-  const personelToplamMaliyet = g.personeller.reduce(
-    (acc, p) => acc + p.netMaas * 1.575 * (p.adet || 1),
-    0,
-  );
+  // SGK işveren payı ≈ net maaş × 0.575 (1.575 - 1)
+  const sgkIsverenToplam = Math.round(toplamNetMaas * 0.575);
+  const yemekBedeliToplam = (g.yemekBedeli || 0) * toplamPersonelSayisi;
+  const personelToplamMaliyet = toplamNetMaas + sgkIsverenToplam + yemekBedeliToplam;
 
   const toplamSabitGider =
     g.kira + g.elektrik + g.su + g.dogalgaz +
@@ -35,6 +39,9 @@ export function opexHesapla(
   return {
     gidaMaliyeti,
     personelToplamMaliyet,
+    yemekBedeliToplam,
+    sgkIsverenToplam,
+    toplamPersonelSayisi,
     toplamSabitGider,
     sarfMalzeme,
     odemeKomisyonu,

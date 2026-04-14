@@ -117,6 +117,7 @@ export interface Personel {
 export interface OpexGirdisi {
   gidaMaliyetOrani: number;        // 0.20–0.45 (ciro yüzdesi, kesirli)
   personeller: Personel[];
+  yemekBedeli: number;             // Kişi başı aylık yemek bedeli (₺)
   kira: number;                    // Net kira ₺/ay
   elektrik: number;
   su: number;
@@ -179,6 +180,9 @@ export interface CiroSonucu {
 export interface OpexSonucu {
   gidaMaliyeti: number;
   personelToplamMaliyet: number;
+  yemekBedeliToplam: number;
+  sgkIsverenToplam: number;
+  toplamPersonelSayisi: number;
   toplamSabitGider: number;
   sarfMalzeme: number;
   odemeKomisyonu: number;
@@ -305,26 +309,27 @@ export const FORM_VARSAYILAN: FormDurumu = {
     gidaMaliyetOrani: 0.32,
     personeller: [
       // Mutfak Operasyonu
-      { unvan: 'Mutfak Şefi (Executive Chef)', adet: 1, netMaas: 35000, grup: 'Mutfak Operasyonu' },
-      { unvan: 'Sous Chef (Şef Yardımcısı)',   adet: 1, netMaas: 25000 },
-      { unvan: 'Kısım Şefi (Demirbaş Aşçı)',   adet: 2, netMaas: 20000 },
-      { unvan: 'Aşçı Yardımcısı',              adet: 2, netMaas: 15000 },
-      { unvan: 'Bulaşıkçı / Steward',          adet: 1, netMaas: 13000 },
+      { unvan: 'Mutfak Şefi (Executive Chef)', adet: 0, netMaas: 35000, grup: 'Mutfak Operasyonu' },
+      { unvan: 'Sous Chef (Şef Yardımcısı)',   adet: 0, netMaas: 25000 },
+      { unvan: 'Kısım Şefi (Demirbaş Aşçı)',   adet: 0, netMaas: 20000 },
+      { unvan: 'Aşçı Yardımcısı',              adet: 0, netMaas: 15000 },
+      { unvan: 'Bulaşıkçı / Steward',          adet: 0, netMaas: 13000 },
       // Salon ve Servis
-      { unvan: 'İşletme Müdürü / Salon Şefi', adet: 1, netMaas: 30000, grup: 'Salon ve Servis' },
-      { unvan: 'Garson',                       adet: 3, netMaas: 15000 },
-      { unvan: 'Komi',                         adet: 2, netMaas: 13000 },
-      { unvan: 'Hostes / Karşılama',           adet: 1, netMaas: 14000 },
-      { unvan: 'Barista / Barmen',             adet: 1, netMaas: 16000 },
+      { unvan: 'İşletme Müdürü / Salon Şefi', adet: 0, netMaas: 30000, grup: 'Salon ve Servis' },
+      { unvan: 'Garson',                       adet: 0, netMaas: 15000 },
+      { unvan: 'Komi',                         adet: 0, netMaas: 13000 },
+      { unvan: 'Hostes / Karşılama',           adet: 0, netMaas: 14000 },
+      { unvan: 'Barista / Barmen',             adet: 0, netMaas: 16000 },
       // Lojistik ve Tedarik
-      { unvan: 'Şoför / Sevkiyat',    adet: 1, netMaas: 14000, grup: 'Lojistik ve Tedarik' },
-      { unvan: 'Depo Sorumlusu',      adet: 1, netMaas: 15000 },
-      { unvan: 'Saha Servis Elemanı', adet: 2, netMaas: 13000 },
+      { unvan: 'Şoför / Sevkiyat',    adet: 0, netMaas: 14000, grup: 'Lojistik ve Tedarik' },
+      { unvan: 'Depo Sorumlusu',      adet: 0, netMaas: 15000 },
+      { unvan: 'Saha Servis Elemanı', adet: 0, netMaas: 13000 },
       // Yönetim ve İdari
-      { unvan: 'Muhasebe / Finans Sorumlusu',  adet: 1, netMaas: 20000, grup: 'Yönetim ve İdari' },
-      { unvan: 'Satış ve Pazarlama Sorumlusu', adet: 1, netMaas: 18000 },
-      { unvan: 'Temizlik / Güvenlik',          adet: 1, netMaas: 13000 },
+      { unvan: 'Muhasebe / Finans Sorumlusu',  adet: 0, netMaas: 20000, grup: 'Yönetim ve İdari' },
+      { unvan: 'Satış ve Pazarlama Sorumlusu', adet: 0, netMaas: 18000 },
+      { unvan: 'Temizlik / Güvenlik',          adet: 0, netMaas: 13000 },
     ],
+    yemekBedeli: 0,
     kira: 50000,
     elektrik: 8000,
     su: 2000,
