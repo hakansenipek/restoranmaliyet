@@ -100,39 +100,37 @@ export default function Page() {
 
     async function init() {
       const { data: { user: u } } = await supabase.auth.getUser();
-
-      if (!u) {
-        // Middleware yönlendirmeli ama fallback
-        router.push('/giris');
-        return;
-      }
-
-      setUser(u);
-
-      // URL ?saved=true varsa localStorage → DB'ye aktar
-      const urlParams = new URLSearchParams(window.location.search);
-      const savedFromCallback = urlParams.get('saved') === 'true';
-
-      // DB'deki en son hesaplamayı yükle
-      const { data: dbRow } = await supabase
-        .from('hesaplamalar')
-        .select('girdi')
-        .eq('user_id', u.id)
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
       const lsVerisi = lsYukle();
 
-      if (savedFromCallback && lsVerisi) {
-        // Magic link sonrası: localStorage verisini kaydet
-        setForm(lsVerisi);
-        localStorage.removeItem(LS_KEY);
-        router.replace('/');
-      } else if (dbRow?.girdi) {
-        setForm(dbRow.girdi as FormDurumu);
-      } else if (lsVerisi) {
-        setForm(lsVerisi);
+      if (u) {
+        setUser(u);
+
+        // URL ?saved=true varsa localStorage → DB'ye aktar
+        const urlParams = new URLSearchParams(window.location.search);
+        const savedFromCallback = urlParams.get('saved') === 'true';
+
+        // DB'deki en son hesaplamayı yükle
+        const { data: dbRow } = await supabase
+          .from('hesaplamalar')
+          .select('girdi')
+          .eq('user_id', u.id)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (savedFromCallback && lsVerisi) {
+          // Magic link sonrası: localStorage verisini kaydet
+          setForm(lsVerisi);
+          localStorage.removeItem(LS_KEY);
+          router.replace('/');
+        } else if (dbRow?.girdi) {
+          setForm(dbRow.girdi as FormDurumu);
+        } else if (lsVerisi) {
+          setForm(lsVerisi);
+        }
+      } else {
+        // Giriş yapılmamış — localStorage'dan yükle
+        if (lsVerisi) setForm(lsVerisi);
       }
 
       setHazir(true);
@@ -141,9 +139,7 @@ export default function Page() {
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (!u) router.push('/giris');
+      setUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
@@ -196,7 +192,6 @@ export default function Page() {
   async function handleCikis() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/giris');
   }
 
   if (!hazir) {
@@ -209,12 +204,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header
-        userEmail={user?.email}
-        kaydetDurum={kaydetDurum}
-        onKaydet={handleKaydet}
-        onCikis={handleCikis}
-      />
+      <Header />
 
       <main className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
         {/* İşletme Adı */}

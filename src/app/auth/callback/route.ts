@@ -33,5 +33,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/giris?error=auth`)
+  return NextResponse.redirect(`${origin}/?error=auth`)
 }
