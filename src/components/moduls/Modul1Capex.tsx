@@ -74,6 +74,9 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
               <InputField label="Cam (Açılır, Katlanır) Bedeli" value={girdi.camBedeli} onChange={v => set('camBedeli', v)} />
               <InputField label="Aydınlatma Bedeli" value={girdi.aydinlatma} onChange={v => set('aydinlatma', v)} />
               <InputField label="Ses Sistemi Bedeli" value={girdi.sesSistemi} onChange={v => set('sesSistemi', v)} />
+              <InputField label="Açık Alan Pergole / Şemsiye Bedeli" value={girdi.pergoleSemiye} onChange={v => set('pergoleSemiye', v)} />
+              <InputField label="Açık Alan Isıtıcı Bedeli" value={girdi.acikAlanIsitici} onChange={v => set('acikAlanIsitici', v)} />
+              <InputField label="Klima Bedeli" value={girdi.klima} onChange={v => set('klima', v)} />
             </div>
 
             {/* Masa & Sandalye */}

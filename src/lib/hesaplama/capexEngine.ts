@@ -4,6 +4,7 @@ export function capexHesapla(g: CapexGirdisi): CapexSonucu {
   const insaatDekorasyon =
     g.zeminDuvarInsaat + g.elektrikTesisat + g.suTesisat + g.dogalgazTesisat +
     g.camBedeli + g.aydinlatma + g.sesSistemi +
+    g.pergoleSemiye + g.acikAlanIsitici + g.klima +
     g.kapaliMasaAdet * g.kapaliMasaBirimFiyat +
     g.acikMasaAdet * g.acikMasaBirimFiyat +
     g.kapaliSandalyeAdet * g.kapaliSandalyeBirimFiyat +

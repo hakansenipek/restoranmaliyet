@@ -11,6 +11,9 @@ export interface CapexGirdisi {
   camBedeli: number;
   aydinlatma: number;
   sesSistemi: number;
+  pergoleSemiye: number;
+  acikAlanIsitici: number;
+  klima: number;
   kapaliMasaAdet: number;
   kapaliMasaBirimFiyat: number;
   acikMasaAdet: number;
@@ -190,6 +193,9 @@ export const FORM_VARSAYILAN: FormDurumu = {
     camBedeli: 50000,
     aydinlatma: 40000,
     sesSistemi: 20000,
+    pergoleSemiye: 0,
+    acikAlanIsitici: 0,
+    klima: 0,
     kapaliMasaAdet: 15,
     kapaliMasaBirimFiyat: 5000,
     acikMasaAdet: 8,
