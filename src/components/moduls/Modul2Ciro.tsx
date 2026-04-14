@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import Card from '@/components/ui/Card';
 import InputField from '@/components/ui/InputField';
-import SliderInput from '@/components/ui/SliderInput';
 import SonucSatiri from '@/components/ui/SonucSatiri';
 import { ciroHesapla } from '@/lib/hesaplama/ciroEngine';
 import type { CiroGirdisi, SezonVerisi } from '@/types';
@@ -359,14 +358,12 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
 
           {/* Çalışma Takvimi */}
           <Card title="Çalışma Takvimi">
-            <SliderInput
+            <InputField
               label="Aylık Çalışma Günü"
-              min={20}
-              max={31}
-              step={1}
               value={girdi.aylikCalismaGunu}
               onChange={v => set('aylikCalismaGunu', v)}
-              suffix=" gün"
+              suffix="gün"
+              step={1}
             />
           </Card>
 
