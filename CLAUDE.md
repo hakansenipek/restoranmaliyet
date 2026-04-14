@@ -1,5 +1,5 @@
 # CLAUDE.md — Restoran Açılış Maliyeti Hesaplama Sitesi
-> **Dosya Versiyonu: 3.0 | Son güncelleme: Nisan 2026**  
+> **Dosya Versiyonu: 3.1 | Son güncelleme: Nisan 2026**  
 > Bu dosya her yeni Claude Code oturumunda proje bağlamı olarak verilmelidir.
 
 ---
@@ -123,6 +123,28 @@ export interface CiroGirdisi {
 kiraSozlesmeTipi: 'bireysel' | 'kurumsal';  // plEngine'e geçirilir
 // bireysel → aylık %20 stopaj hesaplanır
 // kurumsal → stopaj uygulanmaz, KDV eklenir
+aylikKira: number;  // Modül 3 Sabit Giderler'e ve P&L stopaj hesabına aktarılır
+```
+
+> ⚠️ `opex.kira` **kaldırıldı**. Kira tüm hesaplamalarda `capex.aylikKira` üzerinden gelir. `opexHesapla` ve `plHesapla` çağrılarında `form.capex.aylikKira` geçirilir.
+
+### OpexGirdisi (özet — önemli değişiklikler)
+
+```typescript
+// KALDIRILDI: kira (artık capex.aylikKira kullanılır)
+// YENİDEN ADLANDIRILDI: muhasebe → maliMusavir
+yemekBedeli: number;   // Kişi başı aylık yemek bedeli (₺); toplam = yemekBedeli × toplam adet
+maliMusavir: number;   // Eski adı: muhasebe
+```
+
+> ⚠️ Eski localStorage'daki `muhasebe` alanı `maliMusavir`'e migrate edilir (`page.tsx` içinde). `kira` alanı artık `OpexGirdisi`'nde yoktur.
+
+### OpexSonucu (yeni alanlar)
+
+```typescript
+yemekBedeliToplam: number;    // yemekBedeli × toplamPersonelSayisi
+sgkIsverenToplam: number;     // toplamIsverenMaliyet - toplamNetMaas
+toplamPersonelSayisi: number; // Σ p.adet
 ```
 
 ---
@@ -182,6 +204,28 @@ const gunlukBrutCiro = aylikBrutCiro / 30;
 
 ---
 
+## 🧮 OPEX Motoru (`src/lib/hesaplama/opexEngine.ts`)
+
+```typescript
+// İşveren maliyeti formülü (net → brüt → işveren toplamı):
+brüt = netMaas / 0.85
+isverenMaliyeti = brüt × 1.225   // brüt × (1 + 0.225 SGK işveren)
+
+// Personel toplam:
+toplamIsverenMaliyet = Σ (netMaas / 0.85 × 1.225 × adet)
+sgkIsverenToplam     = toplamIsverenMaliyet - toplamNetMaas
+yemekBedeliToplam    = opex.yemekBedeli × toplamPersonelSayisi
+personelToplamMaliyet = round(toplamIsverenMaliyet) + yemekBedeliToplam
+
+// Sabit gider kira kaynağı:
+toplamSabitGider = aylikKira(capex) + elektrik + su + dogalgaz
+                 + maliMusavir + yazilimPos + digerSabit
+```
+
+> `opexHesapla(g, ciro, netSatis, aylikKira)` — 4. parametre zorunlu.
+
+---
+
 ## 🧮 P&L Motoru (`src/lib/hesaplama/plEngine.ts`)
 
 - `kiraSozlesmeTipi` parametresi `CapexGirdisi`'nden gelir
@@ -190,10 +234,15 @@ const gunlukBrutCiro = aylikBrutCiro / 30;
 
 ```typescript
 // page.tsx'te çağrım:
-plHesapla(ciro, opex, pl, form.capex.kiraSozlesmeTipi)
+opexHesapla(form.opex, ciro, netSatis, form.capex.aylikKira)
+plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv,
+          form.capex.aylikKira, form.capex.kiraSozlesmeTipi)
+
+// Modul3Opex'e prop olarak:
+<Modul3Opex aylikKira={form.capex.aylikKira} ... />
 
 // Modul4PL'e prop olarak:
-<Modul4PL kiraSozlesmeTipi={form.capex.kiraSozlesmeTipi} ... />
+<Modul4PL netKira={form.capex.aylikKira} kiraSozlesmeTipi={form.capex.kiraSozlesmeTipi} ... />
 ```
 
 ---
@@ -247,6 +296,34 @@ Alt modül sırası:
 
 ---
 
+## 🖥️ Modül 3 UI (`src/components/moduls/Modul3Opex.tsx`)
+
+### Personel Kartı Yapısı
+
+Her personel satırında tek bir satır:
+- **Sabit unvan** (span, düzenlenemez) | **Adet:** giriş | **Net:** giriş | **×** sil butonu
+- Adet > 0 ise altında: `İşveren maliyeti: X ₺ (N × net ÷ 0.85 = brüt, brüt × 1.225 işveren yükü)`
+
+> Personel unvanları `<input type="text">` DEĞİL `<span>` olarak gösterilir — düzenlenemez.  
+> Varsayılan `adet: 0` — giriş yapılınca hesaba katılır.
+
+### Personel Özet Kutusu (listenin altı)
+
+Sırasıyla:
+1. Toplam Personel Sayısı (kişi)
+2. Toplam Net Maaş (₺)
+3. Yemek Bedeli (kişi/ay) girişi → Toplam Yemek Bedeli
+4. SGK İşveren Payı (brüt × %22.5)
+5. **Toplam Personel Maliyeti** (bold)
+
+### Sabit Giderler
+
+- **Kira**: `aylikKira` prop'undan salt okunur gösterilir — `(Modül 1'den)` etiketi ile
+- **Mali Müşavir**: eski `muhasebe` alanının yeni adı
+- Gıda Maliyeti: `SliderInput` DEĞİL `InputField` (% değeri doğrudan girilir)
+
+---
+
 ## 🛡️ Geriye Dönük Uyumluluk
 
 Eski `localStorage` verisi yeni alanları içermeyebilir. Savunma katmanları:
@@ -256,6 +333,8 @@ Eski `localStorage` verisi yeni alanları içermeyebilir. Savunma katmanları:
 3. `girdi.sezon1 ?? VARSAYILAN_SEZON` — UI'da null koruması
 4. `s.aylar ?? []` — undefined array koruması
 5. `n(v || 0)` — capexEngine'de NaN koruması
+6. `yemekBedeli` yoksa `0` — page.tsx migration
+7. `muhasebe` → `maliMusavir` — page.tsx migration (`opexAny.muhasebe ?? 3000`)
 
 ---
 
@@ -276,6 +355,12 @@ Eski `localStorage` verisi yeni alanları içermeyebilir. Savunma katmanları:
 7. **Tadilat Tamponu:** Kullanıcının girdiği tadilat bütçesine daima %20 eklenir, ayrı satır olarak gösterilir.
 
 8. **TypeScript kontrolü:** Her değişiklik sonrası `npx tsc --noEmit` çalıştırılmalı. Çıktı `EXIT: 0` olmalı.
+
+9. **Kira tek kaynaktan gelir:** `opex.kira` YOKTUR. Kira her yerde `form.capex.aylikKira`'dan okunur. `opexHesapla` ve `plHesapla` fonksiyonlarına 4. parametre olarak geçirilir; `Modul3Opex` ve `Modul4PL` bileşenlerine prop olarak verilir.
+
+10. **Personel işveren maliyeti formülü:** `(netMaas / 0.85) × 1.225 × adet`. Eski `× 1.575` formülü kullanılmaz.
+
+11. **`muhasebe` alanı kaldırıldı:** Yeni adı `maliMusavir`. Eski `muhasebe` adını kullanan herhangi bir kod TypeScript hatası verir.
 
 ---
 
