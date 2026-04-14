@@ -15,10 +15,11 @@ export interface CapexGirdisi {
   tabaklar: number;
   mutfakDiger: number;
   // Mimari & Proje
-  konseptTasarim: number;
-  belediyeRuhsatProjesi: number;
-  dogalgazElektrikProjesi: number;
-  itfaiyeProjesi: number;
+  devirUcreti: number;
+  mimariHizmetBedeli: number;
+  belediyeRuhsatBedeli: number;
+  turizmBelgesiBedeli: number;
+  dogalgazProjeBedeli: number;
   mimariDiger: number;
   // Lisans & Ruhsat
   belediyeRuhsatHarci: number;
@@ -176,10 +177,11 @@ export const FORM_VARSAYILAN: FormDurumu = {
     bardak: 8000,
     tabaklar: 12000,
     mutfakDiger: 0,
-    konseptTasarim: 30000,
-    belediyeRuhsatProjesi: 20000,
-    dogalgazElektrikProjesi: 15000,
-    itfaiyeProjesi: 10000,
+    devirUcreti: 0,
+    mimariHizmetBedeli: 30000,
+    belediyeRuhsatBedeli: 20000,
+    turizmBelgesiBedeli: 0,
+    dogalgazProjeBedeli: 15000,
     mimariDiger: 0,
     belediyeRuhsatHarci: 15000,
     tapdk: 10000,

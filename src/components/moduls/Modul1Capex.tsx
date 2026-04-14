@@ -44,6 +44,19 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
       {acik && (
         <div className="p-5 flex flex-col gap-5">
+          {/* Mimari & Proje */}
+          <Card title="Mimari & Proje">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Devir Ücreti" value={girdi.devirUcreti} onChange={v => set('devirUcreti', v)} />
+              <InputField label="Mimari Hizmet Bedeli" value={girdi.mimariHizmetBedeli} onChange={v => set('mimariHizmetBedeli', v)} />
+              <InputField label="Belediye Ruhsat Bedeli" value={girdi.belediyeRuhsatBedeli} onChange={v => set('belediyeRuhsatBedeli', v)} />
+              <InputField label="Turizm Belgesi Bedeli" value={girdi.turizmBelgesiBedeli} onChange={v => set('turizmBelgesiBedeli', v)} />
+              <InputField label="Doğalgaz Proje Bedeli" value={girdi.dogalgazProjeBedeli} onChange={v => set('dogalgazProjeBedeli', v)} />
+              <InputField label="Diğer" value={girdi.mimariDiger} onChange={v => set('mimariDiger', v)} />
+            </div>
+            <SonucSatiri label="Mimari & Proje Toplamı" value={sonuc.mimariProje} bold />
+          </Card>
+
           {/* İnşaat & Dekorasyon */}
           <Card title="İnşaat & Dekorasyon">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -81,18 +94,6 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
               <InputField label="Diğer" value={girdi.mutfakDiger} onChange={v => set('mutfakDiger', v)} />
             </div>
             <SonucSatiri label="Mutfak Ekipmanları Toplamı" value={sonuc.mutfakEkipmanlari} bold />
-          </Card>
-
-          {/* Mimari & Proje */}
-          <Card title="Mimari & Proje">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Konsept Tasarım" value={girdi.konseptTasarim} onChange={v => set('konseptTasarim', v)} />
-              <InputField label="Belediye Ruhsat Projesi" value={girdi.belediyeRuhsatProjesi} onChange={v => set('belediyeRuhsatProjesi', v)} />
-              <InputField label="Doğalgaz/Elektrik Projesi" value={girdi.dogalgazElektrikProjesi} onChange={v => set('dogalgazElektrikProjesi', v)} />
-              <InputField label="İtfaiye Projesi" value={girdi.itfaiyeProjesi} onChange={v => set('itfaiyeProjesi', v)} />
-              <InputField label="Diğer" value={girdi.mimariDiger} onChange={v => set('mimariDiger', v)} />
-            </div>
-            <SonucSatiri label="Mimari & Proje Toplamı" value={sonuc.mimariProje} bold />
           </Card>
 
           {/* Lisans & Ruhsat */}

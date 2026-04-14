@@ -8,8 +8,8 @@ export function capexHesapla(g: CapexGirdisi): CapexSonucu {
     g.ufakAletler + g.catalKasik + g.bardak + g.tabaklar + g.mutfakDiger;
 
   const mimariProje =
-    g.konseptTasarim + g.belediyeRuhsatProjesi +
-    g.dogalgazElektrikProjesi + g.itfaiyeProjesi + g.mimariDiger;
+    g.devirUcreti + g.mimariHizmetBedeli + g.belediyeRuhsatBedeli +
+    g.turizmBelgesiBedeli + g.dogalgazProjeBedeli + g.mimariDiger;
 
   const lisansRuhsat = g.belediyeRuhsatHarci + g.tapdk + g.lisansDiger;
 
