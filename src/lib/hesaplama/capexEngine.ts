@@ -1,7 +1,13 @@
 import type { CapexGirdisi, CapexSonucu } from '@/types';
 
 export function capexHesapla(g: CapexGirdisi): CapexSonucu {
-  const insaatDekorasyon = g.m2 * g.m2BirimMaliyet;
+  const insaatDekorasyon =
+    g.zeminDuvarInsaat + g.elektrikTesisat + g.suTesisat + g.dogalgazTesisat +
+    g.camBedeli + g.aydinlatma + g.sesSistemi +
+    g.kapaliMasaAdet * g.kapaliMasaBirimFiyat +
+    g.acikMasaAdet * g.acikMasaBirimFiyat +
+    g.kapaliSandalyeAdet * g.kapaliSandalyeBirimFiyat +
+    g.acikSandalyeAdet * g.acikSandalyeBirimFiyat;
 
   const mutfakEkipmanlari =
     g.paslanmazGrup + g.pisiriciGrup + g.sogutma + g.kahveMakinesi +

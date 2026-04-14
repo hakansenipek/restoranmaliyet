@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import Card from '@/components/ui/Card';
 import InputField from '@/components/ui/InputField';
-import SliderInput from '@/components/ui/SliderInput';
 import SonucSatiri from '@/components/ui/SonucSatiri';
 import { capexHesapla } from '@/lib/hesaplama/capexEngine';
 import type { CapexGirdisi } from '@/types';
@@ -59,25 +58,59 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* İnşaat & Dekorasyon */}
           <Card title="İnşaat & Dekorasyon">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField
-                label="Alan (m²)"
-                value={girdi.m2}
-                onChange={v => set('m2', v)}
-                suffix="m²"
-                step={10}
-              />
+            {/* Alan bilgisi */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <InputField label="Kapalı Alan (m²)" value={girdi.kapaliAlan} onChange={v => set('kapaliAlan', v)} suffix="m²" step={5} />
+              <InputField label="Açık Alan (m²)" value={girdi.acikAlan} onChange={v => set('acikAlan', v)} suffix="m²" step={5} />
             </div>
-            <SliderInput
-              label="m² Birim Maliyet"
-              min={2000}
-              max={15000}
-              step={500}
-              value={girdi.m2BirimMaliyet}
-              onChange={v => set('m2BirimMaliyet', v)}
-              suffix=" ₺/m²"
-            />
-            <SonucSatiri label="İnşaat & Dekorasyon" value={sonuc.insaatDekorasyon} bold />
+
+            {/* Maliyet kalemleri */}
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Maliyet Kalemleri</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <InputField label="Zemin ve Duvar İnşaat Bedeli" value={girdi.zeminDuvarInsaat} onChange={v => set('zeminDuvarInsaat', v)} />
+              <InputField label="Elektrik Tesisat Bedeli" value={girdi.elektrikTesisat} onChange={v => set('elektrikTesisat', v)} />
+              <InputField label="Su Tesisat Bedeli" value={girdi.suTesisat} onChange={v => set('suTesisat', v)} />
+              <InputField label="Doğalgaz Tesisat Bedeli" value={girdi.dogalgazTesisat} onChange={v => set('dogalgazTesisat', v)} />
+              <InputField label="Cam (Açılır, Katlanır) Bedeli" value={girdi.camBedeli} onChange={v => set('camBedeli', v)} />
+              <InputField label="Aydınlatma Bedeli" value={girdi.aydinlatma} onChange={v => set('aydinlatma', v)} />
+              <InputField label="Ses Sistemi Bedeli" value={girdi.sesSistemi} onChange={v => set('sesSistemi', v)} />
+            </div>
+
+            {/* Masa & Sandalye */}
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Masa & Sandalye</p>
+            <div className="flex flex-col gap-3 mb-4">
+              {[
+                { label: 'Kapalı Alan Masa', adetKey: 'kapaliMasaAdet', fiyatKey: 'kapaliMasaBirimFiyat' },
+                { label: 'Açık Alan Masa', adetKey: 'acikMasaAdet', fiyatKey: 'acikMasaBirimFiyat' },
+                { label: 'Kapalı Alan Sandalye', adetKey: 'kapaliSandalyeAdet', fiyatKey: 'kapaliSandalyeBirimFiyat' },
+                { label: 'Açık Alan Sandalye', adetKey: 'acikSandalyeAdet', fiyatKey: 'acikSandalyeBirimFiyat' },
+              ].map(({ label, adetKey, fiyatKey }) => {
+                const adet = girdi[adetKey as keyof CapexGirdisi] as number;
+                const fiyat = girdi[fiyatKey as keyof CapexGirdisi] as number;
+                const toplam = adet * fiyat;
+                return (
+                  <div key={adetKey} className="grid grid-cols-[1fr_auto_auto_auto] items-end gap-3">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">{label}</span>
+                    </div>
+                    <div className="w-24">
+                      <InputField label="Adet" value={adet} onChange={v => set(adetKey as keyof CapexGirdisi, v as never)} suffix="ad." step={1} />
+                    </div>
+                    <div className="w-36">
+                      <InputField label="Birim Fiyat" value={fiyat} onChange={v => set(fiyatKey as keyof CapexGirdisi, v as never)} />
+                    </div>
+                    <div className="flex flex-col gap-1 w-36">
+                      <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Toplam</span>
+                      <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-right text-sm font-mono text-gray-700">
+                        {toplam.toLocaleString('tr-TR')} ₺
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <SonucSatiri label="İnşaat & Dekorasyon Toplamı" value={sonuc.insaatDekorasyon} bold />
           </Card>
 
           {/* Mutfak Ekipmanları */}

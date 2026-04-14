@@ -2,8 +2,23 @@
 
 export interface CapexGirdisi {
   // İnşaat & Dekorasyon
-  m2: number;
-  m2BirimMaliyet: number;          // 2.000–15.000 ₺/m²
+  kapaliAlan: number;              // m²
+  acikAlan: number;                // m²
+  zeminDuvarInsaat: number;
+  elektrikTesisat: number;
+  suTesisat: number;
+  dogalgazTesisat: number;
+  camBedeli: number;
+  aydinlatma: number;
+  sesSistemi: number;
+  kapaliMasaAdet: number;
+  kapaliMasaBirimFiyat: number;
+  acikMasaAdet: number;
+  acikMasaBirimFiyat: number;
+  kapaliSandalyeAdet: number;
+  kapaliSandalyeBirimFiyat: number;
+  acikSandalyeAdet: number;
+  acikSandalyeBirimFiyat: number;
   // Mutfak Ekipmanları
   paslanmazGrup: number;
   pisiriciGrup: number;
@@ -166,8 +181,23 @@ export interface HesaplamaSonucu {
 export const FORM_VARSAYILAN: FormDurumu = {
   isletmeAdi: '',
   capex: {
-    m2: 150,
-    m2BirimMaliyet: 5000,
+    kapaliAlan: 100,
+    acikAlan: 50,
+    zeminDuvarInsaat: 300000,
+    elektrikTesisat: 80000,
+    suTesisat: 30000,
+    dogalgazTesisat: 40000,
+    camBedeli: 50000,
+    aydinlatma: 40000,
+    sesSistemi: 20000,
+    kapaliMasaAdet: 15,
+    kapaliMasaBirimFiyat: 5000,
+    acikMasaAdet: 8,
+    acikMasaBirimFiyat: 3000,
+    kapaliSandalyeAdet: 60,
+    kapaliSandalyeBirimFiyat: 1500,
+    acikSandalyeAdet: 32,
+    acikSandalyeBirimFiyat: 1000,
     paslanmazGrup: 80000,
     pisiriciGrup: 60000,
     sogutma: 40000,
