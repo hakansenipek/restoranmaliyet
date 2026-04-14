@@ -53,7 +53,7 @@ function OgunTablosu({
   ];
 
   return (
-    <div className={`flex-1 rounded-lg border ${renk.border} p-3`}>
+    <div className={`w-full rounded-lg border ${renk.border} p-3`}>
       <div className="mb-2">
         <p className={`text-[11px] font-bold ${renk.text}`}>{baslik}</p>
         <p className="text-[10px] text-gray-400">{altBaslik}</p>
@@ -184,7 +184,7 @@ function SezonKarti({ baslik, renk, girdi, digerAylar, onChange }: SezonKartiPro
         {/* Hafta içi / Hafta sonu öğün tabloları */}
         <div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Günlük Öğün Cirosu</p>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <OgunTablosu
               baslik="Hafta İçi"
               altBaslik="Pzt–Cum (22 gün/ay)"
