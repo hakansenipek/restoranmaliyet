@@ -88,19 +88,23 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     ['Toplam Sandalye', (form.ciro.kapaliAlanSandalyeSayisi || 0) + (form.ciro.acikAlanSandalyeSayisi || 0)],
     ['Aylık Çalışma Günü', form.ciro.aylikCalismaGunu],
     ['', ''],
-    ['SEZON', 'AYLAR', 'SABAH (Kişi×₺)', 'ÖĞLE (Kişi×₺)', 'AKŞAM (Kişi×₺)', 'GÜNLÜK TOPLAM'],
+    ['SEZON', 'AYLAR', 'HFT İÇİ GÜNLÜKi', 'HFT SONU GÜNLÜK', 'AYLIK ÖĞÜN', 'AYLIK PAKET'],
     ...([
       { label: 'Sezon 1', s: form.ciro.sezon1 },
       { label: 'Sezon 2', s: form.ciro.sezon2 },
       { label: 'Sezon 3', s: form.ciro.sezon3 },
-    ]).map(({ label, s }) => [
-      label,
-      s.aylar.join(', '),
-      `${s.sabahKisi}×${s.sabahHarcama}₺`,
-      `${s.ogleKisi}×${s.ogleHarcama}₺`,
-      `${s.aksamKisi}×${s.aksamHarcama}₺`,
-      (s.sabahKisi * s.sabahHarcama) + (s.ogleKisi * s.ogleHarcama) + (s.aksamKisi * s.aksamHarcama),
-    ]),
+    ]).map(({ label, s }) => {
+      const haftaIci = (s.haftaIciSabahKisi||0)*(s.haftaIciSabahHarcama||0) + (s.haftaIciOgleKisi||0)*(s.haftaIciOgleHarcama||0) + (s.haftaIciAksamKisi||0)*(s.haftaIciAksamHarcama||0);
+      const haftaSonu = (s.haftaSonuSabahKisi||0)*(s.haftaSonuSabahHarcama||0) + (s.haftaSonuOgleKisi||0)*(s.haftaSonuOgleHarcama||0) + (s.haftaSonuAksamKisi||0)*(s.haftaSonuAksamHarcama||0);
+      return [
+        label,
+        s.aylar.join(', '),
+        haftaIci,
+        haftaSonu,
+        haftaIci * 22 + haftaSonu * 8,
+        (s.paketAdet||0) * (s.paketTutar||0) * 30,
+      ];
+    }),
     ['Paket Servis (Sezonlara Göre)', '', '', '', '', ciro.gunlukPaketCiro],
     ['', '', '', '', ''],
     ['Günlük Kapasite Cirosu', '', '', '', ciro.gunlukKapasiteCiro],

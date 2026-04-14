@@ -60,24 +60,38 @@ export interface CapexGirdisi {
 
 export interface SezonVerisi {
   aylar: string[];          // Seçili ay isimleri
-  sabahKisi: number;
-  sabahHarcama: number;
-  ogleKisi: number;
-  ogleHarcama: number;
-  aksamKisi: number;
-  aksamHarcama: number;
+  // Hafta içi (Pzt–Cum, ~22 gün/ay)
+  haftaIciSabahKisi: number;
+  haftaIciSabahHarcama: number;
+  haftaIciOgleKisi: number;
+  haftaIciOgleHarcama: number;
+  haftaIciAksamKisi: number;
+  haftaIciAksamHarcama: number;
+  // Hafta sonu (Cmt–Paz, ~8 gün/ay)
+  haftaSonuSabahKisi: number;
+  haftaSonuSabahHarcama: number;
+  haftaSonuOgleKisi: number;
+  haftaSonuOgleHarcama: number;
+  haftaSonuAksamKisi: number;
+  haftaSonuAksamHarcama: number;
   paketAdet: number;        // Günlük paket servis adedi
   paketTutar: number;       // Kişi başı ortalama tutar (₺)
 }
 
 export const VARSAYILAN_SEZON: SezonVerisi = {
   aylar: [],
-  sabahKisi: 0,
-  sabahHarcama: 0,
-  ogleKisi: 0,
-  ogleHarcama: 0,
-  aksamKisi: 0,
-  aksamHarcama: 0,
+  haftaIciSabahKisi: 0,
+  haftaIciSabahHarcama: 0,
+  haftaIciOgleKisi: 0,
+  haftaIciOgleHarcama: 0,
+  haftaIciAksamKisi: 0,
+  haftaIciAksamHarcama: 0,
+  haftaSonuSabahKisi: 0,
+  haftaSonuSabahHarcama: 0,
+  haftaSonuOgleKisi: 0,
+  haftaSonuOgleHarcama: 0,
+  haftaSonuAksamKisi: 0,
+  haftaSonuAksamHarcama: 0,
   paketAdet: 0,
   paketTutar: 0,
 };
@@ -256,23 +270,32 @@ export const FORM_VARSAYILAN: FormDurumu = {
     acikAlanSandalyeSayisi: 20,
     sezon1: {
       aylar: ['Haziran', 'Temmuz', 'Ağustos'],
-      sabahKisi: 0, sabahHarcama: 0,
-      ogleKisi: 40, ogleHarcama: 250,
-      aksamKisi: 60, aksamHarcama: 400,
+      haftaIciSabahKisi: 0, haftaIciSabahHarcama: 0,
+      haftaIciOgleKisi: 40, haftaIciOgleHarcama: 250,
+      haftaIciAksamKisi: 60, haftaIciAksamHarcama: 400,
+      haftaSonuSabahKisi: 0, haftaSonuSabahHarcama: 0,
+      haftaSonuOgleKisi: 50, haftaSonuOgleHarcama: 270,
+      haftaSonuAksamKisi: 80, haftaSonuAksamHarcama: 450,
       paketAdet: 20, paketTutar: 200,
     },
     sezon2: {
       aylar: ['Mart', 'Nisan', 'Mayıs', 'Eylül', 'Ekim'],
-      sabahKisi: 0, sabahHarcama: 0,
-      ogleKisi: 35, ogleHarcama: 220,
-      aksamKisi: 50, aksamHarcama: 350,
+      haftaIciSabahKisi: 0, haftaIciSabahHarcama: 0,
+      haftaIciOgleKisi: 35, haftaIciOgleHarcama: 220,
+      haftaIciAksamKisi: 50, haftaIciAksamHarcama: 350,
+      haftaSonuSabahKisi: 0, haftaSonuSabahHarcama: 0,
+      haftaSonuOgleKisi: 45, haftaSonuOgleHarcama: 240,
+      haftaSonuAksamKisi: 65, haftaSonuAksamHarcama: 400,
       paketAdet: 15, paketTutar: 180,
     },
     sezon3: {
       aylar: ['Ocak', 'Şubat', 'Kasım', 'Aralık'],
-      sabahKisi: 0, sabahHarcama: 0,
-      ogleKisi: 25, ogleHarcama: 200,
-      aksamKisi: 40, aksamHarcama: 300,
+      haftaIciSabahKisi: 0, haftaIciSabahHarcama: 0,
+      haftaIciOgleKisi: 25, haftaIciOgleHarcama: 200,
+      haftaIciAksamKisi: 40, haftaIciAksamHarcama: 300,
+      haftaSonuSabahKisi: 0, haftaSonuSabahHarcama: 0,
+      haftaSonuOgleKisi: 35, haftaSonuOgleHarcama: 220,
+      haftaSonuAksamKisi: 55, haftaSonuAksamHarcama: 350,
       paketAdet: 10, paketTutar: 160,
     },
     aylikCalismaGunu: 26,

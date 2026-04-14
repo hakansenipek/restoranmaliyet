@@ -20,6 +20,98 @@ const SEZON_RENK = [
   { bg: 'bg-orange-500', text: 'text-orange-700', border: 'border-orange-200', light: 'bg-orange-50' },
 ];
 
+interface OgunTablosuProps {
+  baslik: string;
+  altBaslik: string;
+  renk: typeof SEZON_RENK[0];
+  sabahKisiKey: keyof SezonVerisi;
+  sabahHarcamaKey: keyof SezonVerisi;
+  ogleKisiKey: keyof SezonVerisi;
+  ogleHarcamaKey: keyof SezonVerisi;
+  aksamKisiKey: keyof SezonVerisi;
+  aksamHarcamaKey: keyof SezonVerisi;
+  girdi: SezonVerisi;
+  setField: (k: keyof SezonVerisi, v: number) => void;
+}
+
+function OgunTablosu({
+  baslik, altBaslik, renk,
+  sabahKisiKey, sabahHarcamaKey,
+  ogleKisiKey, ogleHarcamaKey,
+  aksamKisiKey, aksamHarcamaKey,
+  girdi, setField,
+}: OgunTablosuProps) {
+  const sabahT = (girdi[sabahKisiKey] as number || 0) * (girdi[sabahHarcamaKey] as number || 0);
+  const ogleT  = (girdi[ogleKisiKey]  as number || 0) * (girdi[ogleHarcamaKey]  as number || 0);
+  const aksamT = (girdi[aksamKisiKey] as number || 0) * (girdi[aksamHarcamaKey] as number || 0);
+  const gunluk = sabahT + ogleT + aksamT;
+
+  const satirlar = [
+    { label: 'Sabah', kisiKey: sabahKisiKey, harcamaKey: sabahHarcamaKey, toplam: sabahT },
+    { label: 'Öğle',  kisiKey: ogleKisiKey,  harcamaKey: ogleHarcamaKey,  toplam: ogleT  },
+    { label: 'Akşam', kisiKey: aksamKisiKey, harcamaKey: aksamHarcamaKey, toplam: aksamT },
+  ];
+
+  return (
+    <div className={`flex-1 rounded-lg border ${renk.border} p-3`}>
+      <div className="mb-2">
+        <p className={`text-[11px] font-bold ${renk.text}`}>{baslik}</p>
+        <p className="text-[10px] text-gray-400">{altBaslik}</p>
+      </div>
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="text-gray-400 text-[10px]">
+            <th className="text-left pb-1 font-medium w-10"></th>
+            <th className="text-right pb-1 font-medium">Kişi</th>
+            <th className="text-right pb-1 font-medium pr-1">₺/Kişi</th>
+            <th className="text-right pb-1 font-medium">Toplam</th>
+          </tr>
+        </thead>
+        <tbody>
+          {satirlar.map(({ label, kisiKey, harcamaKey, toplam }) => (
+            <tr key={label} className="border-t border-gray-100">
+              <td className="py-1 font-medium text-gray-700 text-[11px]">{label}</td>
+              <td className="py-1 text-right">
+                <input
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={girdi[kisiKey] as number || 0}
+                  onChange={e => setField(kisiKey, parseFloat(e.target.value) || 0)}
+                  className="w-12 text-right text-xs border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-purple-400"
+                />
+              </td>
+              <td className="py-1 text-right pr-1">
+                <input
+                  type="number"
+                  min={0}
+                  step={10}
+                  value={girdi[harcamaKey] as number || 0}
+                  onChange={e => setField(harcamaKey, parseFloat(e.target.value) || 0)}
+                  className="w-14 text-right text-xs border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-purple-400"
+                />
+              </td>
+              <td className="py-1 text-right font-mono text-gray-700 text-[11px]">
+                {toplam.toLocaleString('tr-TR')}₺
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr className="border-t-2 border-gray-200">
+            <td colSpan={3} className={`py-1 text-[11px] font-semibold ${renk.text}`}>
+              Günlük
+            </td>
+            <td className={`py-1 text-right font-mono font-bold text-[11px] ${renk.text}`}>
+              {gunluk.toLocaleString('tr-TR')}₺
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  );
+}
+
 interface SezonKartiProps {
   baslik: string;
   renk: typeof SEZON_RENK[0];
@@ -40,16 +132,15 @@ function SezonKarti({ baslik, renk, girdi, digerAylar, onChange }: SezonKartiPro
     onChange({ ...girdi, [k]: v });
   }
 
-  const sabahToplam = (girdi.sabahKisi || 0) * (girdi.sabahHarcama || 0);
-  const ogleToplam  = (girdi.ogleKisi  || 0) * (girdi.ogleHarcama  || 0);
-  const aksamToplam = (girdi.aksamKisi || 0) * (girdi.aksamHarcama || 0);
-  const gunlukToplam = sabahToplam + ogleToplam + aksamToplam;
-
-  const ogünler = [
-    { label: 'Sabah', kisiKey: 'sabahKisi' as const, harcamaKey: 'sabahHarcama' as const, toplam: sabahToplam },
-    { label: 'Öğle',  kisiKey: 'ogleKisi'  as const, harcamaKey: 'ogleHarcama'  as const, toplam: ogleToplam  },
-    { label: 'Akşam', kisiKey: 'aksamKisi' as const, harcamaKey: 'aksamHarcama' as const, toplam: aksamToplam },
-  ];
+  const haftaIciGunluk =
+    (girdi.haftaIciSabahKisi || 0) * (girdi.haftaIciSabahHarcama || 0) +
+    (girdi.haftaIciOgleKisi  || 0) * (girdi.haftaIciOgleHarcama  || 0) +
+    (girdi.haftaIciAksamKisi || 0) * (girdi.haftaIciAksamHarcama || 0);
+  const haftaSonuGunluk =
+    (girdi.haftaSonuSabahKisi || 0) * (girdi.haftaSonuSabahHarcama || 0) +
+    (girdi.haftaSonuOgleKisi  || 0) * (girdi.haftaSonuOgleHarcama  || 0) +
+    (girdi.haftaSonuAksamKisi || 0) * (girdi.haftaSonuAksamHarcama || 0);
+  const aylikOgunCiro = haftaIciGunluk * 22 + haftaSonuGunluk * 8;
 
   return (
     <div className={`rounded-xl border ${renk.border} flex flex-col gap-3 overflow-hidden`}>
@@ -90,59 +181,43 @@ function SezonKarti({ baslik, renk, girdi, digerAylar, onChange }: SezonKartiPro
           </div>
         </div>
 
-        {/* Öğün tablosu */}
+        {/* Hafta içi / Hafta sonu öğün tabloları */}
         <div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Günlük Öğün Cirosu</p>
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-gray-400 text-[11px]">
-                <th className="text-left pb-1.5 font-medium"></th>
-                <th className="text-right pb-1.5 font-medium">Kişi</th>
-                <th className="text-right pb-1.5 font-medium pr-1">Harcama</th>
-                <th className="text-right pb-1.5 font-medium">Toplam</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ogünler.map(({ label, kisiKey, harcamaKey, toplam }) => (
-                <tr key={label} className="border-t border-gray-100">
-                  <td className="py-1.5 font-medium text-gray-700 text-[11px] w-10">{label}</td>
-                  <td className="py-1.5 text-right">
-                    <input
-                      type="number"
-                      min={0}
-                      step={1}
-                      value={girdi[kisiKey]}
-                      onChange={e => setField(kisiKey, parseFloat(e.target.value) || 0)}
-                      className="w-12 text-right text-xs border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-purple-400"
-                    />
-                  </td>
-                  <td className="py-1.5 text-right pr-1">
-                    <input
-                      type="number"
-                      min={0}
-                      step={10}
-                      value={girdi[harcamaKey]}
-                      onChange={e => setField(harcamaKey, parseFloat(e.target.value) || 0)}
-                      className="w-16 text-right text-xs border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-purple-400"
-                    />
-                  </td>
-                  <td className="py-1.5 text-right font-mono text-gray-700 text-[11px]">
-                    {toplam.toLocaleString('tr-TR')} ₺
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="border-t-2 border-gray-200">
-                <td colSpan={3} className={`py-1.5 text-[11px] font-semibold ${renk.text}`}>
-                  Günlük Toplam
-                </td>
-                <td className={`py-1.5 text-right font-mono font-bold text-xs ${renk.text}`}>
-                  {gunlukToplam.toLocaleString('tr-TR')} ₺
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+          <div className="flex gap-2">
+            <OgunTablosu
+              baslik="Hafta İçi"
+              altBaslik="Pzt–Cum (22 gün/ay)"
+              renk={renk}
+              sabahKisiKey="haftaIciSabahKisi"
+              sabahHarcamaKey="haftaIciSabahHarcama"
+              ogleKisiKey="haftaIciOgleKisi"
+              ogleHarcamaKey="haftaIciOgleHarcama"
+              aksamKisiKey="haftaIciAksamKisi"
+              aksamHarcamaKey="haftaIciAksamHarcama"
+              girdi={girdi}
+              setField={setField}
+            />
+            <OgunTablosu
+              baslik="Hafta Sonu"
+              altBaslik="Cmt–Paz (8 gün/ay)"
+              renk={renk}
+              sabahKisiKey="haftaSonuSabahKisi"
+              sabahHarcamaKey="haftaSonuSabahHarcama"
+              ogleKisiKey="haftaSonuOgleKisi"
+              ogleHarcamaKey="haftaSonuOgleHarcama"
+              aksamKisiKey="haftaSonuAksamKisi"
+              aksamHarcamaKey="haftaSonuAksamHarcama"
+              girdi={girdi}
+              setField={setField}
+            />
+          </div>
+          <div className={`flex items-center justify-between mt-2 pt-2 border-t ${renk.border}`}>
+            <span className={`text-[11px] font-bold ${renk.text}`}>Aylık Öğün Cirosu</span>
+            <span className={`text-xs font-mono font-bold ${renk.text}`}>
+              {aylikOgunCiro.toLocaleString('tr-TR')} ₺
+            </span>
+          </div>
         </div>
 
         {/* Paket Servis */}
