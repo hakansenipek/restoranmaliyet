@@ -155,6 +155,12 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
                 <span className="font-mono font-bold text-gray-800">{toplamPersonelSayisi} kişi</span>
               </div>
 
+              {/* Net maaş toplamı */}
+              <div className="flex justify-between items-center text-xs text-gray-500">
+                <span>Toplam Net Maaş</span>
+                <span className="font-mono">{toplamNetMaas.toLocaleString('tr-TR')} ₺</span>
+              </div>
+
               {/* Yemek bedeli */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 shrink-0">Yemek Bedeli (kişi/ay):</span>
