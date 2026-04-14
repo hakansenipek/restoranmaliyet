@@ -86,15 +86,36 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
                     </p>
                   )}
                   {/* Personel satırı */}
-                  <div className="rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2 flex flex-col gap-2">
+                  <div className="rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2 flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={p.unvan}
-                        onChange={e => personelGuncelle(i, 'unvan', e.target.value)}
-                        className="flex-1 text-sm border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#7B3F8E] bg-white"
-                        placeholder="Unvan / Görev"
-                      />
+                      {/* Sabit unvan */}
+                      <span className="flex-1 text-sm font-medium text-gray-700 min-w-0 truncate">{p.unvan}</span>
+                      {/* Adet */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-xs text-gray-500 whitespace-nowrap">Adet:</span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={p.adet}
+                          onChange={e => personelGuncelle(i, 'adet', parseFloat(e.target.value) || 0)}
+                          className="w-14 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
+                        />
+                        <span className="text-xs text-gray-400">kişi</span>
+                      </div>
+                      {/* Net Maaş */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-xs text-gray-500 whitespace-nowrap">Net:</span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1000}
+                          value={p.netMaas}
+                          onChange={e => personelGuncelle(i, 'netMaas', parseFloat(e.target.value) || 0)}
+                          className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
+                        />
+                        <span className="text-xs text-gray-400">₺</span>
+                      </div>
                       <button
                         onClick={() => personelSil(i)}
                         className="text-red-400 hover:text-red-600 text-lg leading-none px-1 shrink-0"
@@ -102,21 +123,6 @@ export default function Modul3Opex({ girdi, ciro, onChange }: Props) {
                       >
                         ×
                       </button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <InputField
-                        label="Adet"
-                        value={p.adet}
-                        onChange={v => personelGuncelle(i, 'adet', v)}
-                        suffix="kişi"
-                        step={1}
-                      />
-                      <InputField
-                        label="Net Maaş (Kişi Başı)"
-                        value={p.netMaas}
-                        onChange={v => personelGuncelle(i, 'netMaas', v)}
-                        step={1000}
-                      />
                     </div>
                     <p className="text-[11px] text-gray-400">
                       İşveren maliyeti:{' '}
