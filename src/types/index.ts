@@ -68,6 +68,16 @@ export interface SezonVerisi {
   aksamHarcama: number;
 }
 
+export const VARSAYILAN_SEZON: SezonVerisi = {
+  aylar: [],
+  sabahKisi: 0,
+  sabahHarcama: 0,
+  ogleKisi: 0,
+  ogleHarcama: 0,
+  aksamKisi: 0,
+  aksamHarcama: 0,
+};
+
 export interface CiroGirdisi {
   kapaliAlanSandalyeSayisi: number;
   acikAlanSandalyeSayisi: number;

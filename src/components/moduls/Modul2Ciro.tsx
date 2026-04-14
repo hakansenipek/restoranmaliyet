@@ -7,6 +7,7 @@ import SliderInput from '@/components/ui/SliderInput';
 import SonucSatiri from '@/components/ui/SonucSatiri';
 import { ciroHesapla } from '@/lib/hesaplama/ciroEngine';
 import type { CiroGirdisi, SezonVerisi } from '@/types';
+import { VARSAYILAN_SEZON } from '@/types';
 
 const AYLAR = [
   'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
@@ -164,9 +165,12 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
     [girdi, onChange],
   );
 
-  const s1Aylar = girdi.sezon1.aylar;
-  const s2Aylar = girdi.sezon2.aylar;
-  const s3Aylar = girdi.sezon3.aylar;
+  const s1 = girdi.sezon1 ?? VARSAYILAN_SEZON;
+  const s2 = girdi.sezon2 ?? VARSAYILAN_SEZON;
+  const s3 = girdi.sezon3 ?? VARSAYILAN_SEZON;
+  const s1Aylar = s1.aylar ?? [];
+  const s2Aylar = s2.aylar ?? [];
+  const s3Aylar = s3.aylar ?? [];
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
@@ -220,21 +224,21 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
               <SezonKarti
                 baslik="Sezon 1"
                 renk={SEZON_RENK[0]}
-                girdi={girdi.sezon1}
+                girdi={s1}
                 digerAylar={[...s2Aylar, ...s3Aylar]}
                 onChange={v => set('sezon1', v)}
               />
               <SezonKarti
                 baslik="Sezon 2"
                 renk={SEZON_RENK[1]}
-                girdi={girdi.sezon2}
+                girdi={s2}
                 digerAylar={[...s1Aylar, ...s3Aylar]}
                 onChange={v => set('sezon2', v)}
               />
               <SezonKarti
                 baslik="Sezon 3"
                 renk={SEZON_RENK[2]}
-                girdi={girdi.sezon3}
+                girdi={s3}
                 digerAylar={[...s1Aylar, ...s2Aylar]}
                 onChange={v => set('sezon3', v)}
               />
