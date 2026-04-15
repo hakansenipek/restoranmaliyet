@@ -291,7 +291,7 @@ export const FORM_VARSAYILAN: FormDurumu = {
       // Mutfak Operasyonu
       { unvan: 'Mutfak Şefi (Executive Chef)', adet: 0, netMaas: 0, grup: 'Mutfak Operasyonu' },
       { unvan: 'Sous Chef (Şef Yardımcısı)',   adet: 0, netMaas: 0 },
-      { unvan: 'Kısım Şefi (Demirbaş Aşçı)',   adet: 0, netMaas: 0 },
+      { unvan: 'Kısım Şefi',                    adet: 0, netMaas: 0 },
       { unvan: 'Aşçı Yardımcısı',              adet: 0, netMaas: 0 },
       { unvan: 'Bulaşıkçı / Steward',          adet: 0, netMaas: 0 },
       // Salon ve Servis
