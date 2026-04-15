@@ -1,5 +1,5 @@
 # CLAUDE.md — Restoran Açılış Maliyeti Hesaplama Sitesi
-> **Dosya Versiyonu: 3.1 | Son güncelleme: Nisan 2026**  
+> **Dosya Versiyonu: 3.2 | Son güncelleme: Nisan 2026**  
 > Bu dosya her yeni Claude Code oturumunda proje bağlamı olarak verilmelidir.
 
 ---
@@ -40,7 +40,7 @@ src/
 │   └── ui/
 │       ├── Card.tsx
 │       ├── InputField.tsx
-│       ├── SliderInput.tsx         # Modul2Ciro artık KULLANMIYOR
+│       ├── SliderInput.tsx         # Modul2Ciro KULLANMIYOR; Modul3Opex ödeme dağılımı, Modul4PL KDV sliderları kullanır
 │       ├── SonucSatiri.tsx
 │       └── ...
 ├── lib/
@@ -124,6 +124,12 @@ kiraSozlesmeTipi: 'bireysel' | 'kurumsal';  // plEngine'e geçirilir
 // bireysel → aylık %20 stopaj hesaplanır
 // kurumsal → stopaj uygulanmaz, KDV eklenir
 aylikKira: number;  // Modül 3 Sabit Giderler'e ve P&L stopaj hesabına aktarılır
+
+// Lisans & Ruhsat — yeni eklenen alanlar:
+itfaiyeBelgesi: number;
+muzikTelifLisans: number;
+tabelaReklamVergisi: number;
+bacaBelgesi: number;
 ```
 
 > ⚠️ `opex.kira` **kaldırıldı**. Kira tüm hesaplamalarda `capex.aylikKira` üzerinden gelir. `opexHesapla` ve `plHesapla` çağrılarında `form.capex.aylikKira` geçirilir.
@@ -133,7 +139,7 @@ aylikKira: number;  // Modül 3 Sabit Giderler'e ve P&L stopaj hesabına aktarı
 ```typescript
 // KALDIRILDI: kira (artık capex.aylikKira kullanılır)
 // YENİDEN ADLANDIRILDI: muhasebe → maliMusavir
-yemekBedeli: number;   // Kişi başı aylık yemek bedeli (₺); toplam = yemekBedeli × toplam adet
+yemekBedeli: number;   // Kişi başı GÜNLÜK yemek bedeli (₺); toplam = yemekBedeli × kişi × aylikCalismaGunu
 maliMusavir: number;   // Eski adı: muhasebe
 ```
 
@@ -142,7 +148,7 @@ maliMusavir: number;   // Eski adı: muhasebe
 ### OpexSonucu (yeni alanlar)
 
 ```typescript
-yemekBedeliToplam: number;    // yemekBedeli × toplamPersonelSayisi
+yemekBedeliToplam: number;    // yemekBedeli × toplamPersonelSayisi × aylikCalismaGunu
 sgkIsverenToplam: number;     // toplamIsverenMaliyet - toplamNetMaas
 toplamPersonelSayisi: number; // Σ p.adet
 ```
@@ -197,7 +203,7 @@ const gunlukBrutCiro = aylikBrutCiro / 30;
 - Tüm alanlar `n()` yardımcı fonksiyonuyla (`v || 0`) NaN'dan korunur
 - `insaatDekorasyon`: 7 tesisat kalemi + 3 açık alan kalemi + 4 masa/sandalye adet×fiyat
 - `mimariProje`: devirUcreti + mimariHizmetBedeli + belediyeRuhsatBedeli + turizmBelgesiBedeli + dogalgazProjeBedeli + mimariDiger
-- `lisansRuhsat`: yazarKasaPos + tapdk + lisansDiger
+- `lisansRuhsat`: yazarKasaPos + tapdk + itfaiyeBelgesi + muzikTelifLisans + tabelaReklamVergisi + bacaBelgesi + lisansDiger
 - `kiraDepozito`: depozitoBedeli + emlakciKomisyonu
 - `acilisPazarlama`: sosyalMedyaReklam + influencerBedeli + billboardReklam + elIlaniReklam
 - `gorulenmeyen`: araToplamCapex × 0.10 (%10 beklenmeyen gider tamponu)
@@ -214,7 +220,7 @@ isverenMaliyeti = brüt × 1.225   // brüt × (1 + 0.225 SGK işveren)
 // Personel toplam:
 toplamIsverenMaliyet = Σ (netMaas / 0.85 × 1.225 × adet)
 sgkIsverenToplam     = toplamIsverenMaliyet - toplamNetMaas
-yemekBedeliToplam    = opex.yemekBedeli × toplamPersonelSayisi
+yemekBedeliToplam    = opex.yemekBedeli × toplamPersonelSayisi × aylikCalismaGunu
 personelToplamMaliyet = round(toplamIsverenMaliyet) + yemekBedeliToplam
 
 // Sabit gider kira kaynağı:
@@ -222,7 +228,7 @@ toplamSabitGider = aylikKira(capex) + elektrik + su + dogalgaz
                  + maliMusavir + yazilimPos + digerSabit
 ```
 
-> `opexHesapla(g, ciro, netSatis, aylikKira)` — 4. parametre zorunlu.
+> `opexHesapla(g, ciro, netSatis, aylikKira, aylikCalismaGunu)` — 5 parametre, hepsi zorunlu.
 
 ---
 
@@ -234,12 +240,12 @@ toplamSabitGider = aylikKira(capex) + elektrik + su + dogalgaz
 
 ```typescript
 // page.tsx'te çağrım:
-opexHesapla(form.opex, ciro, netSatis, form.capex.aylikKira)
+opexHesapla(form.opex, ciro, netSatis, form.capex.aylikKira, form.ciro.aylikCalismaGunu)
 plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv,
           form.capex.aylikKira, form.capex.kiraSozlesmeTipi)
 
 // Modul3Opex'e prop olarak:
-<Modul3Opex aylikKira={form.capex.aylikKira} ... />
+<Modul3Opex aylikKira={form.capex.aylikKira} aylikCalismaGunu={form.ciro.aylikCalismaGunu} ... />
 
 // Modul4PL'e prop olarak:
 <Modul4PL netKira={form.capex.aylikKira} kiraSozlesmeTipi={form.capex.kiraSozlesmeTipi} ... />
@@ -312,7 +318,7 @@ Her personel satırında tek bir satır:
 Sırasıyla:
 1. Toplam Personel Sayısı (kişi)
 2. Toplam Net Maaş (₺)
-3. Yemek Bedeli (kişi/ay) girişi → Toplam Yemek Bedeli
+3. Yemek Bedeli **(kişi/gün)** girişi → Toplam Yemek Bedeli `(kişi × gün)` açıklamasıyla
 4. SGK İşveren Payı (brüt × %22.5)
 5. **Toplam Personel Maliyeti** (bold)
 
@@ -321,6 +327,12 @@ Sırasıyla:
 - **Kira**: `aylikKira` prop'undan salt okunur gösterilir — `(Modül 1'den)` etiketi ile
 - **Mali Müşavir**: eski `muhasebe` alanının yeni adı
 - Gıda Maliyeti: `SliderInput` DEĞİL `InputField` (% değeri doğrudan girilir)
+- Sarf Malzeme: `SliderInput` DEĞİL `InputField`
+
+### Ödeme Dağılımı
+
+- 4 kanal: Nakit, Kredi Kartı, Yemek Kartı, Online — hepsi **`SliderInput`**
+- Komisyon oranları label'da gösterilir: KK %2, Yemek kartı %10, Online %20
 
 ---
 
@@ -335,6 +347,7 @@ Eski `localStorage` verisi yeni alanları içermeyebilir. Savunma katmanları:
 5. `n(v || 0)` — capexEngine'de NaN koruması
 6. `yemekBedeli` yoksa `0` — page.tsx migration
 7. `muhasebe` → `maliMusavir` — page.tsx migration (`opexAny.muhasebe ?? 3000`)
+8. `hammaddeKdvOrani` → `hammaddeKdv1Pay` — page.tsx migration (eski `0.01` → `1`, eski `0.10` → `0`)
 
 ---
 
@@ -361,6 +374,12 @@ Eski `localStorage` verisi yeni alanları içermeyebilir. Savunma katmanları:
 10. **Personel işveren maliyeti formülü:** `(netMaas / 0.85) × 1.225 × adet`. Eski `× 1.575` formülü kullanılmaz.
 
 11. **`muhasebe` alanı kaldırıldı:** Yeni adı `maliMusavir`. Eski `muhasebe` adını kullanan herhangi bir kod TypeScript hatası verir.
+
+12. **`hammaddeKdvOrani` kaldırıldı:** Yerine `hammaddeKdv1Pay` (0–1, %1 KDV'li alımların payı) kullanılır. plEngine efektif oran = `hammaddeKdv1Pay × 0.01 + (1 - hammaddeKdv1Pay) × 0.10` olarak hesaplar. Modul4PL'de iki senkron SliderInput ile gösterilir.
+
+13. **KDV dağılımı iki slider:** `kdvDusukPay` (%10'luk ciro payı, 0–1) tek kaynak olmaya devam eder. %20 slider değeri `(1 - kdvDusukPay) × 100` olarak türetilir; onChange'de `kdvDusukPay = (100 - v) / 100` set edilir.
+
+14. **`aylikCalismaGunu` opexEngine'e geçirilir:** `Modul3Opex` bileşeni bu değeri `prop` olarak alır; `opexHesapla` 5. parametre olarak kullanır. Yemek bedeli günlüktür — aylık toplam `günlük × kişi × aylikCalismaGunu`.
 
 ---
 
