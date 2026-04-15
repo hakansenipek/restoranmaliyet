@@ -124,6 +124,9 @@ export default function Modul4PL({ girdi, ciro, opex, netKira, kiraSozlesmeTipi,
 
           {/* Vergi Türü */}
           <Card title="Vergi Türü">
+            <p className="text-xs text-gray-500 mb-3">
+              Vergi hesaplamasının doğruluğu için şirket yapınızı seçin. Şahıs şirketlerinde artan oranlı vergi dilimleri (Gelir Vergisi), LTD ve AŞ&apos;lerde ise sabit %25 vergi oranı (Kurumlar Vergisi) baz alınır. Sistem, seçiminize göre net kârınızı otomatik olarak revize edecektir.
+            </p>
             <div className="flex gap-3">
               {(['gelir', 'kurumlar'] as const).map(tur => (
                 <button
