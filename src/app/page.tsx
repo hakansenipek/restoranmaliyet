@@ -162,10 +162,25 @@ export default function Page() {
           .maybeSingle();
 
         if (savedFromCallback && lsVerisi) {
-          // Magic link sonrası: localStorage verisini kaydet
+          // Magic link sonrası: localStorage verisini DB'ye kaydet
           setForm(lsVerisi);
           localStorage.removeItem(LS_KEY);
           router.replace('/');
+          // DB'ye otomatik kaydet
+          try {
+            const kaydetPayload = {
+              isletme_adi: lsVerisi.isletmeAdi || null,
+              girdi: lsVerisi as unknown as Record<string, unknown>,
+              sonuc: hesapla(lsVerisi) as unknown as Record<string, unknown>,
+              updated_at: new Date().toISOString(),
+            };
+            const { data: mevcut } = await supabase.from('hesaplamalar').select('id').eq('user_id', u.id).maybeSingle();
+            if (mevcut?.id) {
+              await supabase.from('hesaplamalar').update(kaydetPayload).eq('id', mevcut.id);
+            } else {
+              await supabase.from('hesaplamalar').insert({ user_id: u.id, ...kaydetPayload });
+            }
+          } catch { /* sessizce devam et */ }
         } else if (dbRow?.girdi) {
           setForm(dbRow.girdi as FormDurumu);
         } else if (lsVerisi) {
@@ -247,7 +262,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <Header onKaydet={user ? handleKaydet : undefined} kaydetDurum={kaydetDurum} />
 
       <main className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
         {/* Hero Section */}

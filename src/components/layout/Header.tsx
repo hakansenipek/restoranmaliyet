@@ -10,7 +10,14 @@ function emailKisa(e: string): string {
   return local.slice(0, 10) + '…@' + domain;
 }
 
-export default function Header() {
+type KaydetDurum = 'bos' | 'yukleniyor' | 'basarili' | 'hata';
+
+interface HeaderProps {
+  onKaydet?: () => void;
+  kaydetDurum?: KaydetDurum;
+}
+
+export default function Header({ onKaydet, kaydetDurum = 'bos' }: HeaderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [modalAcik, setModalAcik] = useState(false);
   const [email, setEmail] = useState('');
@@ -86,6 +93,28 @@ export default function Header() {
                 <span className="text-xs text-purple-200 hidden sm:inline">
                   {emailKisa(user.email ?? '')}
                 </span>
+                {onKaydet && (
+                  <button
+                    onClick={onKaydet}
+                    disabled={kaydetDurum === 'yukleniyor' || kaydetDurum === 'basarili'}
+                    className="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors disabled:opacity-70"
+                    style={
+                      kaydetDurum === 'basarili'
+                        ? { backgroundColor: '#16a34a', color: 'white' }
+                        : kaydetDurum === 'hata'
+                        ? { backgroundColor: '#dc2626', color: 'white' }
+                        : { backgroundColor: 'white', color: '#5A2D6E' }
+                    }
+                  >
+                    {kaydetDurum === 'yukleniyor'
+                      ? 'Kaydediliyor…'
+                      : kaydetDurum === 'basarili'
+                      ? 'Kaydedildi ✓'
+                      : kaydetDurum === 'hata'
+                      ? 'Hata — Tekrar Dene'
+                      : 'Kaydet'}
+                  </button>
+                )}
                 <button
                   onClick={cikisYap}
                   className="px-3 py-1.5 rounded-md text-xs font-semibold text-white border border-white/40 hover:bg-white/10 transition-colors"
