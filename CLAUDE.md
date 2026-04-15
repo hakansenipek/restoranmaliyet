@@ -1,5 +1,5 @@
 # CLAUDE.md — Restoran Açılış Maliyeti Hesaplama Sitesi
-> **Dosya Versiyonu: 3.2 | Son güncelleme: Nisan 2026**  
+> **Dosya Versiyonu: 3.3 | Son güncelleme: Nisan 2026**  
 > Bu dosya her yeni Claude Code oturumunda proje bağlamı olarak verilmelidir.
 
 ---
@@ -19,7 +19,11 @@
 Frontend:   Next.js 14 (App Router) + TypeScript
 Styling:    Tailwind CSS
 Grafik:     Recharts (Cash Flow grafiği)
-Export:     xlsx (Excel) + jsPDF + autoTable (PDF)
+Export:     jsPDF + autoTable (PDF) — Excel kaldırıldı
+Auth:       Supabase Auth (magic link / OTP)
+DB:         Supabase (hesaplamalar tablosu)
+E-posta:    Supabase Auth → magic link gönderir
+            Resend → "Görüş ve Talepler" admin bildirimi (RESEND_API_KEY gerekir)
 Deploy:     Vercel
 ```
 
@@ -30,17 +34,23 @@ Deploy:     Vercel
 ```
 src/
 ├── app/
-│   └── page.tsx                    # Ana sayfa — tüm modüller burada birleşir
+│   ├── page.tsx                    # Ana sayfa — tüm modüller burada birleşir
+│   └── api/
+│       └── gorus/
+│           └── route.ts            # POST /api/gorus — Resend ile admin mail
 ├── components/
-│   ├── moduls/                     # 4 ana modül
-│   │   ├── Modul1Capex.tsx         # Yatırım maliyeti
-│   │   ├── Modul2Ciro.tsx          # Ciro projeksiyonu (sezonlara göre)
-│   │   ├── Modul3Opex.tsx          # Aylık işletme giderleri
-│   │   └── Modul4PL.tsx            # Kar/Zarar & ROI
+│   ├── moduls/
+│   │   ├── Modul1Capex.tsx
+│   │   ├── Modul2Ciro.tsx
+│   │   ├── Modul3Opex.tsx
+│   │   └── Modul4PL.tsx
+│   ├── layout/
+│   │   └── Header.tsx              # Auth durumu, modal login, giriş butonu
+│   ├── IndirButonlari.tsx          # PDF indir + Görüş formu (login guard)
 │   └── ui/
 │       ├── Card.tsx
-│       ├── InputField.tsx
-│       ├── SliderInput.tsx         # Modul2Ciro KULLANMIYOR; Modul3Opex ödeme dağılımı, Modul4PL KDV sliderları kullanır
+│       ├── InputField.tsx          # type="text", TR locale format, undefined/NaN korumalı
+│       ├── SliderInput.tsx
 │       ├── SonucSatiri.tsx
 │       └── ...
 ├── lib/
@@ -49,10 +59,16 @@ src/
 │   │   ├── ciroEngine.ts
 │   │   ├── opexEngine.ts
 │   │   └── plEngine.ts
-│   └── export/
-│       └── index.ts                # Excel + PDF dışa aktarım
-└── types/
-    └── index.ts                    # Tüm tipler ve FORM_VARSAYILAN
+│   ├── export/
+│   │   └── index.ts                # PDF dışa aktarım (NotoSans font, Türkçe karakter)
+│   └── supabase/
+│       ├── client.ts               # Browser Supabase client
+│       └── server.ts
+├── types/
+│   └── index.ts                    # Tüm tipler ve FORM_VARSAYILAN
+public/
+└── fonts/
+    └── NotoSans-Regular.ttf        # PDF için Türkçe karakter desteği (597KB)
 ```
 
 ---
@@ -65,7 +81,7 @@ Ciro girişi hafta içi / hafta sonu olarak ikiye ayrılmıştır:
 
 ```typescript
 export interface SezonVerisi {
-  aylar: string[];              // Seçili ay isimleri
+  aylar: string[];
 
   // Hafta içi (Pzt–Cum, ~22 gün/ay)
   haftaIciSabahKisi: number;
@@ -83,117 +99,51 @@ export interface SezonVerisi {
   haftaSonuAksamKisi: number;
   haftaSonuAksamHarcama: number;
 
-  paketAdet: number;            // Günlük paket servis adedi
-  paketTutar: number;           // Kişi başı ortalama tutar (₺)
-}
-
-export const VARSAYILAN_SEZON: SezonVerisi = {
-  aylar: [],
-  haftaIciSabahKisi: 0, haftaIciSabahHarcama: 0,
-  haftaIciOgleKisi: 0,  haftaIciOgleHarcama: 0,
-  haftaIciAksamKisi: 0, haftaIciAksamHarcama: 0,
-  haftaSonuSabahKisi: 0, haftaSonuSabahHarcama: 0,
-  haftaSonuOgleKisi: 0,  haftaSonuOgleHarcama: 0,
-  haftaSonuAksamKisi: 0, haftaSonuAksamHarcama: 0,
-  paketAdet: 0,
-  paketTutar: 0,
-};
-```
-
-> ⚠️ **Eski alanlar tamamen kaldırıldı:** `sabahKisi`, `sabahHarcama`, `ogleKisi`, `ogleHarcama`, `aksamKisi`, `aksamHarcama` artık yoktur. Bunları kullanan kod TypeScript hatası verir.
-
-### CiroGirdisi
-
-```typescript
-export interface CiroGirdisi {
-  kapaliAlanSandalyeSayisi: number;
-  acikAlanSandalyeSayisi: number;
-  sezon1: SezonVerisi;
-  sezon2: SezonVerisi;
-  sezon3: SezonVerisi;
-  aylikCalismaGunu: number;     // UI'da InputField (SliderInput DEĞİL)
+  paketAdet: number;
+  paketTutar: number;
 }
 ```
 
-> ⚠️ **Kaldırılan alanlar:** `paketSiparisSayisi`, `paketSiparisOrtalaması`. Paket servis artık her sezonda `paketAdet` ve `paketTutar` ile tanımlanır.
+> ⚠️ **Eski alanlar tamamen kaldırıldı:** `sabahKisi`, `sabahHarcama`, `ogleKisi`, `ogleHarcama`, `aksamKisi`, `aksamHarcama` artık yoktur.
 
 ### CapexGirdisi (özet — önemli alanlar)
 
 ```typescript
-kiraSozlesmeTipi: 'bireysel' | 'kurumsal';  // plEngine'e geçirilir
-// bireysel → aylık %20 stopaj hesaplanır
-// kurumsal → stopaj uygulanmaz, KDV eklenir
-aylikKira: number;  // Modül 3 Sabit Giderler'e ve P&L stopaj hesabına aktarılır
+kiraSozlesmeTipi: 'bireysel' | 'kurumsal';
+aylikKira: number;
 
-// Lisans & Ruhsat — yeni eklenen alanlar:
+// Lisans & Ruhsat:
 itfaiyeBelgesi: number;
 muzikTelifLisans: number;
 tabelaReklamVergisi: number;
 bacaBelgesi: number;
+
+// İnşaat & Dekorasyon:
+sesSistemi: number;   // UI'da "Ses ve Kamera Sistemi Bedeli" olarak gösterilir
 ```
 
-> ⚠️ `opex.kira` **kaldırıldı**. Kira tüm hesaplamalarda `capex.aylikKira` üzerinden gelir. `opexHesapla` ve `plHesapla` çağrılarında `form.capex.aylikKira` geçirilir.
+> ⚠️ `opex.kira` **kaldırıldı**. Kira tüm hesaplamalarda `capex.aylikKira` üzerinden gelir.
 
-### OpexGirdisi (özet — önemli değişiklikler)
+### OpexGirdisi (özet)
 
 ```typescript
-// KALDIRILDI: kira (artık capex.aylikKira kullanılır)
-// YENİDEN ADLANDIRILDI: muhasebe → maliMusavir
-yemekBedeli: number;   // Kişi başı GÜNLÜK yemek bedeli (₺); toplam = yemekBedeli × kişi × aylikCalismaGunu
-maliMusavir: number;   // Eski adı: muhasebe
+yemekBedeli: number;        // Kişi başı GÜNLÜK yemek bedeli
+maliMusavir: number;        // Eski adı: muhasebe
+personelKiyafet: number;    // Kişi başı aylık kıyafet bedeli
+personelServisi: number;    // Aylık toplam servis/ulaşım
+internetTelefon: number;
+aidatOrtakAlan: number;
+bakimOnarimIlaclama: number;
 ```
 
-> ⚠️ Eski localStorage'daki `muhasebe` alanı `maliMusavir`'e migrate edilir (`page.tsx` içinde). `kira` alanı artık `OpexGirdisi`'nde yoktur.
-
-### OpexSonucu (yeni alanlar)
+### OpexSonucu
 
 ```typescript
-yemekBedeliToplam: number;    // yemekBedeli × toplamPersonelSayisi × aylikCalismaGunu
-sgkIsverenToplam: number;     // toplamIsverenMaliyet - toplamNetMaas
-toplamPersonelSayisi: number; // Σ p.adet
-```
-
----
-
-## 🧮 Ciro Hesaplama Motoru (`src/lib/hesaplama/ciroEngine.ts`)
-
-### Temel Formül
-
-```typescript
-const HAFTA_ICI_GUN = 22;   // Ayda ortalama hafta içi günü
-const HAFTA_SONU_GUN = 8;   // Ayda ortalama hafta sonu günü
-
-// Sezon günlük hesaplar
-function sezonHaftaIciGunluk(s: SezonVerisi): number {
-  return (s.haftaIciSabahKisi || 0) * (s.haftaIciSabahHarcama || 0)
-    + (s.haftaIciOgleKisi || 0) * (s.haftaIciOgleHarcama || 0)
-    + (s.haftaIciAksamKisi || 0) * (s.haftaIciAksamHarcama || 0);
-}
-
-function sezonHaftaSonuGunluk(s: SezonVerisi): number {
-  return (s.haftaSonuSabahKisi || 0) * (s.haftaSonuSabahHarcama || 0)
-    + (s.haftaSonuOgleKisi || 0) * (s.haftaSonuOgleHarcama || 0)
-    + (s.haftaSonuAksamKisi || 0) * (s.haftaSonuAksamHarcama || 0);
-}
-
-// Aylık öğün cirosu
-function sezonAylikOgun(s: SezonVerisi): number {
-  return sezonHaftaIciGunluk(s) * HAFTA_ICI_GUN
-    + sezonHaftaSonuGunluk(s) * HAFTA_SONU_GUN;
-}
-
-// Aylık paket cirosu
-function sezonAylikPaket(s: SezonVerisi): number {
-  return (s.paketAdet || 0) * (s.paketTutar || 0) * 30;
-}
-
-// Yıllık katkı: her sezon için
-const s1Yillik = (sezonAylikOgun(s1) + sezonAylikPaket(s1)) * (s1.aylar?.length || 0);
-// ... s2, s3 aynı şekilde
-
-const yillikBrutCiro = s1Yillik + s2Yillik + s3Yillik;
-const aylikBrutCiro  = yillikBrutCiro / 12;
-const gunlukBrutCiro = aylikBrutCiro / 30;
+yemekBedeliToplam: number;
+personelKiyafetToplam: number;
+personelServisiToplam: number;
+sgkIsverenToplam: number;
+toplamPersonelSayisi: number;
 ```
 
 ---
@@ -201,31 +151,21 @@ const gunlukBrutCiro = aylikBrutCiro / 30;
 ## 🧮 CAPEX Motoru (`src/lib/hesaplama/capexEngine.ts`)
 
 - Tüm alanlar `n()` yardımcı fonksiyonuyla (`v || 0`) NaN'dan korunur
-- `insaatDekorasyon`: 7 tesisat kalemi + 3 açık alan kalemi + 4 masa/sandalye adet×fiyat
-- `mimariProje`: devirUcreti + mimariHizmetBedeli + belediyeRuhsatBedeli + turizmBelgesiBedeli + dogalgazProjeBedeli + mimariDiger
+- `insaatDekorasyon`: tesisat kalemleri + açık alan + masa/sandalye + sesSistemi
 - `lisansRuhsat`: yazarKasaPos + tapdk + itfaiyeBelgesi + muzikTelifLisans + tabelaReklamVergisi + bacaBelgesi + lisansDiger
-- `kiraDepozito`: depozitoBedeli + emlakciKomisyonu
-- `acilisPazarlama`: sosyalMedyaReklam + influencerBedeli + billboardReklam + elIlaniReklam
-- `gorulenmeyen`: araToplamCapex × 0.10 (%10 beklenmeyen gider tamponu)
+- `gorulenmeyen`: araToplamCapex × 0.10
 
 ---
 
 ## 🧮 OPEX Motoru (`src/lib/hesaplama/opexEngine.ts`)
 
 ```typescript
-// İşveren maliyeti formülü (net → brüt → işveren toplamı):
-brüt = netMaas / 0.85
-isverenMaliyeti = brüt × 1.225   // brüt × (1 + 0.225 SGK işveren)
-
-// Personel toplam:
-toplamIsverenMaliyet = Σ (netMaas / 0.85 × 1.225 × adet)
-sgkIsverenToplam     = toplamIsverenMaliyet - toplamNetMaas
-yemekBedeliToplam    = opex.yemekBedeli × toplamPersonelSayisi × aylikCalismaGunu
-personelToplamMaliyet = round(toplamIsverenMaliyet) + yemekBedeliToplam
-
-// Sabit gider kira kaynağı:
+// İşveren maliyeti: (netMaas / 0.85) × 1.225 × adet
+// Personel toplam maliyeti = işveren + yemek + kıyafet + servis
 toplamSabitGider = aylikKira(capex) + elektrik + su + dogalgaz
-                 + maliMusavir + yazilimPos + digerSabit
+                 + maliMusavir + yazilimPos
+                 + internetTelefon + aidatOrtakAlan + bakimOnarimIlaclama
+                 + digerSabit
 ```
 
 > `opexHesapla(g, ciro, netSatis, aylikKira, aylikCalismaGunu)` — 5 parametre, hepsi zorunlu.
@@ -234,161 +174,122 @@ toplamSabitGider = aylikKira(capex) + elektrik + su + dogalgaz
 
 ## 🧮 P&L Motoru (`src/lib/hesaplama/plEngine.ts`)
 
-- `kiraSozlesmeTipi` parametresi `CapexGirdisi`'nden gelir
-- `bireysel` → `kiraStopaj = netKira × kiraStopajOrani` (varsayılan %20)
-- `kurumsal` → `kiraStopaj = 0`
-
-```typescript
-// page.tsx'te çağrım:
-opexHesapla(form.opex, ciro, netSatis, form.capex.aylikKira, form.ciro.aylikCalismaGunu)
-plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv,
-          form.capex.aylikKira, form.capex.kiraSozlesmeTipi)
-
-// Modul3Opex'e prop olarak:
-<Modul3Opex aylikKira={form.capex.aylikKira} aylikCalismaGunu={form.ciro.aylikCalismaGunu} ... />
-
-// Modul4PL'e prop olarak:
-<Modul4PL netKira={form.capex.aylikKira} kiraSozlesmeTipi={form.capex.kiraSozlesmeTipi} ... />
-```
-
----
-
-## 🖥️ Modül 2 UI (`src/components/moduls/Modul2Ciro.tsx`)
-
-### SezonKarti yapısı
-
-Her sezon kartında sırasıyla:
-1. **Ay seçimi** — 12 aylık grid, diğer sezonlarda seçili aylar disabled
-2. **Günlük Öğün Cirosu** — alt alta iki kart:
-   - **Hafta İçi** (Pzt–Cum, 22 gün/ay): Sabah / Öğle / Akşam satırları
-   - **Hafta Sonu** (Cmt–Paz, 8 gün/ay): Sabah / Öğle / Akşam satırları
-   - Her iki kartın altında **Aylık Öğün Cirosu** özet satırı
-3. **Paket Servis** — Günlük Adet + Kişi Başı Tutar + Aylık Toplam
-
-> Hafta içi ve hafta sonu kartları **yan yana değil alt alta** (`flex-col`) dizilir.  
-> `aylikCalismaGunu` alanı **`InputField`** ile girilir — `SliderInput` kullanılmaz.
-
-### OgunTablosu bileşeni
-
-```typescript
-function OgunTablosu({ baslik, altBaslik, renk,
-  sabahKisiKey, sabahHarcamaKey,
-  ogleKisiKey, ogleHarcamaKey,
-  aksamKisiKey, aksamHarcamaKey,
-  girdi, setField }: OgunTablosuProps)
-```
-`SezonVerisi` key adları prop olarak geçirilir — böylece hafta içi ve hafta sonu için aynı bileşen yeniden kullanılır.
-
----
-
-## 🏗️ Modül 1 UI (`src/components/moduls/Modul1Capex.tsx`)
-
-Alt modül sırası:
-1. Mimari & Proje
-2. İnşaat & Dekorasyon (alan bilgisi + maliyet kalemleri + masa/sandalye)
-3. Mutfak ve Servis Ekipmanları
-4. Lisans & Ruhsat
-5. Kira & Depozito (sözleşme tipi toggle: bireysel/kurumsal)
-6. Açılış Pazarlaması
-7. İlk Stok
+- `kiraSozlesmeTipi`: `bireysel` → stopaj %20, `kurumsal` → stopaj yok
+- `hammaddeEfektifKdv = hammaddeKdv1Pay × 0.01 + (1 - hammaddeKdv1Pay) × 0.10`
 
 ---
 
 ## 📤 Dışa Aktarım (`src/lib/export/index.ts`)
 
-- **Excel:** `xlsx` paketi ile `.xlsx` dosyası
-- **PDF:** `jsPDF` + `jspdf-autotable` ile `.pdf`
-- Ciro tablosunda hafta içi/hafta sonu günlük tutarlar ve aylık öğün/paket cirosu ayrı sütunlarda gösterilir
+- **PDF:** `jsPDF` + `jspdf-autotable` + NotoSans font (Türkçe karakter desteği)
+- Font `/public/fonts/NotoSans-Regular.ttf`'den fetch edilir, base64 encode ile embed edilir
+- `btoa` için Uint8Array spread yerine for döngüsü kullanılır (TS downlevelIteration hatası)
+- Header'da sağ üstte `restoranmaliyet.com` yazar
+- **Excel kaldırıldı** — `excelIndir` fonksiyonu hâlâ dosyada duruyor ama buton yok
+
+---
+
+## 🔐 Auth & Kullanıcı Akışı
+
+- **Magic link** ile giriş — Supabase Auth, şifre yok
+- Giriş yapılmamış kullanıcı: localStorage'da 30 gün saklanır
+- Giriş yapılmış kullanıcı: Supabase `hesaplamalar` tablosuna kaydedilir
+- Magic link sonrası `?saved=true` parametresiyle localStorage → DB'ye aktarım
+- **Görüş ve Talepler formu:** sadece giriş yapmış kullanıcılar gönderebilir; giriş yapılmamışsa "Giriş Gerekli" uyarı modalı açılır
+
+---
+
+## 📬 Görüş ve Talepler (`src/app/api/gorus/route.ts`)
+
+- `POST /api/gorus` — Resend ile admin'e HTML mail gönderir
+- `Resend` örneği modül seviyesinde değil, **handler içinde** oluşturulur (build hatası önlenir)
+- Gerekli env değişkenleri: `RESEND_API_KEY`, `ADMIN_EMAIL` (varsayılan: hakansenipek@gmail.com)
+- Magic link gönderimi Resend değil **Supabase** tarafından yapılır
+
+---
+
+## 🖥️ Header (`src/components/layout/Header.tsx`)
+
+- Giriş yapılmamışsa: "Kayıt Ol / Giriş Yap" butonu + altında açıklama metni (sm: görünür)
+- Giriş yapılmışsa: e-posta (kısaltılmış) + "Çıkış Yap" butonu
+- Modal: magic link gönderme formu, başarı/hata durumları
 
 ---
 
 ## 🖥️ Modül 3 UI (`src/components/moduls/Modul3Opex.tsx`)
 
-### Personel Kartı Yapısı
-
-Her personel satırında tek bir satır:
-- **Sabit unvan** (span, düzenlenemez) | **Adet:** giriş | **Net:** giriş | **×** sil butonu
-- Adet > 0 ise altında: `İşveren maliyeti: X ₺ (N × net ÷ 0.85 = brüt, brüt × 1.225 işveren yükü)`
-
-> Personel unvanları `<input type="text">` DEĞİL `<span>` olarak gösterilir — düzenlenemez.  
-> Varsayılan `adet: 0` — giriş yapılınca hesaba katılır.
-
-### Personel Özet Kutusu (listenin altı)
-
-Sırasıyla:
-1. Toplam Personel Sayısı (kişi)
-2. Toplam Net Maaş (₺)
-3. Yemek Bedeli **(kişi/gün)** girişi → Toplam Yemek Bedeli `(kişi × gün)` açıklamasıyla
-4. SGK İşveren Payı (brüt × %22.5)
-5. **Toplam Personel Maliyeti** (bold)
+### Personel Özet Kutusu sırası:
+1. Toplam Personel Sayısı
+2. Yemek Bedeli (kişi/gün) girişi → Toplam Yemek Bedeli
+3. Personel Kıyafeti (kişi) girişi → Toplam Kıyafet Bedeli
+4. Personel Servisi (ulaşım) girişi
+5. Toplam Net Maaş
+6. SGK İşveren Payı
+7. **Toplam Personel Maliyeti**
 
 ### Sabit Giderler
-
-- **Kira**: `aylikKira` prop'undan salt okunur gösterilir — `(Modül 1'den)` etiketi ile
-- **Mali Müşavir**: eski `muhasebe` alanının yeni adı
-- Gıda Maliyeti: `SliderInput` DEĞİL `InputField` (% değeri doğrudan girilir)
-- Sarf Malzeme: `SliderInput` DEĞİL `InputField`
-
-### Ödeme Dağılımı
-
-- 4 kanal: Nakit, Kredi Kartı, Yemek Kartı, Online — hepsi **`SliderInput`**
-- Komisyon oranları label'da gösterilir: KK %2, Yemek kartı %10, Online %20
+- Kira: `aylikKira` prop'undan salt okunur — `(Modül 1'den)` etiketi ile
+- Yeni alanlar: İnternet & Telefon, Aidat/Ortak Alan, Bakım/Onarım/İlaçlama
 
 ---
 
-## 🛡️ Geriye Dönük Uyumluluk
+## 🛡️ Geriye Dönük Uyumluluk (localStorage Migration)
 
-Eski `localStorage` verisi yeni alanları içermeyebilir. Savunma katmanları:
+`page.tsx` → `lsYukle()` içinde:
 
-1. `VARSAYILAN_SEZON` sabiti — tüm alanlar `0`
-2. `g.sezon1 ?? VARSAYILAN_SEZON` — engine'de null koruması
-3. `girdi.sezon1 ?? VARSAYILAN_SEZON` — UI'da null koruması
-4. `s.aylar ?? []` — undefined array koruması
-5. `n(v || 0)` — capexEngine'de NaN koruması
-6. `yemekBedeli` yoksa `0` — page.tsx migration
-7. `muhasebe` → `maliMusavir` — page.tsx migration (`opexAny.muhasebe ?? 3000`)
-8. `hammaddeKdvOrani` → `hammaddeKdv1Pay` — page.tsx migration (eski `0.01` → `1`, eski `0.10` → `0`)
+1. Personel `unvan` yoksa → varsayılan liste
+2. "Kısım Şefi (Demirbaş Aşçı)" → "Kısım Şefi"
+3. `yemekBedeli` yoksa → 0
+4. `muhasebe` → `maliMusavir`
+5. `hammaddeKdvOrani` → `hammaddeKdv1Pay`
+6. Yeni capex alanları (`itfaiyeBelgesi`, `muzikTelifLisans`, `tabelaReklamVergisi`, `bacaBelgesi`, `pergoleSemiye`, `acikAlanIsitici`) yoksa → 0
+7. Yeni opex alanları (`personelKiyafet`, `personelServisi`, `internetTelefon`, `aidatOrtakAlan`, `bakimOnarimIlaclama`) yoksa → 0
+
+---
+
+## 🧩 InputField Davranışı (`src/components/ui/InputField.tsx`)
+
+- `type="text"`, `inputMode="decimal"`
+- Odakta: 0 ise boş, değer varsa ham sayı (virgüllü ondalık)
+- Blur'da: TR locale binlik noktalı format (`1.000`, `10.000`)
+- `value` prop `undefined` veya `NaN` gelirse 0 olarak işlenir (crash önlenir)
+- `NumInput`: Modul3Opex içindeki inline sayı girişleri için aynı davranışı sağlayan yerel bileşen
 
 ---
 
 ## 📋 Kritik Geliştirme Notları (Her Oturumda Okunacak)
 
-1. **SezonVerisi alanları değişti:** Eski `sabahKisi/ogleKisi/aksamKisi` yok. Yeni kod `haftaIciOgleKisi` vb. kullanır. Yeni alan ekleneceğinde `SezonVerisi`, `VARSAYILAN_SEZON`, `FORM_VARSAYILAN` ve `ciroEngine` birlikte güncellenir.
+1. **Kira tek kaynaktan gelir:** `opex.kira` YOKTUR. Her yerde `form.capex.aylikKira` kullanılır.
 
-2. **Paket servis sezon bazlı:** Global `paketSiparisSayisi/paketSiparisOrtalaması` kaldırıldı. Her sezonda `paketAdet` ve `paketTutar` var.
+2. **Personel işveren maliyeti:** `(netMaas / 0.85) × 1.225 × adet`. Eski `× 1.575` kullanılmaz.
 
-3. **Ciro formülü:** `aylikOgunCiro = haftaIciGunluk × 22 + haftaSonuGunluk × 8`. `aylikCalismaGunu` günlük→aylık çevrimde artık kullanılmıyor; alanı kaldırmak gerekirse `CiroGirdisi` + `FORM_VARSAYILAN` + `Modul2Ciro` güncellenir.
+3. **`muhasebe` kaldırıldı:** Yeni adı `maliMusavir`.
 
-4. **ROI İki Türlü Gösterilmeli:** "Muhasebe ROI" ve "Nakit ROI" mutlaka ayrı gösterilmeli. Tek sayı yanıltıcıdır.
+4. **`hammaddeKdvOrani` kaldırıldı:** Yerine `hammaddeKdv1Pay` (0–1).
 
-5. **Net Ciro Zorunlu:** Karlılık hesapları `hesaplaNetAylikCiro()` üzerinden yapılmalı — `brutCiro` platform/POS komisyonlarını atlar.
+5. **Excel kaldırıldı:** `IndirButonlari`'nda sadece PDF butonu var.
 
-6. **Stopaj Sadeliği:** Kullanıcıya "nakit çıkışınız değişmez, ama beyan yükümlülüğünüz var" cümlesiyle özetle.
+6. **PDF font:** NotoSans fetch → for loop ile base64 → addFileToVFS → setFont. Uint8Array spread kullanılmaz.
 
-7. **Tadilat Tamponu:** Kullanıcının girdiği tadilat bütçesine daima %20 eklenir, ayrı satır olarak gösterilir.
+7. **Görüş formu login guard:** `IndirButonlari`'nda `userEmail` state'i Supabase session'dan alınır; `undefined` ise uyarı modalı gösterilir, form gösterilmez.
 
-8. **TypeScript kontrolü:** Her değişiklik sonrası `npx tsc --noEmit` çalıştırılmalı. Çıktı `EXIT: 0` olmalı.
+8. **Resend handler içinde:** `new Resend(process.env.RESEND_API_KEY)` modül seviyesinde değil, POST handler içinde oluşturulmalı.
 
-9. **Kira tek kaynaktan gelir:** `opex.kira` YOKTUR. Kira her yerde `form.capex.aylikKira`'dan okunur. `opexHesapla` ve `plHesapla` fonksiyonlarına 4. parametre olarak geçirilir; `Modul3Opex` ve `Modul4PL` bileşenlerine prop olarak verilir.
+9. **Yeni alan eklenince migration:** `page.tsx` → `lsYukle()` içine yeni alan için `typeof x !== 'number'` kontrolü eklenir.
 
-10. **Personel işveren maliyeti formülü:** `(netMaas / 0.85) × 1.225 × adet`. Eski `× 1.575` formülü kullanılmaz.
+10. **TypeScript kontrolü:** Her değişiklik sonrası `npx tsc --noEmit` çalıştırılmalı.
 
-11. **`muhasebe` alanı kaldırıldı:** Yeni adı `maliMusavir`. Eski `muhasebe` adını kullanan herhangi bir kod TypeScript hatası verir.
+11. **SezonVerisi:** Eski `sabahKisi/ogleKisi/aksamKisi` yok. Yeni kod `haftaIciOgleKisi` vb. kullanır.
 
-12. **`hammaddeKdvOrani` kaldırıldı:** Yerine `hammaddeKdv1Pay` (0–1, %1 KDV'li alımların payı) kullanılır. plEngine efektif oran = `hammaddeKdv1Pay × 0.01 + (1 - hammaddeKdv1Pay) × 0.10` olarak hesaplar. Modul4PL'de iki senkron SliderInput ile gösterilir.
+12. **`aylikCalismaGunu`:** opexEngine'e 5. parametre olarak geçirilir. Yemek bedeli günlük × kişi × gün.
 
-13. **KDV dağılımı iki slider:** `kdvDusukPay` (%10'luk ciro payı, 0–1) tek kaynak olmaya devam eder. %20 slider değeri `(1 - kdvDusukPay) × 100` olarak türetilir; onChange'de `kdvDusukPay = (100 - v) / 100` set edilir.
-
-14. **`aylikCalismaGunu` opexEngine'e geçirilir:** `Modul3Opex` bileşeni bu değeri `prop` olarak alır; `opexHesapla` 5. parametre olarak kullanır. Yemek bedeli günlüktür — aylık toplam `günlük × kişi × aylikCalismaGunu`.
+13. **KDV sliderları:** `kdvDusukPay` tek kaynak; %20 slider = `(1 - kdvDusukPay) × 100`, onChange = `kdvDusukPay = (100 - v) / 100`.
 
 ---
 
 ## 📌 Sabit Değerler
 
 ```typescript
-// ⚠️ Türkiye mevzuatı değişkendir. Asgari ücret Ocak ve Temmuz'da,
-// vergi dilimleri her yıl Ocak'ta güncellenir.
-
 export const VERGI_ORANLARI = {
   kdv_gida_temel: 0.01,
   kdv_gida_islenmis: 0.10,
@@ -421,30 +322,38 @@ export const SEKTOREL_BENCHMARKLAR = {
   roi_nakit_iyi: 24,
   roi_nakit_kabul: 36,
   roi_nakit_riskli: 48,
-  tadilat_tampon: 1.20,    // %20 üst bütçe payı
+  tadilat_tampon: 1.20,
 };
 ```
 
 ---
 
-## 🗃️ Supabase Schema (opsiyonel)
+## 🗃️ Supabase Schema
 
 ```sql
-CREATE TABLE fizibilite_raporlari (
-  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id          UUID REFERENCES auth.users(id),
-  restoran_adi     TEXT,
-  veri             JSONB NOT NULL,
-  toplam_yatirim   NUMERIC,
-  aylik_net_kar    NUMERIC,
-  nakit_roi_ay     NUMERIC,
-  muhasebe_roi_ay  NUMERIC,
-  fizibilite_skoru INTEGER,
-  constants_version TEXT,
-  created_at       TIMESTAMPTZ DEFAULT NOW()
+-- Aktif olarak kullanılan tablo:
+CREATE TABLE hesaplamalar (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id     UUID REFERENCES auth.users(id),
+  isletme_adi TEXT,
+  girdi       JSONB NOT NULL,
+  sonuc       JSONB,
+  updated_at  TIMESTAMPTZ DEFAULT NOW(),
+  created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE fizibilite_raporlari ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "kullanici_kendi_raporu" ON fizibilite_raporlari
+ALTER TABLE hesaplamalar ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "kullanici_kendi_verisi" ON hesaplamalar
   FOR ALL USING (auth.uid() = user_id);
+```
+
+---
+
+## 🔧 Vercel Ortam Değişkenleri
+
+```
+NEXT_PUBLIC_SUPABASE_URL      = https://tsoztrgjqakwnldxsdfr.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY = (Supabase dashboard'dan)
+RESEND_API_KEY                = re_xxxx (Görüş formu admin maili için)
+ADMIN_EMAIL                   = hakansenipek@gmail.com (varsayılan, opsiyonel)
 ```
