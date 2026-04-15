@@ -248,6 +248,9 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* İlk Stok */}
           <Card title="İlk Stok">
+            <p className="text-xs text-gray-500 mb-3">
+              Restoranınızın kapılarını açtığınız gün, menünüzdeki ürünleri servis edebilmeniz için gereken &ldquo;hazır değer&rdquo; yatırımıdır. Mutfağınızdaki ilk kuru gıda, et, sebze, dondurulmuş ürünler ve içecek stoğunuzu kapsar. Genellikle ilk 1–2 haftalık operasyonu kesintisiz sürdürebilecek miktarda planlanması önerilir.
+            </p>
             <InputField
               label="Açılış İlk Hammadde Alımı"
               value={girdi.ilkStok}
