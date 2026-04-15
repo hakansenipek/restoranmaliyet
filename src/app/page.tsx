@@ -73,7 +73,7 @@ function hesapla(form: FormDurumu): HesaplamaSonucu {
     ciro.aylikBrutCiro,
     form.pl.kdvDusukPay,
   );
-  const opex = opexHesapla(form.opex, ciro, netSatis, form.capex.aylikKira);
+  const opex = opexHesapla(form.opex, ciro, netSatis, form.capex.aylikKira, form.ciro.aylikCalismaGunu);
   const pl = plHesapla(form.pl, ciro, opex, netSatis, tahsilEdilenKdv, form.capex.aylikKira, form.capex.kiraSozlesmeTipi);
   const roi = roiHesapla(capex, opex, pl, form.ciro);
   return { capex, ciro, opex, pl, roi };
@@ -267,6 +267,7 @@ export default function Page() {
               girdi={form.opex}
               ciro={sonuc.ciro}
               aylikKira={form.capex.aylikKira}
+              aylikCalismaGunu={form.ciro.aylikCalismaGunu}
               onChange={opex => handleChange({ opex })}
             />
             <Modul4PL

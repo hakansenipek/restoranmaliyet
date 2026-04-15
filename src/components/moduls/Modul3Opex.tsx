@@ -12,10 +12,11 @@ interface Props {
   girdi: OpexGirdisi;
   ciro: CiroSonucu;
   aylikKira: number;
+  aylikCalismaGunu: number;
   onChange: (v: OpexGirdisi) => void;
 }
 
-export default function Modul3Opex({ girdi, ciro, aylikKira, onChange }: Props) {
+export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, onChange }: Props) {
   const [acik, setAcik] = useState(false);
 
   const set = useCallback(
@@ -50,7 +51,7 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, onChange }: Props) 
     0,
   );
   const sgkIsverenToplam = Math.round(toplamIsverenMaliyet - toplamNetMaas);
-  const toplamYemekBedeli = (girdi.yemekBedeli || 0) * toplamPersonelSayisi;
+  const toplamYemekBedeli = (girdi.yemekBedeli || 0) * toplamPersonelSayisi * (aylikCalismaGunu || 30);
   const personelMaliyeti = Math.round(toplamIsverenMaliyet) + toplamYemekBedeli;
 
   const toplamOdemePayi =
@@ -168,12 +169,12 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, onChange }: Props) 
 
               {/* Yemek bedeli */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 shrink-0">Yemek Bedeli (kişi/ay):</span>
+                <span className="text-xs text-gray-500 shrink-0">Yemek Bedeli (kişi/gün):</span>
                 <div className="flex items-center gap-1 ml-auto">
                   <input
                     type="number"
                     min={0}
-                    step={500}
+                    step={10}
                     value={girdi.yemekBedeli || 0}
                     onChange={e => set('yemekBedeli', parseFloat(e.target.value) || 0)}
                     className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
@@ -183,7 +184,12 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, onChange }: Props) 
               </div>
               {toplamYemekBedeli > 0 && (
                 <div className="flex justify-between items-center text-xs text-gray-500">
-                  <span>Toplam Yemek Bedeli</span>
+                  <span>
+                    Toplam Yemek Bedeli
+                    <span className="ml-1 text-gray-400">
+                      ({toplamPersonelSayisi} kişi × {aylikCalismaGunu || 30} gün)
+                    </span>
+                  </span>
                   <span className="font-mono">{toplamYemekBedeli.toLocaleString('tr-TR')} ₺</span>
                 </div>
               )}

@@ -117,7 +117,7 @@ export interface Personel {
 export interface OpexGirdisi {
   gidaMaliyetOrani: number;        // 0.20–0.45 (ciro yüzdesi, kesirli)
   personeller: Personel[];
-  yemekBedeli: number;             // Kişi başı aylık yemek bedeli (₺)
+  yemekBedeli: number;             // Kişi başı günlük yemek bedeli (₺)
   elektrik: number;
   su: number;
   dogalgaz: number;

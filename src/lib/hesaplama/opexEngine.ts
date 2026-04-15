@@ -6,6 +6,7 @@ export function opexHesapla(
   ciro: CiroSonucu,
   netSatis: number,
   aylikKira: number,
+  aylikCalismaGunu: number,
 ): OpexSonucu {
   const gidaMaliyeti = netSatis * g.gidaMaliyetOrani;
 
@@ -20,7 +21,7 @@ export function opexHesapla(
   );
   // SGK işveren payı = brüt × %22.5 (işveren SSK + işsizlik)
   const sgkIsverenToplam = Math.round(toplamIsverenMaliyet - toplamNetMaas);
-  const yemekBedeliToplam = (g.yemekBedeli || 0) * toplamPersonelSayisi;
+  const yemekBedeliToplam = (g.yemekBedeli || 0) * toplamPersonelSayisi * (aylikCalismaGunu || 30);
   const personelToplamMaliyet = Math.round(toplamIsverenMaliyet) + yemekBedeliToplam;
 
   const toplamSabitGider =
