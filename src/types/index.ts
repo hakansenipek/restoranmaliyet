@@ -135,7 +135,7 @@ export interface OpexGirdisi {
 
 export interface PlGirdisi {
   kdvDusukPay: number;             // %10 KDV'li ürünlerin ciro payı (0–1)
-  hammaddeKdvOrani: number;        // 0.01 veya 0.10
+  hammaddeKdv1Pay: number;         // Hammadde alımlarının %1 KDV'li payı (0–1); kalan %10 KDV'li
   kiraStopajOrani: number;         // Varsayılan 0.20
   vergiTuru: 'gelir' | 'kurumlar';
 }
@@ -316,7 +316,7 @@ export const FORM_VARSAYILAN: FormDurumu = {
   },
   pl: {
     kdvDusukPay: 0,
-    hammaddeKdvOrani: 0.10,
+    hammaddeKdv1Pay: 0,
     kiraStopajOrani: 0.20,
     vergiTuru: 'gelir',
   },

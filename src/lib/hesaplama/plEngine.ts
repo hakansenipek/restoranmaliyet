@@ -47,7 +47,8 @@ export function plHesapla(
   kiraSozlesmeTipi: 'bireysel' | 'kurumsal' = 'bireysel',
 ): PlSonucu {
   void ciro; // ciro değeri ileride kullanılabilir
-  const odenenKdv = opex.gidaMaliyeti * g.hammaddeKdvOrani;
+  const hammaddeEfektifKdv = g.hammaddeKdv1Pay * 0.01 + (1 - g.hammaddeKdv1Pay) * 0.10;
+  const odenenKdv = opex.gidaMaliyeti * hammaddeEfektifKdv;
   const odenmesiGerekenKdv = tahsilEdilenKdv - odenenKdv;
 
   // Kira stopajı: yalnızca bireysel sözleşmede uygulanır

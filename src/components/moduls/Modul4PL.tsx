@@ -76,26 +76,31 @@ export default function Modul4PL({ girdi, ciro, opex, netKira, kiraSozlesmeTipi,
               suffix="%"
             />
 
-            <div className="mt-2">
-              <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                Hammadde KDV Oranı
-              </label>
-              <div className="flex gap-3 mt-1.5">
-                {([0.01, 0.10] as const).map(oran => (
-                  <button
-                    key={oran}
-                    onClick={() => set('hammaddeKdvOrani', oran)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
-                      girdi.hammaddeKdvOrani === oran
-                        ? 'text-white border-transparent'
-                        : 'bg-white text-gray-600 border-gray-300 hover:border-purple-400'
-                    }`}
-                    style={girdi.hammaddeKdvOrani === oran ? { backgroundColor: '#7B3F8E' } : {}}
-                  >
-                    %{oran * 100}
-                  </button>
-                ))}
-              </div>
+            <div className="mt-4 flex flex-col gap-1">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                Hammadde Satın Alma KDV Oranı
+              </p>
+              <p className="text-xs text-gray-500 mb-3">
+                Satın aldığınız ürünlerin KDV oranını seçin. Temel gıda (et, sebze vb.) alımları genellikle %1, işlenmiş ürün veya içecek alımları %10 KDV&apos;lidir.
+              </p>
+              <SliderInput
+                label="%1 KDV'li Alımların Payı (Temel Gıda)"
+                min={0}
+                max={100}
+                step={5}
+                value={Math.round(girdi.hammaddeKdv1Pay * 100)}
+                onChange={v => set('hammaddeKdv1Pay', v / 100)}
+                suffix="%"
+              />
+              <SliderInput
+                label="%10 KDV'li Alımların Payı (İşlenmiş / İçecek)"
+                min={0}
+                max={100}
+                step={5}
+                value={Math.round((1 - girdi.hammaddeKdv1Pay) * 100)}
+                onChange={v => set('hammaddeKdv1Pay', (100 - v) / 100)}
+                suffix="%"
+              />
             </div>
           </Card>
 

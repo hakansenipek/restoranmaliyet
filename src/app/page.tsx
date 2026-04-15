@@ -60,6 +60,13 @@ function lsYukle(): FormDurumu | null {
     if (f.opex && typeof opexAny.maliMusavir !== 'number') {
       f.opex = { ...f.opex, maliMusavir: opexAny.muhasebe ?? 3000 };
     }
+    // hammaddeKdvOrani → hammaddeKdv1Pay migrasyonu
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const plAny = f.pl as any;
+    if (f.pl && typeof plAny.hammaddeKdv1Pay !== 'number') {
+      // Eski değer 0.01 ise tüm alım %1'liydi, 0.10 ise %1 payı 0
+      f.pl = { ...f.pl, hammaddeKdv1Pay: plAny.hammaddeKdvOrani === 0.01 ? 1 : 0 };
+    }
     return f;
   } catch { return null; }
 }
