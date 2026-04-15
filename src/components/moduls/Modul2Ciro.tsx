@@ -364,6 +364,9 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
 
           {/* Çalışma Takvimi */}
           <Card title="Çalışma Takvimi">
+            <p className="text-xs text-gray-500 mb-3">
+              İşletmenizin aylık çalışma takvimini girin. Haftalık izin günlerini düşerek net çalışma gününüzü belirlemek, gider kalemlerinizin (personel yemeği vb.) gerçekçi hesaplanmasını sağlar.
+            </p>
             <InputField
               label="Aylık Çalışma Günü"
               value={girdi.aylikCalismaGunu}
@@ -371,6 +374,9 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
               suffix="gün"
               step={1}
             />
+            <p className="text-[11px] text-gray-400 mt-2">
+              Eğer haftanın her günü açıksanız 30, haftada 1 gün kapalıysanız ortalama 26 gün olarak tanımlayabilirsiniz.
+            </p>
           </Card>
 
           {/* Özet */}
