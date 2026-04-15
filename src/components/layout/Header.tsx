@@ -131,8 +131,8 @@ export default function Header() {
                   </svg>
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">Giriş Yap / Kayıt Ol</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Planlarınızın kayıtta kalması için giriş yapın.
+                <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                  Planlarınıza kaldığınız yerden devam etmek ve detaylı raporlarınızı kalıcı hale getirmek için sadece size özel tek kullanımlık bir link gönderilir. Şifre gerektirmez, kişisel verilerinizi toplamaz ve asla kötüye kullanılmaz.
                 </p>
               </div>
               <button
