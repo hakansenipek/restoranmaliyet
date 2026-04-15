@@ -94,12 +94,17 @@ export default function Header() {
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => setModalAcik(true)}
-                className="px-3 py-1.5 rounded-md text-xs font-semibold text-white border border-white/40 hover:bg-white/10 transition-colors"
-              >
-                Kayıt Ol / Giriş Yap
-              </button>
+              <div className="flex flex-col items-end gap-1">
+                <button
+                  onClick={() => setModalAcik(true)}
+                  className="px-3 py-1.5 rounded-md text-xs font-semibold text-white border border-white/40 hover:bg-white/10 transition-colors"
+                >
+                  Kayıt Ol / Giriş Yap
+                </button>
+                <p className="hidden sm:block text-right text-purple-300 leading-snug" style={{ fontSize: '10px', maxWidth: '220px' }}>
+                  Planlarınıza kaldığınız yerden devam etmek ve detaylı raporlarınızı kalıcı hale getirmek için şimdi giriş yapın.
+                </p>
+              </div>
             )}
           </div>
         </div>
