@@ -61,6 +61,10 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* İnşaat & Dekorasyon */}
           <Card title="İnşaat & Dekorasyon">
+            <p className="text-xs text-gray-500 mb-3">
+              <span className="font-semibold text-gray-700">Mekânın Fiziksel Kurulumu</span><br />
+              Boş bir dükkânı işleyen bir restorana dönüştürmek için gereken tüm yapısal ve estetik harcamaları kapsar.
+            </p>
             {/* Alan bilgisi */}
             <div className="grid grid-cols-2 gap-4 mb-4">
               <InputField label="Kapalı Alan (m²)" value={girdi.kapaliAlan} onChange={v => set('kapaliAlan', v)} suffix="m²" step={5} />
