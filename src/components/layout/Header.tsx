@@ -127,7 +127,7 @@ export default function Header() {
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">Giriş Yap / Kayıt Ol</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Hesaplamalarınızı kaydetmek için giriş yapın
+                  Planlarınıza kaldığınız yerden devam etmek ve detaylı raporlarınızı kalıcı hale getirmek için şimdi giriş yapın.
                 </p>
               </div>
               <button

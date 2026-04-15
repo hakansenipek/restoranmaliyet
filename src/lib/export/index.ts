@@ -222,6 +222,18 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   const { default: autoTable } = await import('jspdf-autotable');
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  // ── Türkçe font yükle ────────────────────────────────────────────────────
+  const fontRes = await fetch('/fonts/NotoSans-Regular.ttf');
+  const fontBuf = await fontRes.arrayBuffer();
+  const fontBytes = new Uint8Array(fontBuf);
+  let fontBinary = '';
+  for (let i = 0; i < fontBytes.byteLength; i++) fontBinary += String.fromCharCode(fontBytes[i]);
+  const fontB64 = btoa(fontBinary);
+  doc.addFileToVFS('NotoSans-Regular.ttf', fontB64);
+  doc.addFont('NotoSans-Regular.ttf', 'NotoSans', 'normal');
+  doc.setFont('NotoSans', 'normal');
+
   const renk = { koyu: '#5A2D6E', mor: '#7B3F8E', magenta: '#C4215A', yesil: '#16a34a', kirmizi: '#dc2626' };
 
   const pageW = doc.internal.pageSize.getWidth();
@@ -231,19 +243,19 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   doc.setFillColor(90, 45, 110);
   doc.rect(0, 0, pageW, 28, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Restoran Fizibilite Raporu', 14, 12);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Fizibilite Raporu', 14, 19);
-  doc.text(`Tarih: ${tarih()}`, pageW - 14, 19, { align: 'right' });
+  doc.setFontSize(15);
+  doc.setFont('NotoSans', 'normal');
+  doc.text('Restoran Fizibilite Raporu', 14, 11);
+  doc.setFontSize(8);
+  doc.text('Fizibilite Raporu', 14, 18);
+  doc.text(`Tarih: ${tarih()}`, pageW / 2, 18, { align: 'center' });
+  doc.text('restoranmaliyet.com', pageW - 14, 18, { align: 'right' });
   doc.setTextColor(0, 0, 0);
   y = 34;
 
   // ── CAPEX ───────────────────────────────────────────────────────────────
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('NotoSans', 'normal');
   doc.setTextColor(90, 45, 110);
   doc.text('1. Yatırım Maliyeti (CAPEX)', 14, y);
   y += 5;
@@ -263,8 +275,8 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       ['Görülmeyen Giderler (%10)', para(sonuc.capex.gorulenmeyen)],
       ['TOPLAM YATIRIM', para(sonuc.capex.toplamCapex)],
     ],
-    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], fontStyle: 'bold' },
-    bodyStyles: { fontSize: 9 },
+    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], font: 'NotoSans' },
+    bodyStyles: { fontSize: 9, font: 'NotoSans' },
     columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
     foot: [],
     didParseCell: (data) => {
@@ -280,7 +292,7 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
 
   // ── Ciro ────────────────────────────────────────────────────────────────
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('NotoSans', 'normal');
   doc.setTextColor(90, 45, 110);
   doc.text('2. Ciro Projeksiyonu', 14, y);
   y += 5;
@@ -298,8 +310,8 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       ['AYLIK BRÜT CİRO', para(sonuc.ciro.aylikBrutCiro)],
       ['Yıllık Projeksiyon', para(sonuc.ciro.yillikBrutCiro)],
     ],
-    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], fontStyle: 'bold' },
-    bodyStyles: { fontSize: 9 },
+    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], font: 'NotoSans' },
+    bodyStyles: { fontSize: 9, font: 'NotoSans' },
     columnStyles: { 1: { halign: 'right' } },
     didParseCell: (data) => {
       if (data.row.index === 5) {
@@ -316,7 +328,7 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   if (y > 220) { doc.addPage(); y = 14; }
 
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('NotoSans', 'normal');
   doc.setTextColor(90, 45, 110);
   doc.text('3. Operasyonel Giderler (OPEX)', 14, y);
   y += 5;
@@ -333,8 +345,8 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       ['Ödeme Komisyonu', para(sonuc.opex.odemeKomisyonu)],
       ['TOPLAM OPEX', para(sonuc.opex.toplamOpex)],
     ],
-    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], fontStyle: 'bold' },
-    bodyStyles: { fontSize: 9 },
+    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], font: 'NotoSans' },
+    bodyStyles: { fontSize: 9, font: 'NotoSans' },
     columnStyles: { 1: { halign: 'right' } },
     didParseCell: (data) => {
       if (data.row.index === 5) {
@@ -351,9 +363,9 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   if (y > 220) { doc.addPage(); y = 14; }
 
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('NotoSans', 'normal');
   doc.setTextColor(90, 45, 110);
-  doc.text('4. Vergilendirme ve Net Kar (P&L)', 14, y);
+  doc.text('4. Vergilendirme ve Net Kâr (P&L)', 14, y);
   y += 5;
   doc.setTextColor(0, 0, 0);
 
@@ -371,8 +383,8 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       ['NET AYLIK KÂR', para(pl.netAylikKar)],
       ['Net Kâr Marjı', pct(pl.netKarMarji)],
     ],
-    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], fontStyle: 'bold' },
-    bodyStyles: { fontSize: 9 },
+    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], font: 'NotoSans' },
+    bodyStyles: { fontSize: 9, font: 'NotoSans' },
     columnStyles: { 1: { halign: 'right' } },
     didParseCell: (data) => {
       if (data.row.index === 6) {
@@ -390,9 +402,9 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   if (y > 220) { doc.addPage(); y = 14; }
 
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('NotoSans', 'normal');
   doc.setTextColor(90, 45, 110);
-  doc.text('5. ROI & Basabas Noktasi', 14, y);
+  doc.text('5. ROI & Başabaş Noktası', 14, y);
   y += 5;
   doc.setTextColor(0, 0, 0);
 
@@ -407,8 +419,8 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       ['Toplam Yatırım', para(sonuc.capex.toplamCapex)],
       ['Amortisman Süresi', roi.roiAy !== null ? `${Math.ceil(roi.roiAy)} ay` : 'Hesaplanamıyor'],
     ],
-    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], fontStyle: 'bold' },
-    bodyStyles: { fontSize: 9 },
+    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], font: 'NotoSans' },
+    bodyStyles: { fontSize: 9, font: 'NotoSans' },
     columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
     didParseCell: (data) => {
       if (data.row.index === 4) {
@@ -425,9 +437,9 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   if (y > 220) { doc.addPage(); y = 14; }
 
   doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('NotoSans', 'normal');
   doc.setTextColor(90, 45, 110);
-  doc.text('6. Senaryo Karsilastirmasi', 14, y);
+  doc.text('6. Senaryo Karşılaştırması', 14, y);
   y += 5;
   doc.setTextColor(0, 0, 0);
 
@@ -444,9 +456,9 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   }
 
   const senaryolar = [
-    { etiket: 'Dusuk (%70)', brutCiro: sonuc.ciro.dusukCiro },
+    { etiket: 'Düşük (%70)', brutCiro: sonuc.ciro.dusukCiro },
     { etiket: 'Baz (%100)', brutCiro: sonuc.ciro.bazCiro },
-    { etiket: 'Yuksek (%130)', brutCiro: sonuc.ciro.yuksekCiro },
+    { etiket: 'Yüksek (%130)', brutCiro: sonuc.ciro.yuksekCiro },
   ];
 
   autoTable(doc, {
@@ -459,8 +471,8 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
       const roiStr = nk > 0 ? `${Math.ceil(sonuc.capex.toplamCapex / nk)} ay` : '—';
       return [s.etiket, para(s.brutCiro), para(nk), pct(marj), roiStr];
     }),
-    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], fontStyle: 'bold' },
-    bodyStyles: { fontSize: 9 },
+    headStyles: { fillColor: [123, 63, 142], textColor: [255, 255, 255], font: 'NotoSans' },
+    bodyStyles: { fontSize: 9, font: 'NotoSans' },
     columnStyles: {
       1: { halign: 'right' },
       2: { halign: 'right' },
@@ -477,14 +489,14 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
   doc.setDrawColor(251, 191, 36);
   doc.roundedRect(14, y, pageW - 28, 18, 2, 2, 'FD');
   doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('NotoSans', 'normal');
   doc.setTextColor(120, 80, 0);
   doc.text(
-    'Bu rapor yalnizca tahmini hesaplama icerir. Amortismam muhasebesi, tam vergi dilimi, bankacilik giderleri ve sigorta dahil degildir.',
+    'Bu rapor yalnızca tahmini hesaplama içerir. Amortisman muhasebesi, tam vergi dilimi, bankacılık giderleri ve sigorta dahil değildir.',
     18, y + 7,
     { maxWidth: pageW - 36 },
   );
-  doc.text('Kesin finansal karar icin mali musavir destegi aliniz.', 18, y + 13);
+  doc.text('Kesin finansal karar için mali müşavir desteği alınız.', 18, y + 13);
 
   // ── Footer ──────────────────────────────────────────────────────────────
   const pageCount = doc.getNumberOfPages();
@@ -494,8 +506,9 @@ export async function pdfIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     doc.setFillColor(90, 45, 110);
     doc.rect(0, ph - 10, pageW, 10, 'F');
     doc.setFontSize(7);
+    doc.setFont('NotoSans', 'normal');
     doc.setTextColor(200, 180, 220);
-    doc.text('Restoran Maliyet Hesaplama Araci — Yalnizca bilgi amaclidir', 14, ph - 3.5);
+    doc.text('Restoran Maliyet Hesaplama Aracı — Yalnızca bilgi amaçlıdır', 14, ph - 3.5);
     doc.text(`Sayfa ${i} / ${pageCount}`, pageW - 14, ph - 3.5, { align: 'right' });
   }
 
