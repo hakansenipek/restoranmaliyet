@@ -45,6 +45,9 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
         <div className="p-5 flex flex-col gap-5">
           {/* Mimari & Proje */}
           <Card title="Mimari & Proje">
+            <p className="text-xs text-gray-500 mb-3">
+              Restoranın fiziksel olarak kapılarını açabilmesi için gerekli olan yasal izinleri ve profesyonel tasarım süreçlerini kapsar. Bu kalemler genellikle &ldquo;görünmez&rdquo; maliyetlerdir ancak bütçeyi ciddi etkiler.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField label="Devir Ücreti" value={girdi.devirUcreti} onChange={v => set('devirUcreti', v)} />
               <InputField label="Mimari Hizmet Bedeli" value={girdi.mimariHizmetBedeli} onChange={v => set('mimariHizmetBedeli', v)} />
