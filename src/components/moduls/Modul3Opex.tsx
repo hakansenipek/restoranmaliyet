@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import Card from '@/components/ui/Card';
 import InputField from '@/components/ui/InputField';
+import SliderInput from '@/components/ui/SliderInput';
 import SonucSatiri from '@/components/ui/SonucSatiri';
 import UyariKutusu from '@/components/ui/UyariKutusu';
 import type { CiroSonucu, OpexGirdisi, Personel } from '@/types';
@@ -267,42 +268,50 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
 
           {/* Ödeme Komisyonları */}
           <Card title="Ödeme Dağılımı">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField
-                label="Nakit (%)"
+            <p className="text-xs text-gray-500 mb-3">
+              Toplam cironuzun hangi kanallardan tahsil edileceğini belirleyin. Yemek kartları ve online sipariş platformları yüksek komisyon oranları (ortalama %10–%20) içerdiği için net kârınızı doğrudan etkiler. Dağılımın toplamı %100 olmalıdır.
+            </p>
+            <div className="flex flex-col gap-3">
+              <SliderInput
+                label="Nakit"
+                min={0}
+                max={100}
+                step={5}
                 value={girdi.nakitPay}
                 onChange={v => set('nakitPay', v)}
                 suffix="%"
-                step={5}
               />
-              <InputField
-                label="Kredi Kartı (%)"
+              <SliderInput
+                label="Kredi Kartı — %2 komisyon"
+                min={0}
+                max={100}
+                step={5}
                 value={girdi.kkPay}
                 onChange={v => set('kkPay', v)}
                 suffix="%"
-                step={5}
               />
-              <InputField
-                label="Yemek Kartı (%)"
+              <SliderInput
+                label="Yemek Kartı — %10 komisyon"
+                min={0}
+                max={100}
+                step={5}
                 value={girdi.yemekKartiPay}
                 onChange={v => set('yemekKartiPay', v)}
                 suffix="%"
-                step={5}
               />
-              <InputField
-                label="Online (%)"
+              <SliderInput
+                label="Online Platform — %20 komisyon"
+                min={0}
+                max={100}
+                step={5}
                 value={girdi.onlinePay}
                 onChange={v => set('onlinePay', v)}
                 suffix="%"
-                step={5}
               />
             </div>
-            <div className={`text-xs text-right font-mono mt-1 ${toplamPayHatali ? 'text-red-500' : 'text-green-600'}`}>
+            <div className={`text-xs text-right font-mono mt-2 ${toplamPayHatali ? 'text-red-500' : 'text-green-600'}`}>
               Toplam: %{toplamOdemePayi} {toplamPayHatali ? '(100 olmalı!)' : '✓'}
             </div>
-            <p className="text-[11px] text-gray-400">
-              KK: %2 kom. · Yemek kartı: %10 kom. · Online: %20 kom. · Nakit: komisyonsuz
-            </p>
           </Card>
         </div>
       )}
