@@ -335,7 +335,7 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
               Servis Öğünleri — Sezonlara Göre
             </p>
             <p className="text-xs text-gray-500 mb-3">
-              Yılın her ayı aynı yoğunlukta geçmez. Takvimden ayları seçerek (Yaz/Kış veya Bayram/Sezon gibi) 3 farklı dönem tanımlayın. Restoranınızın cirosunu tahmin ederken, misafirlerinizi hangi öğünlerde ve hangi yoğunlukta ağırlayacağınızı belirleyin.
+              Restoranınızın doluluk oranları mevsimsel faktörlere göre değişkenlik gösterir. 12 ayı kendi içinde 3 ana sezona ayırarak; hafta içi ve hafta sonu misafir alışkanlıklarını her dönem için ayrı ayrı simüle edin. İşletmenizin cirosunu tahmin ederken, misafirlerinizi hangi öğünlerde ve hangi yoğunlukta ağırlayacağınızı belirleyin.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <SezonKarti
