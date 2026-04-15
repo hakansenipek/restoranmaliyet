@@ -331,8 +331,11 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
 
           {/* Sezonlar */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
               Servis Öğünleri — Sezonlara Göre
+            </p>
+            <p className="text-xs text-gray-500 mb-3">
+              Yılın her ayı aynı yoğunlukta geçmez. Takvimden ayları seçerek (Yaz/Kış veya Bayram/Sezon gibi) 3 farklı dönem tanımlayın. Restoranınızın cirosunu tahmin ederken, misafirlerinizi hangi öğünlerde ve hangi yoğunlukta ağırlayacağınızı belirleyin.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <SezonKarti
