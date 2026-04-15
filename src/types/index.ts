@@ -122,6 +122,8 @@ export interface OpexGirdisi {
   gidaMaliyetOrani: number;        // 0.20–0.45 (ciro yüzdesi, kesirli)
   personeller: Personel[];
   yemekBedeli: number;             // Kişi başı günlük yemek bedeli (₺)
+  personelKiyafet: number;         // Kişi başı aylık kıyafet bedeli (₺)
+  personelServisi: number;         // Aylık toplam personel servisi / ulaşım bedeli (₺)
   elektrik: number;
   su: number;
   dogalgaz: number;
@@ -184,6 +186,8 @@ export interface OpexSonucu {
   gidaMaliyeti: number;
   personelToplamMaliyet: number;
   yemekBedeliToplam: number;
+  personelKiyafetToplam: number;
+  personelServisiToplam: number;
   sgkIsverenToplam: number;
   toplamPersonelSayisi: number;
   toplamSabitGider: number;
@@ -310,6 +314,8 @@ export const FORM_VARSAYILAN: FormDurumu = {
       { unvan: 'Temizlik / Güvenlik',          adet: 0, netMaas: 0 },
     ],
     yemekBedeli: 0,
+    personelKiyafet: 0,
+    personelServisi: 0,
     elektrik: 0,
     su: 0,
     dogalgaz: 0,

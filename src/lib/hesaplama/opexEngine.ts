@@ -22,7 +22,10 @@ export function opexHesapla(
   // SGK işveren payı = brüt × %22.5 (işveren SSK + işsizlik)
   const sgkIsverenToplam = Math.round(toplamIsverenMaliyet - toplamNetMaas);
   const yemekBedeliToplam = (g.yemekBedeli || 0) * toplamPersonelSayisi * (aylikCalismaGunu || 30);
-  const personelToplamMaliyet = Math.round(toplamIsverenMaliyet) + yemekBedeliToplam;
+  const personelKiyafetToplam = (g.personelKiyafet || 0) * toplamPersonelSayisi;
+  const personelServisiToplam = g.personelServisi || 0;
+  const personelToplamMaliyet =
+    Math.round(toplamIsverenMaliyet) + yemekBedeliToplam + personelKiyafetToplam + personelServisiToplam;
 
   const toplamSabitGider =
     aylikKira + g.elektrik + g.su + g.dogalgaz +
@@ -46,6 +49,8 @@ export function opexHesapla(
     gidaMaliyeti,
     personelToplamMaliyet,
     yemekBedeliToplam,
+    personelKiyafetToplam,
+    personelServisiToplam,
     sgkIsverenToplam,
     toplamPersonelSayisi,
     toplamSabitGider,

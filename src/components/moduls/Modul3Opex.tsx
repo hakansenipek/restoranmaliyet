@@ -52,7 +52,10 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
   );
   const sgkIsverenToplam = Math.round(toplamIsverenMaliyet - toplamNetMaas);
   const toplamYemekBedeli = (girdi.yemekBedeli || 0) * toplamPersonelSayisi * (aylikCalismaGunu || 30);
-  const personelMaliyeti = Math.round(toplamIsverenMaliyet) + toplamYemekBedeli;
+  const personelKiyafetToplam = (girdi.personelKiyafet || 0) * toplamPersonelSayisi;
+  const personelServisiToplam = girdi.personelServisi || 0;
+  const personelMaliyeti =
+    Math.round(toplamIsverenMaliyet) + toplamYemekBedeli + personelKiyafetToplam + personelServisiToplam;
 
   const toplamOdemePayi =
     girdi.nakitPay + girdi.kkPay + girdi.yemekKartiPay + girdi.onlinePay;
@@ -158,19 +161,14 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
 
             {/* Özet */}
             <div className="mt-3 rounded-lg border border-purple-100 bg-purple-50/40 px-4 py-3 flex flex-col gap-2">
-              {/* Toplam personel sayısı */}
+
+              {/* 1. Toplam personel sayısı */}
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600 font-medium">Toplam Personel Sayısı</span>
                 <span className="font-mono font-bold text-gray-800">{toplamPersonelSayisi} kişi</span>
               </div>
 
-              {/* Net maaş toplamı */}
-              <div className="flex justify-between items-center text-xs text-gray-500">
-                <span>Toplam Net Maaş</span>
-                <span className="font-mono">{toplamNetMaas.toLocaleString('tr-TR')} ₺</span>
-              </div>
-
-              {/* Yemek bedeli */}
+              {/* 2. Yemek bedeli girişi */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 shrink-0">Yemek Bedeli (kişi/gün):</span>
                 <div className="flex items-center gap-1 ml-auto">
@@ -185,6 +183,8 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
                   <span className="text-xs text-gray-400">₺</span>
                 </div>
               </div>
+
+              {/* 3. Toplam yemek bedeli */}
               {toplamYemekBedeli > 0 && (
                 <div className="flex justify-between items-center text-xs text-gray-500">
                   <span>
@@ -197,13 +197,62 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
                 </div>
               )}
 
-              {/* SGK */}
+              {/* 4. Personel kıyafeti */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 shrink-0">
+                  Personel Kıyafeti
+                  {toplamPersonelSayisi > 0 && (
+                    <span className="ml-1 text-gray-400">({toplamPersonelSayisi} kişi ×)</span>
+                  )}
+                </span>
+                <div className="flex items-center gap-1 ml-auto">
+                  <input
+                    type="number"
+                    min={0}
+                    step={50}
+                    value={girdi.personelKiyafet || 0}
+                    onChange={e => set('personelKiyafet', parseFloat(e.target.value) || 0)}
+                    className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
+                  />
+                  <span className="text-xs text-gray-400">₺</span>
+                </div>
+              </div>
+              {personelKiyafetToplam > 0 && (
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>Toplam Kıyafet Bedeli</span>
+                  <span className="font-mono">{personelKiyafetToplam.toLocaleString('tr-TR')} ₺</span>
+                </div>
+              )}
+
+              {/* 5. Personel servisi */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 shrink-0">Personel Servisi (Ulaşım):</span>
+                <div className="flex items-center gap-1 ml-auto">
+                  <input
+                    type="number"
+                    min={0}
+                    step={500}
+                    value={girdi.personelServisi || 0}
+                    onChange={e => set('personelServisi', parseFloat(e.target.value) || 0)}
+                    className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
+                  />
+                  <span className="text-xs text-gray-400">₺</span>
+                </div>
+              </div>
+
+              {/* 6. Toplam net maaş */}
+              <div className="flex justify-between items-center text-xs text-gray-500">
+                <span>Toplam Net Maaş</span>
+                <span className="font-mono">{toplamNetMaas.toLocaleString('tr-TR')} ₺</span>
+              </div>
+
+              {/* 7. SGK */}
               <div className="flex justify-between items-center text-xs text-gray-500">
                 <span>SGK İşveren Payı (brüt × %22.5)</span>
                 <span className="font-mono">{sgkIsverenToplam.toLocaleString('tr-TR')} ₺</span>
               </div>
 
-              {/* Toplam */}
+              {/* 8. Toplam */}
               <div className="border-t border-purple-200 pt-2">
                 <SonucSatiri label="Toplam Personel Maliyeti" value={personelMaliyeti} bold />
               </div>
