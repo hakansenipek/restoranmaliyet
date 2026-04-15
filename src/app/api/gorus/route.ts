@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'hakansenipek@gmail.com';
 
 export async function POST(req: NextRequest) {
   try {
     const { mesaj, email } = await req.json() as { mesaj: string; email?: string };
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     if (!mesaj || mesaj.trim().length < 5) {
       return NextResponse.json({ error: 'Mesaj çok kısa.' }, { status: 400 });
