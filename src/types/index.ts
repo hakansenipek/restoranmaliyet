@@ -129,6 +129,9 @@ export interface OpexGirdisi {
   dogalgaz: number;
   maliMusavir: number;
   yazilimPos: number;
+  internetTelefon: number;
+  aidatOrtakAlan: number;
+  bakimOnarimIlaclama: number;
   digerSabit: number;
   sarfMalzemeOrani: number;        // Ciro %'si (kesirli, örn 0.03)
   nakitPay: number;                // % (0–100)
@@ -321,6 +324,9 @@ export const FORM_VARSAYILAN: FormDurumu = {
     dogalgaz: 0,
     maliMusavir: 0,
     yazilimPos: 0,
+    internetTelefon: 0,
+    aidatOrtakAlan: 0,
+    bakimOnarimIlaclama: 0,
     digerSabit: 0,
     sarfMalzemeOrani: 0,
     nakitPay: 0,

@@ -29,7 +29,9 @@ export function opexHesapla(
 
   const toplamSabitGider =
     aylikKira + g.elektrik + g.su + g.dogalgaz +
-    g.maliMusavir + g.yazilimPos + g.digerSabit;
+    g.maliMusavir + g.yazilimPos +
+    (g.internetTelefon || 0) + (g.aidatOrtakAlan || 0) + (g.bakimOnarimIlaclama || 0) +
+    g.digerSabit;
 
   const sarfMalzeme = ciro.aylikBrutCiro * g.sarfMalzemeOrani;
 

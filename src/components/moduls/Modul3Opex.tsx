@@ -287,6 +287,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
 
           {/* Sabit Giderler */}
           <Card title="Sabit Giderler">
+            <p className="text-xs text-gray-500 mb-3">
+              İşletmenizin sürdürülebilirliği için gereken, satış hacminden bağımsız aylık kemikleşmiş maliyetlerinizi buradan yönetin.
+            </p>
             {/* Kira: Modül 1'den otomatik */}
             <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2">
               <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Kira (Net)</span>
@@ -301,11 +304,14 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
               <InputField label="Doğalgaz / LPG" value={girdi.dogalgaz} onChange={v => set('dogalgaz', v)} />
               <InputField label="Mali Müşavir" value={girdi.maliMusavir} onChange={v => set('maliMusavir', v)} />
               <InputField label="Yazılım & POS" value={girdi.yazilimPos} onChange={v => set('yazilimPos', v)} />
+              <InputField label="İnternet & Telefon" value={girdi.internetTelefon || 0} onChange={v => set('internetTelefon', v)} />
+              <InputField label="Aidat / Ortak Alan Gideri" value={girdi.aidatOrtakAlan || 0} onChange={v => set('aidatOrtakAlan', v)} />
+              <InputField label="Bakım / Onarım / İlaçlama" value={girdi.bakimOnarimIlaclama || 0} onChange={v => set('bakimOnarimIlaclama', v)} />
               <InputField label="Diğer Sabit" value={girdi.digerSabit} onChange={v => set('digerSabit', v)} />
             </div>
             <SonucSatiri
               label="Toplam Sabit Gider"
-              value={aylikKira + girdi.elektrik + girdi.su + girdi.dogalgaz + girdi.maliMusavir + girdi.yazilimPos + girdi.digerSabit}
+              value={aylikKira + girdi.elektrik + girdi.su + girdi.dogalgaz + girdi.maliMusavir + girdi.yazilimPos + (girdi.internetTelefon || 0) + (girdi.aidatOrtakAlan || 0) + (girdi.bakimOnarimIlaclama || 0) + girdi.digerSabit}
               bold
             />
           </Card>
