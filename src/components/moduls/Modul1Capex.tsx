@@ -234,6 +234,9 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* Açılış Pazarlaması */}
           <Card title="Açılış Pazarlaması">
+            <p className="text-xs text-gray-500 mb-3">
+              İşletmenizin açılış sürecinde çevrenize ve hedef kitlenize duyurulması için ayrılan stratejik bütçedir.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField label="Sosyal Medya Reklamları" value={girdi.sosyalMedyaReklam} onChange={v => set('sosyalMedyaReklam', v)} />
               <InputField label="İnfluencer Bedeli" value={girdi.influencerBedeli} onChange={v => set('influencerBedeli', v)} />
