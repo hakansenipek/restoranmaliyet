@@ -54,6 +54,9 @@ export default function Modul4PL({ girdi, ciro, opex, netKira, kiraSozlesmeTipi,
         <div className="p-5 flex flex-col gap-5">
           {/* KDV Ayarları */}
           <Card title="KDV Dağılımı">
+            <p className="text-xs text-gray-500 mb-3">
+              Restoranlarda yiyecek ve alkolsüz içecek satışı %10 KDV&apos;ye, alkollü içecek satışı ise %20 KDV&apos;ye tabidir. Satışlarınızın içindeki alkol oranına göre slider&apos;ı ayarlayın.
+            </p>
             <SliderInput
               label="%10 KDV'li Ürünlerin Ciro Payı"
               min={0}
@@ -63,9 +66,15 @@ export default function Modul4PL({ girdi, ciro, opex, netKira, kiraSozlesmeTipi,
               onChange={v => set('kdvDusukPay', v / 100)}
               suffix="%"
             />
-            <p className="text-xs text-gray-400">
-              %20 KDV'li ürün payı: %{Math.round((1 - girdi.kdvDusukPay) * 100)}
-            </p>
+            <SliderInput
+              label="%20 KDV'li Ürünlerin Ciro Payı (Alkol)"
+              min={0}
+              max={100}
+              step={5}
+              value={Math.round((1 - girdi.kdvDusukPay) * 100)}
+              onChange={v => set('kdvDusukPay', (100 - v) / 100)}
+              suffix="%"
+            />
 
             <div className="mt-2">
               <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
