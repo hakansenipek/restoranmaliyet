@@ -305,6 +305,9 @@ export default function Modul2Ciro({ girdi, onChange }: Props) {
         <div className="p-5 flex flex-col gap-5">
           {/* Mekan */}
           <Card title="Mekan">
+            <p className="text-xs text-gray-500 mb-3">
+              Sandalye sayısı, o öğünde ağırlayabileceğiniz maksimum kişiyi temsil eder. Tahminlerinizi yaparken sandalye sayınızı ve &ldquo;masa devir hızınızı&rdquo; (turnover) göz önünde bulundurun.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField
                 label="Kapalı Alan Sandalye Sayısı"
