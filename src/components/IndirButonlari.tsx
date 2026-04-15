@@ -77,7 +77,39 @@ export default function IndirButonlari({ form, sonuc }: Props) {
         </button>
       </div>
 
-      {modalAcik && (
+      {/* Giriş yapılmamışsa uyarı modalı */}
+      {modalAcik && !userEmail && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          onClick={e => { if (e.target === e.currentTarget) modalKapat(); }}
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white shadow-lg p-8 text-center">
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ backgroundColor: '#EFE6F4' }}
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="#7B3F8E" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-bold text-gray-800 mb-2">Giriş Gerekli</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Görüş ve taleplerinizi iletmek için lütfen önce giriş yapın.
+            </p>
+            <button
+              onClick={modalKapat}
+              className="w-full rounded-xl py-2.5 text-sm font-semibold text-white"
+              style={{ backgroundColor: '#5A2D6E' }}
+            >
+              Tamam
+            </button>
+          </div>
+        </div>
+      )}
+
+      {modalAcik && userEmail && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
