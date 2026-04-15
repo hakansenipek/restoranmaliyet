@@ -76,6 +76,33 @@ function lsYukle(): FormDurumu | null {
       // Eski değer 0.01 ise tüm alım %1'liydi, 0.10 ise %1 payı 0
       f.pl = { ...f.pl, hammaddeKdv1Pay: plAny.hammaddeKdvOrani === 0.01 ? 1 : 0 };
     }
+    // Yeni capex alanları: eski veriler için 0 ile başlat
+    if (f.capex) {
+      const c = f.capex as unknown as Record<string, unknown>;
+      const capexYeniAlanlar: (keyof typeof f.capex)[] = [
+        'itfaiyeBelgesi', 'muzikTelifLisans', 'tabelaReklamVergisi', 'bacaBelgesi',
+        'pergoleSemiye', 'acikAlanIsitici',
+      ];
+      let capexGuncellendi = false;
+      const capexPatch: Partial<typeof f.capex> = {};
+      for (const alan of capexYeniAlanlar) {
+        if (typeof c[alan] !== 'number') { (capexPatch as Record<string, number>)[alan] = 0; capexGuncellendi = true; }
+      }
+      if (capexGuncellendi) f.capex = { ...f.capex, ...capexPatch };
+    }
+    // Yeni opex alanları: eski veriler için 0 ile başlat
+    if (f.opex) {
+      const o = f.opex as unknown as Record<string, unknown>;
+      const opexYeniAlanlar: (keyof typeof f.opex)[] = [
+        'personelKiyafet', 'personelServisi', 'internetTelefon', 'aidatOrtakAlan', 'bakimOnarimIlaclama',
+      ];
+      let opexGuncellendi = false;
+      const opexPatch: Partial<typeof f.opex> = {};
+      for (const alan of opexYeniAlanlar) {
+        if (typeof o[alan] !== 'number') { (opexPatch as Record<string, number>)[alan] = 0; opexGuncellendi = true; }
+      }
+      if (opexGuncellendi) f.opex = { ...f.opex, ...opexPatch };
+    }
     return f;
   } catch { return null; }
 }

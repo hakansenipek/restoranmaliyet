@@ -11,8 +11,8 @@ interface Props {
   step?: number;
 }
 
-function format(n: number): string {
-  if (n === 0) return '';
+function format(n: number | undefined | null): string {
+  if (n === undefined || n === null || isNaN(n) || n === 0) return '';
   return n.toLocaleString('tr-TR');
 }
 
@@ -25,7 +25,8 @@ function parse(s: string): number {
 export default function InputField({ label, value, onChange, suffix = '₺', hint, isPercent = false }: Props) {
   const [inputStr, setInputStr] = useState<string | null>(null);
 
-  const numVal = isPercent ? +(value * 100).toFixed(4) : value;
+  const safeValue = (typeof value === 'number' && !isNaN(value)) ? value : 0;
+  const numVal = isPercent ? +(safeValue * 100).toFixed(4) : safeValue;
   const displayValue = inputStr !== null ? inputStr : format(numVal);
 
   return (
@@ -36,7 +37,7 @@ export default function InputField({ label, value, onChange, suffix = '₺', hin
           type="text"
           inputMode="decimal"
           value={displayValue}
-          onFocus={() => setInputStr(numVal === 0 ? '' : String(numVal).replace('.', ','))}
+          onFocus={() => setInputStr(safeValue === 0 ? '' : String(safeValue).replace('.', ','))}
           onBlur={() => setInputStr(null)}
           onChange={e => {
             const str = e.target.value;
