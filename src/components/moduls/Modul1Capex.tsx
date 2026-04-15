@@ -173,6 +173,9 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* Kira & Depozito */}
           <Card title="Kira & Depozito">
+            <p className="text-xs text-gray-500 mb-3">
+              İşletmenizin fiziksel varlığı için gereken başlangıç ödemelerini ve aylık sabit yükümlülüğünüzü belirler.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <InputField
                 label="Aylık Kira (Net)"
