@@ -102,7 +102,7 @@ export default function Header() {
                   Kayıt Ol / Giriş Yap
                 </button>
                 <p className="hidden sm:block text-right text-purple-300 leading-snug" style={{ fontSize: '10px', maxWidth: '220px' }}>
-                  Planlarınıza kaldığınız yerden devam etmek ve detaylı raporlarınızı kalıcı hale getirmek için şimdi giriş yapın.
+                  Planlarınızın kayıtta kalması için giriş yapın.
                 </p>
               </div>
             )}
@@ -132,7 +132,7 @@ export default function Header() {
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">Giriş Yap / Kayıt Ol</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Planlarınıza kaldığınız yerden devam etmek ve detaylı raporlarınızı kalıcı hale getirmek için şimdi giriş yapın.
+                  Planlarınızın kayıtta kalması için giriş yapın.
                 </p>
               </div>
               <button
