@@ -153,12 +153,22 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* Lisans & Ruhsat */}
           <Card title="Lisans & Ruhsat">
+            <p className="text-xs text-gray-500 mb-3">
+              İşletmenizin resmi kurumlarca onaylanması ve günlük satış operasyonunun yürütülmesi için gereken zorunlu giderlerdir.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField label="Yazar Kasa / POS Programı" value={girdi.yazarKasaPos} onChange={v => set('yazarKasaPos', v)} />
               <InputField label="TAPDK / Alkol Belgesi" value={girdi.tapdk} onChange={v => set('tapdk', v)} />
+              <InputField label="İtfaiye Uygunluk Belgesi" value={girdi.itfaiyeBelgesi} onChange={v => set('itfaiyeBelgesi', v)} />
+              <InputField label="Müzik Telif Lisans Bedeli" value={girdi.muzikTelifLisans} onChange={v => set('muzikTelifLisans', v)} />
+              <InputField label="Tabela / Reklam Vergisi" value={girdi.tabelaReklamVergisi} onChange={v => set('tabelaReklamVergisi', v)} />
+              <InputField label="Baca Uygunluk Belgesi" value={girdi.bacaBelgesi} onChange={v => set('bacaBelgesi', v)} />
               <InputField label="Diğer" value={girdi.lisansDiger} onChange={v => set('lisansDiger', v)} />
             </div>
             <SonucSatiri label="Lisans & Ruhsat Toplamı" value={sonuc.lisansRuhsat} bold />
+            <p className="text-[11px] text-gray-400 mt-2">
+              Not: Ruhsat ve lisans bedelleri, yerel belediyenizin ve faaliyet göstereceğiniz bölgenin &ldquo;Turizm Bölgesi&rdquo; olup olmamasına göre değişiklik gösterebilir. En güncel harç miktarları için bağlı olduğunuz belediyeden bilgi almanız önerilir.
+            </p>
           </Card>
 
           {/* Kira & Depozito */}

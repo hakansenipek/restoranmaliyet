@@ -20,7 +20,10 @@ export function capexHesapla(g: CapexGirdisi): CapexSonucu {
     n(g.devirUcreti) + n(g.mimariHizmetBedeli) + n(g.belediyeRuhsatBedeli) +
     n(g.turizmBelgesiBedeli) + n(g.dogalgazProjeBedeli) + n(g.mimariDiger);
 
-  const lisansRuhsat = n(g.yazarKasaPos) + n(g.tapdk) + n(g.lisansDiger);
+  const lisansRuhsat =
+    n(g.yazarKasaPos) + n(g.tapdk) + n(g.itfaiyeBelgesi) +
+    n(g.muzikTelifLisans) + n(g.tabelaReklamVergisi) + n(g.bacaBelgesi) +
+    n(g.lisansDiger);
 
   const acilisPazarlama =
     n(g.sosyalMedyaReklam) + n(g.influencerBedeli) +

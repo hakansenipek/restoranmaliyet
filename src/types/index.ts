@@ -41,6 +41,10 @@ export interface CapexGirdisi {
   // Lisans & Ruhsat
   yazarKasaPos: number;            // Yazar kasa / POS programı
   tapdk: number;                   // TAPDK / alkol belgesi
+  itfaiyeBelgesi: number;          // İtfaiye uygunluk belgesi
+  muzikTelifLisans: number;        // Müzik telif lisans bedeli
+  tabelaReklamVergisi: number;     // Tabela / reklam vergisi
+  bacaBelgesi: number;             // Baca uygunluk belgesi
   lisansDiger: number;
   // Açılış Pazarlaması
   sosyalMedyaReklam: number;
@@ -258,6 +262,10 @@ export const FORM_VARSAYILAN: FormDurumu = {
     mimariDiger: 0,
     yazarKasaPos: 0,
     tapdk: 0,
+    itfaiyeBelgesi: 0,
+    muzikTelifLisans: 0,
+    tabelaReklamVergisi: 0,
+    bacaBelgesi: 0,
     lisansDiger: 0,
     sosyalMedyaReklam: 0,
     influencerBedeli: 0,
