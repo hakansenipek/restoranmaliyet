@@ -125,14 +125,23 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
 
           {/* Mutfak ve Servis Ekipmanları */}
           <Card title="Mutfak ve Servis Ekipmanları">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Mutfak Ekipmanları</p>
+            <p className="text-xs text-gray-500 mb-4">
+              Restoranınızın mutfak kapasitesini ve servis kalitesini belirleyen temel ekipman yatırımlarıdır.
+            </p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Mutfak Ekipmanları</p>
+            <p className="text-xs text-gray-500 mb-2">
+              Hazırlık (paslanmaz tezgahlar), pişirme (ocak, fırın) ve saklama (soğuk hava depoları) gruplarını kapsar. Bu kalemleri seçerken menünüzdeki pişirme tekniklerini ve yoğunluk kapasitenizi dikkate alın.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <InputField label="Paslanmaz Grubu" value={girdi.paslanmazGrup} onChange={v => set('paslanmazGrup', v)} hint="Tezgahlar, davlumbaz vb." />
               <InputField label="Pişirici Grubu" value={girdi.pisiriciGrup} onChange={v => set('pisiriciGrup', v)} hint="Fırın, Ocak, Plate, Fritöz vb." />
               <InputField label="Soğutma Grubu" value={girdi.sogutma} onChange={v => set('sogutma', v)} hint="Buzdolabı, soğuk hava odası vb." />
               <InputField label="Endüstriyel Makineler" value={girdi.endustriyelMakineler} onChange={v => set('endustriyelMakineler', v)} hint="Bulaşık, buz, kahve makinesi vb." />
             </div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Servis Ekipmanları</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Servis Ekipmanları</p>
+            <p className="text-xs text-gray-500 mb-2">
+              Müşteriye sunumda kullanılan tabak, bardak ve çatal-bıçak takımlarıdır. Kırılma ve kayıp payını hesaba katarak, kapasitenizin en az %20 fazlasını (yedekli) bütçelemeniz önerilir.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <InputField label="Çatal / Bıçak / Kaşık" value={girdi.catalKasik} onChange={v => set('catalKasik', v)} />
               <InputField label="Bardaklar" value={girdi.bardak} onChange={v => set('bardak', v)} />
