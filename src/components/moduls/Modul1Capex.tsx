@@ -262,6 +262,9 @@ export default function Modul1Capex({ girdi, onChange }: Props) {
           <div className="rounded-xl border border-purple-200 p-4 flex flex-col gap-1" style={{ backgroundColor: '#EFE6F4' }}>
             <SonucSatiri label="Ara Toplam" value={sonuc.araToplamCapex} />
             <SonucSatiri label="Görülmeyen Giderler (%10)" value={sonuc.gorulenmeyen} />
+            <p className="text-[11px] text-gray-500 mt-1">
+              Restoran kurulum süreçlerinde; malzeme fiyatlarındaki ani artışlar, öngörülemeyen tesisat arızaları veya inşaat sırasında ortaya çıkan teknik zorluklar nedeniyle bütçeler genellikle hedeflenenin üzerine çıkar.
+            </p>
             <div className="border-t border-purple-200 mt-1 pt-1">
               <SonucSatiri label="TOPLAM YATIRIM (CAPEX)" value={sonuc.toplamCapex} bold highlight="purple" />
             </div>
