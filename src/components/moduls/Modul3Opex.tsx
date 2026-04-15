@@ -1,6 +1,24 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+
+// Inline sayı girişi: odakta 0 kaybolur, blur'da binlik noktalı format
+function NumInput({ value, onChange, className }: { value: number; onChange: (v: number) => void; className: string }) {
+  const [str, setStr] = useState<string | null>(null);
+  const fmt = (n: number) => n === 0 ? '' : n.toLocaleString('tr-TR');
+  const parse = (s: string) => parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
+  return (
+    <input
+      type="text"
+      inputMode="decimal"
+      value={str !== null ? str : fmt(value)}
+      onFocus={() => setStr(value === 0 ? '' : String(value).replace('.', ','))}
+      onBlur={() => setStr(null)}
+      onChange={e => { setStr(e.target.value); onChange(parse(e.target.value)); }}
+      className={className}
+    />
+  );
+}
 import Card from '@/components/ui/Card';
 import InputField from '@/components/ui/InputField';
 import SliderInput from '@/components/ui/SliderInput';
@@ -106,12 +124,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
                       {/* Adet */}
                       <div className="flex items-center gap-1 shrink-0">
                         <span className="text-xs text-gray-500 whitespace-nowrap">Adet:</span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1}
+                        <NumInput
                           value={p.adet}
-                          onChange={e => personelGuncelle(i, 'adet', parseFloat(e.target.value) || 0)}
+                          onChange={v => personelGuncelle(i, 'adet', v)}
                           className="w-14 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
                         />
                         <span className="text-xs text-gray-400">kişi</span>
@@ -119,12 +134,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
                       {/* Net Maaş */}
                       <div className="flex items-center gap-1 shrink-0">
                         <span className="text-xs text-gray-500 whitespace-nowrap">Net:</span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1000}
+                        <NumInput
                           value={p.netMaas}
-                          onChange={e => personelGuncelle(i, 'netMaas', parseFloat(e.target.value) || 0)}
+                          onChange={v => personelGuncelle(i, 'netMaas', v)}
                           className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
                         />
                         <span className="text-xs text-gray-400">₺</span>
@@ -172,12 +184,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 shrink-0">Yemek Bedeli (kişi/gün):</span>
                 <div className="flex items-center gap-1 ml-auto">
-                  <input
-                    type="number"
-                    min={0}
-                    step={10}
+                  <NumInput
                     value={girdi.yemekBedeli || 0}
-                    onChange={e => set('yemekBedeli', parseFloat(e.target.value) || 0)}
+                    onChange={v => set('yemekBedeli', v)}
                     className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
                   />
                   <span className="text-xs text-gray-400">₺</span>
@@ -206,12 +215,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
                   )}
                 </span>
                 <div className="flex items-center gap-1 ml-auto">
-                  <input
-                    type="number"
-                    min={0}
-                    step={50}
+                  <NumInput
                     value={girdi.personelKiyafet || 0}
-                    onChange={e => set('personelKiyafet', parseFloat(e.target.value) || 0)}
+                    onChange={v => set('personelKiyafet', v)}
                     className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
                   />
                   <span className="text-xs text-gray-400">₺</span>
@@ -228,12 +234,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 shrink-0">Personel Servisi (Ulaşım):</span>
                 <div className="flex items-center gap-1 ml-auto">
-                  <input
-                    type="number"
-                    min={0}
-                    step={500}
+                  <NumInput
                     value={girdi.personelServisi || 0}
-                    onChange={e => set('personelServisi', parseFloat(e.target.value) || 0)}
+                    onChange={v => set('personelServisi', v)}
                     className="w-28 rounded border border-gray-200 bg-white px-2 py-1 text-right text-sm font-mono text-gray-800 focus:border-[#7B3F8E] focus:outline-none"
                   />
                   <span className="text-xs text-gray-400">₺</span>
