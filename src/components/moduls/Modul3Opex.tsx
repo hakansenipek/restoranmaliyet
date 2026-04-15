@@ -264,6 +264,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
 
           {/* Gıda Maliyeti */}
           <Card title="Gıda Maliyeti">
+            <p className="text-xs text-gray-500 mb-3">
+              Toplam net satış gelirinizin ne kadarının hammadde alımına (mal alış bedeli) gittiğini girin. Buraya gireceğiniz değer, brüt kar marjınızı doğrudan hesaplamak için kullanılacaktır.
+            </p>
             <InputField
               label="Gıda Maliyet Oranı (Net Ciro %'si)"
               value={Math.round(girdi.gidaMaliyetOrani * 100)}
@@ -277,6 +280,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
                 tip="uyari"
               />
             )}
+            <p className="text-[11px] text-gray-400 mt-2">
+              Hızlı servis restoranlarda (Fast Food) bu oran %25–30 bandına çekilebilirken, alakart ve fine-dining restoranlarda hammadde kalitesine bağlı olarak %35–40 seviyelerine çıkabilir.
+            </p>
           </Card>
 
           {/* Sabit Giderler */}
