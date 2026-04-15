@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import Card from '@/components/ui/Card';
 import InputField from '@/components/ui/InputField';
-import SliderInput from '@/components/ui/SliderInput';
 import SonucSatiri from '@/components/ui/SonucSatiri';
 import UyariKutusu from '@/components/ui/UyariKutusu';
 import type { CiroSonucu, OpexGirdisi, Personel } from '@/types';
@@ -251,14 +250,15 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
 
           {/* Sarf Malzeme */}
           <Card title="Sarf Malzeme">
-            <SliderInput
+            <p className="text-xs text-gray-500 mb-3">
+              Temizlik ürünleri, peçete ve paket servis ambalajı gibi yardımcı giderleri kapsar. Sektör ortalaması cironun %2–4&apos;ü arasındadır. Paket servis ağırlıklı işletmelerde bu oran daha yüksek seçilmelidir.
+            </p>
+            <InputField
               label="Sarf Malzeme Oranı (Brüt Ciro %'si)"
-              min={1}
-              max={10}
-              step={1}
               value={Math.round(girdi.sarfMalzemeOrani * 100)}
               onChange={v => set('sarfMalzemeOrani', v / 100)}
               suffix="%"
+              step={1}
             />
             <p className="text-xs text-gray-400">
               Tahmini: {Math.round(ciro.aylikBrutCiro * girdi.sarfMalzemeOrani).toLocaleString('tr-TR')} ₺ / ay
