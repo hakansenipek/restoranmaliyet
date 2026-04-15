@@ -83,6 +83,9 @@ export default function Modul3Opex({ girdi, ciro, aylikKira, aylikCalismaGunu, o
 
           {/* Personel Giderleri — Gıda Maliyeti'nin ÜSTÜNDE */}
           <Card title="Personel Giderleri">
+            <p className="text-xs text-gray-500 mb-3">
+              İşletmenizde görev alacak personellerin pozisyon bazlı sayılarını ve net maaş beklentilerini belirleyin. Netten brüte tüm yasal kesintiler ve işveren maliyetleri, toplam işletme giderlerinize anlık olarak yansıtılır.
+            </p>
             <div className="flex flex-col gap-1">
               {girdi.personeller.map((p, i) => (
                 <div key={i}>
