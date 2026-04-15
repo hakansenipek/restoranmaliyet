@@ -36,7 +36,7 @@ export async function excelIndir(form: FormDurumu, sonuc: HesaplamaSonucu) {
     ['  Doğalgaz Tesisat', form.capex.dogalgazTesisat],
     ['  Cam Bedeli', form.capex.camBedeli],
     ['  Aydınlatma', form.capex.aydinlatma],
-    ['  Ses Sistemi', form.capex.sesSistemi],
+    ['  Ses ve Kamera Sistemi', form.capex.sesSistemi],
     ['  Kapalı Alan Masa', form.capex.kapaliMasaAdet + ' ad × ' + form.capex.kapaliMasaBirimFiyat.toLocaleString('tr-TR') + ' ₺'],
     ['  Açık Alan Masa', form.capex.acikMasaAdet + ' ad × ' + form.capex.acikMasaBirimFiyat.toLocaleString('tr-TR') + ' ₺'],
     ['  Kapalı Alan Sandalye', form.capex.kapaliSandalyeAdet + ' ad × ' + form.capex.kapaliSandalyeBirimFiyat.toLocaleString('tr-TR') + ' ₺'],
