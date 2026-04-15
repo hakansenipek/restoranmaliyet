@@ -50,6 +50,15 @@ function lsYukle(): FormDurumu | null {
     if (!personellerGecerli) {
       f.opex = { ...f.opex, personeller: FORM_VARSAYILAN.opex.personeller };
     }
+    // Personel unvan düzeltmeleri (eski localStorage'daki eski isimler)
+    if (f.opex?.personeller) {
+      f.opex = {
+        ...f.opex,
+        personeller: f.opex.personeller.map(p =>
+          p.unvan === 'Kısım Şefi (Demirbaş Aşçı)' ? { ...p, unvan: 'Kısım Şefi' } : p,
+        ),
+      };
+    }
     // Yeni alan: yemekBedeli yoksa 0 ile başlat
     if (f.opex && typeof f.opex.yemekBedeli !== 'number') {
       f.opex = { ...f.opex, yemekBedeli: 0 };
