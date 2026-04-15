@@ -217,11 +217,6 @@ export default function Page() {
         {/* Hero Section */}
         <div className="border-b border-purple-200 pb-8 mb-8">
 
-          <div className="inline-flex items-center gap-2 bg-purple-50 text-purple-800 text-xs font-medium px-3 py-1.5 rounded-full mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
-            Türkiye 2026 vergi ve asgari ücret verileriyle güncellendi
-          </div>
-
           <h1 className="text-xl font-medium text-gray-900 leading-snug mb-4 max-w-2xl">
             Hayalinizdeki restoran projesini somut verilere dayanan bir iş planına dönüştürün
           </h1>
