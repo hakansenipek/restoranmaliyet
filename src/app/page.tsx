@@ -279,6 +279,11 @@ export default function Page() {
             geri dönüş süresini (ROI) dakikalar içinde, en güncel parametrelerle hesaplayın.
           </p>
 
+          <p className="text-sm text-gray-500 leading-relaxed max-w-xl mb-5">
+            Aşağıdaki modülleri doldurarak projenize ait finansal sonuçları ve analizleri anında
+            görüntüleyebilirsiniz.
+          </p>
+
           <div className="w-8 h-0.5 bg-purple-700 rounded mb-5" />
 
           <div className="grid grid-cols-3 gap-2.5 mb-5 max-w-xl">
